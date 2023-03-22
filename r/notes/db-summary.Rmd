@@ -1,0 +1,617 @@
+---
+title: "PREP Database Summary"
+author: "Jeffrey Walker"
+date: "2023-03-21"
+output: 
+  html_document: 
+    toc: yes
+    number_sections: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+<style>
+blockquote {
+  color: orangered;
+}
+table {
+  width: 0px !important;
+}
+td {
+  white-space: nowrap !important;
+}
+.datatables {
+  overflow-x: auto !important;
+}
+</style>
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(sf)
+library(janitor)
+library(dbcooper)
+library(DT)
+library(htmlwidgets)
+library(mapview)
+
+con <- DBI::dbConnect(
+  RPostgres::Postgres(),
+  dbname = "PREP"
+)
+rs <- DBI::dbSendQuery(con, "SET search_path = odm2, public")
+DBI::dbClearResult(rs)
+
+dbc_init(con, "prep")
+
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
+```
+
+# Summary
+
+The following is a review of the PREP database, which is based on the [ODM2 schema](https://odm2.org).
+
+Based on this review, I identified the following potential issues related to display of this database in the web-based data explorer:
+
+1. **Spatial Extent**: The database include stations across the entire state. A regional boundary is needed to filter the database for stations within or around the estuaries.
+1. **Categorical vs Timeseries Values**: Result values (i.e., measurement values) are stored in two sets of tables: `categoricalresultvalues` and `timeseriesresultvalues`. Although the categorical results includes some categorical variables (e.g. tide stages like "EBB" and "FLOOD"), it also includes censored data values ("<0.005" for PO4). It appears that any time a source dataset had a non-numeric character ("<", ">", "=", "ND") associated with a numeric variable, then the value was saved to `categoricalresultvalues`. Although it's easy to merge `categoricalresultvalues` and `timeseriesresultvalues` via `UNION`, the web application will need to correctly parse the non-numeric values. For example, if the value is "<0.005" then the web application will need to strip off the "<" character in order to show a point at "0.005". Ideally, `categoricalresultvalues` would only store categorical variables like tidal stages, and numeric variables would always be stored in `timeseriesresultvalues` with censoring or non-detects indicated using the `censorcodecv` column, which is not currently used.
+1. **Variable Codes**: For some parameters, the database contains a large number of different codes that may refer to the same property (e.g. "Phosphate Dissolved", "Phosphorus As P Dissolved", and "Phosphorus, Orthophosphate As P Dissolved"). This is especially common for nutrients (N and P), but may occur for other parameters. The controlled vocabulary `variablenamecv` seems to be inconsistent (different cv values for a given code). 
+1. **Variable Units**: The units can vary for a given variable and station. For example, station `samplingfeaturecode=GRBSQ` contains salinity data in both `pss` and `ppt`. The front-end application will thus need to create separate axes for different units of the same variable, or will need to identify units that are functionally equivalent (e.g. "#/100mL" and "mpn/100mL" for bacteria). Ideally, values for each variable would be standardized to a single type of units.
+1. **No Data Values**: The `timeseriesresultvalues` contains large, negative numeric values (e.g., -1,000,000) that do not match the `nodatavalue` field of the corresponding variable. Therefore, the `nodatavalue` needs to be corrected or the front-end will need to check for these instances to prevent skewing the plot axes.
+1. **Quality Code**: The `qualitycodecv` field in `timeseriesresultvalues` indicates that about 8% of the values are "Bad" and 17% are "Pending QA". Should the data explorer show only "Good" data?
+
+# Stations Table
+
+```{r}
+samplingfeatures <- prep_tbl("samplingfeatures") |> 
+  left_join(prep_tbl("sites"), by = "samplingfeatureid") |> 
+  collect()
+sf_samplingfeatures <- samplingfeatures |> 
+  mutate(geometry = st_as_sfc(featuregeometry, crs = 4326)) |> 
+  st_as_sf()
+samplingfeatures <- samplingfeatures |> 
+  st_drop_geometry() |>
+  select(-featuregeometrywkt, -featuregeometry, -spatialreferenceid, -samplingfeaturegeotypecv)
+```
+
+Stations are stored in the `samplingfeatures` table. The `sites` table provides additional fields (`sitetypecv`, `latitude`, `longitude`).
+
+```{r}
+DT::datatable(samplingfeatures)
+```
+
+The following map shows all stations colored by `samplingfeaturetypecv`. The database includes stations across the entire state.
+
+> A regional extent boundary will be needed to spatially filter the stations around the estuaries (unless the data explorer should show all stations across the entire state).
+
+```{r results="asis"}
+map_samplingfeatures <- mapview(
+  sf_samplingfeatures, 
+  zcol = "samplingfeaturetypecv", 
+  legend = TRUE, 
+  label = sf_samplingfeatures$samplingfeaturename
+)
+map_samplingfeatures
+```
+
+The following tables summarize the available fields from the `samplingfeatures` and `sites` tables:
+
+```{r}
+skimr::skim(samplingfeatures)
+```
+
+Station tally for each unique value of `samplingfeaturetypecv`:
+
+```{r results="markdown"}
+tabyl(samplingfeatures, samplingfeaturetypecv) |> 
+  knitr::kable()
+```
+
+The `sitetypecv` field is not useful (most rows are type "Stream"):
+
+```{r results="markdown"}
+tabyl(samplingfeatures, sitetypecv) |> 
+  knitr::kable()
+```
+
+> Aside from the ID, name, description, and coordinates of each station, the only useful field is `samplingfeaturetypecv`, which indicates the type of sampling performed at each station. The database does not contain any information about station ownership (`actionby` is empty) or water body type (see `sitetypecv` below).
+
+# Results Table
+
+```{r}
+results <- prep_tbl("results") |> 
+  collect() |> 
+  mutate(
+    across(bit64::is.integer64, as.integer)
+  )
+```
+
+The `results` table combines the `feature` (station), `action`, `variable` of one or more measurements. ODM2 also allows for different types of results (e.g., profiles, timeseries, measurements, categorical, etc). The PREP database splits all results between `timeseriesresults` for numeric values and `categoricalresults` tables for non-numeric values that are either categories or contain a non-numeric character (e.g. "< 0.005"; see *Categorical Results* below). 
+
+Here are the first 100 rows of `results`:
+
+```{r}
+DT::datatable(head(results, 100))
+```
+
+The following summarizes each column of `results`:
+
+```{r}
+skimr::skim(results)
+```
+
+The `sampledmediumcv` column only contains "Liquid aqueous" (plus 2 "Unknown"), and is therefore not useful.
+
+```{r results="markdown"}
+tabyl(results, sampledmediumcv) |> 
+  knitr::kable()
+```
+
+The `processinglevelid` column references the `processinglevels` table and is primarily "L1 passed QAQC".
+
+```{r}
+results |> 
+  tabyl(processinglevelid) |> 
+  left_join(collect(prep_tbl("processinglevels")), by = "processinglevelid") |>
+  select(processinglevelid, definition, n) |> 
+  knitr::kable()
+```
+
+## Variables
+
+```{r}
+variables <- prep_tbl("variables") |> 
+  semi_join(prep_tbl("results"), by = c("variableid")) |> 
+  collect()
+```
+
+The `variables` table contains over 1,000 rows with columns containing the variable code, definition, type (sample medium), controlled (see `variablenamecv`) name, and no-data value. Note the `speciationcv` is not used.
+
+```{r}
+DT::datatable(arrange(variables, variablecode, variabletypecv))
+```
+
+```{r}
+skimr::skim(variables)
+```
+
+The `variabletypecv` column indicates the sample medium:
+
+```{r results="markdown"} 
+tabyl(variables, variabletypecv) |> 
+  knitr::kable()
+```
+
+The `nodatavalue` is primarily "-9999" (5 rows are "-6999").
+
+```{r results="markdown"} 
+tabyl(variables, nodatavalue) |> 
+  knitr::kable()
+```
+
+The `variablenamecv` column references the `cv_variablename` table, which contains a Controlled Vocabulary (CV) list from [odm2.org](http://vocabulary.odm2.org/variablename/). In theory, this column would standardize the variable names to be consistent with the official variables published by ODM2. However, there are a number of mismatched variables. For example, `variablenamecv="Acidity, total acidity"` is associated with a number of coliform species: 
+
+```{r}
+variables |> 
+  filter(variablenamecv == "Acidity, total acidity") |> 
+  select(-speciationcv, -nodatavalue) |> 
+  knitr::kable()
+```
+
+> The `variablecode` column should be used to identify results for specific variables. The `variablenamecv` contains a number of errors and is not reliable. The `variabletypecv` column can be used to filter results by sample medium (e.g., Air, Habitat, Water quality, etc). Missing result values can be identified using `nodatavalue`.
+
+The 20 most-frequent variables in the `results` table are (note frequencies may differ based on actual measurement values): 
+
+```{r}
+prep_tbl("results") |> 
+  left_join(prep_tbl("variables"), by = c("variableid")) |> 
+  select(resultid, variableid, variabletypecv, variablecode) |> 
+  count(variabletypecv, variablecode) |> 
+  arrange(desc(n)) |> 
+  head(20) |> 
+  collect() |> 
+  rename(n_results = n) |> 
+  knitr::kable()
+```
+
+## Timeseries Results
+
+```{r}
+timeseriesresults <- prep_tbl("timeseriesresults") |> 
+  collect()
+```
+
+```{r}
+DT::datatable(timeseriesresults)
+```
+
+```{r}
+skimr::skim(timeseriesresults)
+```
+
+The `zlocation` presumably provides depth information at about 38% of all results. The `intendedtimespacing` (i.e. frequency) is rarely specified.
+
+Most of the timeseries results have `aggregationstatisticcv` of "Continuous" (0.2% of all rows are "Average")
+
+```{r results="markdown"} 
+tabyl(timeseriesresults, aggregationstatisticcv) |> 
+  knitr::kable()
+```
+
+### Timeseries Result Values
+
+The actual measurement values for each row in `timeseriesresults` are stored in `timeseriesresultvalues`.
+
+
+```{r}
+timeseriesresultvalues <- prep_tbl("timeseriesresultvalues") |> 
+  collect() |> 
+  mutate(
+    across(bit64::is.integer64, as.integer)
+  )
+```
+
+```{r}
+DT::datatable(head(timeseriesresultvalues, 100))
+```
+
+```{r}
+skimr::skim(timeseriesresultvalues)
+```
+
+The `censorcodecv` is not currently used (see *Timeseries and Categorical Values* section below).
+
+```{r}
+timeseriesresultvalues |> 
+  tabyl(censorcodecv)
+```
+
+> The `censorcodecv` field is not being used to indicate censored values
+
+The `qualitycodecv` indicates that `timeseriesresultvalues` contains "Good", "Bad", and "Pending QA" data. 
+
+```{r}
+timeseriesresultvalues |> 
+  tabyl(qualitycodecv)
+```
+
+> Should data explorer only show `qualitycodecv` = "Good" data?
+
+Timeseries values are either instantaneous (1 minute) or averaged every 15 minutes. 
+
+```{r}
+timeseriesresultvalues |> 
+  left_join(timeseriesresults, by = "resultid") |> 
+  count(aggregationstatisticcv, timeaggregationinterval, timeaggregationintervalunitsid) |> 
+  left_join(collect(prep_tbl("units")), by = c("timeaggregationintervalunitsid" = "unitsid")) |> 
+  select(aggregationstatisticcv, timeaggregationinterval, timeaggregationintervalunitsid, unitsname, n) |> 
+  knitr::kable()
+```
+
+Some timeseries result values have `datavalue` = -1000000 but the corresponding `variables.nodatavalue` is -9999.
+
+```{r}
+timeseriesresultvalues |> 
+  filter(datavalue < -1e4) |> 
+  left_join(timeseriesresults, by = "resultid") |> 
+  left_join(results, by = "resultid") |> 
+  left_join(variables, by = "variableid") |> 
+  select(resultid, valueid, valuedatetime, datavalue, variableid, variablecode, nodatavalue) |> 
+  head(10) |> 
+  knitr::kable()
+```
+
+> Some timeseries result values do not match `nodatavalue` of corresponding variable, making automatic detection of `nodata` values challenging.
+
+## Categorical Results
+
+```{r}
+categoricalresults <- prep_tbl("categoricalresults") |> 
+  collect()
+```
+
+The first 100 rows of `categoricalresults`:
+
+```{r}
+DT::datatable(head(categoricalresults, 100))
+```
+
+```{r}
+skimr::skim(categoricalresults)
+```
+
+The `*location` fields are not used.
+
+All rows in `categoricalresults` have `qualitycodecv` of "Good".
+
+```{r results="markdown"} 
+tabyl(categoricalresults, qualitycodecv) |> 
+  knitr::kable()
+```
+
+### Categorical Result Values
+
+The `categoricalresultvalues` table contains any `datavalue` that is non-numeric. This includes variables that are truly categorical (e.g. tidal categories) as well as censored measurements ("<0.50").
+
+```{r}
+categoricalresultvalues <- prep_tbl("categoricalresultvalues") |> 
+  collect() |> 
+  mutate(
+    across(bit64::is.integer64, as.integer)
+  )
+```
+
+First 100 rows of `categoricalresultvalues`
+
+```{r}
+DT::datatable(head(categoricalresultvalues, 100))
+```
+
+```{r}
+skimr::skim(categoricalresultvalues)
+```
+
+This table lists the number of categorical values for each unique `resultid`.
+
+```{r results="markdown"}
+categoricalresultvalues |> 
+  count(resultid) |> 
+  arrange(desc(n)) |> 
+  left_join(results, by = "resultid") |> 
+  left_join(variables, by = "variableid") |> 
+  select(resultid, variableid, variablecode, n_values = n) |> 
+  head(10) |> 
+  knitr::kable()
+```
+
+For example, the data values for `variableid=29` ("Tide Stage") are truly categorical:
+
+```{r results="markdown"}
+categoricalresultvalues |> 
+  left_join(results, by = "resultid") |> 
+  filter(variableid == 29) |> 
+  left_join(variables, by = "variableid") |> 
+  count(datavalue) |> 
+  head(10) |> 
+  knitr::kable()
+```
+
+But the data values for `variableid=1648` ("Phosphorus, Orthophosphate As P Dissolved") include censored values ("<0.0009"), values with "=" ("=0.02"), and non-detects ("ND").
+
+```{r}
+categoricalresultvalues |> 
+  left_join(results, by = "resultid") |> 
+  filter(variableid == 1648) |> 
+  left_join(variables, by = "variableid") |> 
+  count(datavalue) |> 
+  knitr::kable()
+```
+
+> Censored values, non detects and some detects (values containing "=") for numeric variables (e.g. PO4 concentrations) are stored in `categoricalresultvalues` since the value is non-numeric. Ideally, these data values would instead be stored in `timeseriesresultvalues` with appropriate values in the `censorcodecv` field. Although the `categoricalresultvalues` and `timeseriesresultvalues` records can easily be merged with `UNION`, the non-numeric values will need to parsed by the web application (i.e., the `<` will need to be stripped from `<0.005` in order to display the numeric value).
+
+# Result Summaries
+
+```{r}
+value_cat_summary <- prep_tbl("categoricalresultvalues") |> 
+  group_by(resultid) |> 
+  summarise(
+    n_values_cat = n(),
+    start_cat = min(valuedatetime, na.rm = TRUE),
+    end_cat = max(valuedatetime, na.rm = TRUE)
+  )
+value_ts_summary <- prep_tbl("timeseriesresultvalues") |> 
+  group_by(resultid) |> 
+  summarise(
+    n_values_ts = n(),
+    start_ts = min(valuedatetime, na.rm = TRUE),
+    end_ts = max(valuedatetime, na.rm = TRUE)
+  )
+results_summary <- prep_tbl("results") |> 
+  left_join(value_cat_summary, by = "resultid") |> 
+  left_join(value_ts_summary, by = "resultid") |> 
+  left_join(prep_tbl("variables"), by = "variableid") |> 
+  left_join(prep_tbl("units"), by = "unitsid") |> 
+  left_join(prep_tbl("featureactions"), by ="featureactionid") |> 
+  left_join(prep_tbl("samplingfeatures"), by ="samplingfeatureid") |> 
+  left_join(prep_tbl("actions"), by ="actionid") |> 
+  left_join(prep_tbl("methods"), by ="methodid") |> 
+  collect() |> 
+  mutate(
+    across(starts_with("n_values"), \(x) coalesce(x, 0L)),
+    n_values = n_values_cat + n_values_ts,
+    start = as_date(pmin(start_cat, start_ts, na.rm = TRUE)),
+    end = as_date(pmax(end_cat, end_ts, na.rm = TRUE))
+  ) |> 
+  select(
+    resultid, featureactionid,
+    samplingfeatureid, samplingfeaturetypecv, samplingfeaturecode, samplingfeaturename, 
+    variableid, variabletypecv, variablecode, unitsid, unitsabbreviation,
+    methodcode, methodname, methodtypecv,
+    n_values_cat, n_values_ts, n_values, start, end
+  ) |> 
+  arrange(featureactionid, variablecode, unitsid, variabletypecv)
+```
+
+A summary of the results table was created by merging the `results`, `categoricalresultvalues`, `timeseriesresultvalues`, `variables`, `units`, `featureactions`, and `samplingfeatures`. 
+
+The `results` table may contain multiple rows with the same station, parameter, units, etc. but with values covering different time periods.
+
+The `n_values_cat` and `n_values_ts` indicate the number of categorical and timeseries values, respectively (`n_values = n_values_cat + n_values_ts`).
+
+First 100 rows of the results summary (full dataset saved to `results-summary.csv`).
+
+```{r}
+DT::datatable(head(results_summary, 100))
+```
+
+The results summary table shows that some stations contain variables in different units. For example, at `samplingfeaturecode='GRBSQ'`, salinity data are in both `pss` and `ppt`, and `Chlorophyll A (Probe)` in both `ug/l` and `rfu`.
+
+```{r}
+results_summary |> 
+  filter(featureactionid == 286) |> 
+  DT::datatable()
+```
+
+> Out of `r nrow(results_summary)` total rows in `results`, about a third (`r sum(results_summary$n_values == 0)`) have no values. `r sum(results_summary$n_values_cat > 0 & results_summary$n_values_ts > 0)` `results` records have both categorical and timeseries values.
+
+As an example, `resultid=132782` contains 39 phosphorus measurements of which 13 (33%) are censored and stored in the `categoricalresultvalues` and the other 26 (66%) are numeric and stored in `timeseriesresultvalues`.
+
+```{r results="markdown"}
+bind_rows(
+  categorical = categoricalresultvalues |> 
+    filter(resultid == 132782),
+  timeseries = timeseriesresultvalues |> 
+    filter(resultid == 132782) |> 
+    mutate(datavalue = as.character(datavalue)),
+  .id = "result_type"
+) |>
+  left_join(results, by = "resultid") |> 
+  left_join(variables, by = "variableid") |> 
+  select(result_type, valueid, resultid, variablecode, valuedatetime, datavalue) |> 
+  arrange(valuedatetime) |> 
+  DT::datatable()
+```
+
+Summary of result value counts by `variabletypecv` (sample medium):
+
+```{r}
+results_summary |> 
+  group_by(variabletypecv) |> 
+  summarise(
+    n_results = n(),
+    across(starts_with("n_values"), sum)
+  )
+```
+
+> Only one set of `results` has `variabletypecv='Instrumentation'` for variable `variablecode='Battery voltage'`
+
+The `methodcode` and `methodname` columns seem to refer to the collection method, not the lab analysis method:
+
+```{r}
+results_summary |> 
+  group_by(variablecode, methodcode, methodname) |> 
+  summarise(n_results = n(), n_values = sum(n_values), .groups = "drop") |> 
+  DT::datatable()
+```
+
+> Lab analysis methods do not appear to be stored in the database (`methods` table contains some kind of field collection method)
+
+# Station/Parameter Summaries
+
+To summarize the number of values for each station and parameter, the results summary table was aggregated by `samplingfeatureid` (aka station ID), `variableid`, and `unitsid`. This summary table was saved to `station-parameter-summary.csv`.
+
+```{r}
+station_parameter_summary <- results_summary |> 
+  filter(n_values > 0) |> 
+  group_by(
+    samplingfeatureid,
+    variableid, 
+    unitsid
+  ) |> 
+  summarize(
+    across(starts_with("n_values"), sum),
+    start = min(start),
+    end = max(end),
+    .groups = "drop"
+  ) |> 
+  left_join(collect(prep_tbl("variables")), by = "variableid") |> 
+  left_join(collect(prep_tbl("units")), by = "unitsid") |> 
+  left_join(collect(prep_tbl("samplingfeatures")), by ="samplingfeatureid") |> 
+  select(
+    samplingfeatureid, samplingfeaturetypecv, samplingfeaturecode, samplingfeaturename, 
+    variableid, variabletypecv, variablecode, 
+    unitsid, unitsabbreviation,
+    n_values_cat, n_values_ts, n_values, start, end
+  ) |> 
+  arrange(samplingfeatureid, variablecode, unitsid, variabletypecv)
+```
+
+```{r}
+DT::datatable(head(station_parameter_summary, 100))
+```
+
+This table lists the top 10 station/parameter/units combinations with the largest number of values:
+
+```{r}
+station_parameter_summary |> 
+  arrange(desc(n_values)) |> 
+  head(10) |> 
+  select(samplingfeatureid, samplingfeaturecode, variablecode, unitsabbreviation, n_values, start, end) |> 
+  knitr::kable()
+```
+
+This plot shows the largest timeseries (`samplingfeaturecode='GRBGB'`, `variablecode='Dissolved Oxygen'`):
+
+```{r}
+timeseriesresultvalues |> 
+  filter(resultid == 15318) |> 
+  ggplot(aes(valuedatetime, datavalue)) + 
+  geom_line() +
+  labs(title = "GRBGB | Dissolved Oxygen", y = "DO (mg/L)")
+```
+
+Note that this timeseries includes flagged data based on `qualitycodecv`:
+
+```{r}
+timeseriesresultvalues |> 
+  filter(resultid == 15318) |> 
+  tabyl(qualitycodecv) |> 
+  knitr::kable()
+```
+
+Excluding the values with `qualitycodecv='Bad'` suggests there is still abnormal data in late 2004 with `qualitycodecv='Good'`:
+
+```{r}
+timeseriesresultvalues |> 
+  filter(resultid == 15318, qualitycodecv == "Good") |> 
+  ggplot(aes(valuedatetime, datavalue)) + 
+  geom_line() +
+  labs(title = "GRBGB | Dissolved Oxygen (qualitycodecv='Good')", y = "DO (mg/L)")
+```
+
+The station/parameter/units summary table shows that varying units for the same variable and at a single station occurs often. For example, many bacteria measurements are provided in "#/100ml", "mpn/100ml", "cfu/100ml". Some results are also missing the units.
+
+```{r}
+station_parameter_summary |> 
+  distinct(samplingfeatureid, samplingfeaturecode, variablecode, unitsabbreviation) |> 
+  add_count(samplingfeatureid, samplingfeaturecode, variablecode) |> 
+  filter(n > 1) |> 
+  head(10) |> 
+  knitr::kable()
+```
+
+> Units can vary for a given variable and station (e.g. "#/100ml", "mpn/100ml", "cfu/100ml" for bacteria).
+
+Lastly, the database contains a large number of speciations for nutrients such as Phosphorus, which can also have differing units (mg/L and ug/L):
+
+```{r}
+station_parameter_summary |> 
+  filter(str_detect(variablecode, "Phos")) |> 
+  filter(variabletypecv == "Water quality") |> 
+  tabyl(variablecode, unitsabbreviation) |> 
+  adorn_totals(where = "col")
+```
+
+> The `variablecode` field can contain a large number of variations of the same compound, especially for nutrients. Should the data explorer include all of these as separate options? Or combine some (e.g. "Phosphate Dissolved", "Phosphorus As P Dissolved", and "Phosphorus, Orthophosphate As P Dissolved")?
+
+Note the `variablenamecv` controlled vocabulary is not always consistent for each `variablecode`:
+
+```{r}
+station_parameter_summary |> 
+  left_join(select(variables, variableid, variablenamecv), by = "variableid") |>
+  filter(str_detect(variablecode, "Phos")) |> 
+  filter(variabletypecv == "Water quality") |> 
+  count(variablecode, variablenamecv)
+```
+
+```{r}
+results_summary |> 
+  write_csv("../export/db/results-summary.csv", na = "")
+station_parameter_summary |> 
+  write_csv("../export/db/station-parameter-summary.csv", na = "")
+samplingfeatures |> 
+  write_csv("../export/db/stations.csv", na = "")
+```
+
+
+
+
