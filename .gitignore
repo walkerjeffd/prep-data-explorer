@@ -2,5 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
+r/data/nhd
 r/**/*.html
 r/export/**/*.csv
