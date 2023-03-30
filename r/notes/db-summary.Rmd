@@ -28,6 +28,7 @@ td {
 ```{r setup, include=FALSE}
 library(tidyverse)
 library(sf)
+library(targets)
 library(janitor)
 library(dbcooper)
 library(DT)
@@ -42,6 +43,9 @@ rs <- DBI::dbSendQuery(con, "SET search_path = odm2, public")
 DBI::dbClearResult(rs)
 
 dbc_init(con, "prep")
+
+tar_config_set(store = "../_targets/")
+gis_basin <- targets::tar_read("gis_basin")
 
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
 ```
@@ -85,10 +89,10 @@ The following map shows all stations colored by `samplingfeaturetypecv`. The dat
 
 ```{r results="asis"}
 map_samplingfeatures <- mapview(
-  sf_samplingfeatures, 
-  zcol = "samplingfeaturetypecv", 
-  legend = TRUE, 
-  label = sf_samplingfeatures$samplingfeaturename
+  list(sf_samplingfeatures, gis_basin),
+  zcol = list("samplingfeaturetypecv", NULL),
+  legend = TRUE,
+  label = list(sf_samplingfeatures$samplingfeaturename, "PREP Basin")
 )
 map_samplingfeatures
 ```
@@ -161,6 +165,9 @@ results |>
 ```{r}
 variables <- prep_tbl("variables") |> 
   semi_join(prep_tbl("results"), by = c("variableid")) |> 
+  collect()
+units <- prep_tbl("units") |> 
+  semi_join(prep_tbl("results"), by = c("unitsid")) |> 
   collect()
 ```
 
@@ -604,14 +611,33 @@ station_parameter_summary |>
 ```
 
 ```{r}
+basin_samplingfeatureids <- st_intersection(
+  sf_samplingfeatures,
+  st_transform(gis_basin, crs = st_crs(sf_samplingfeatures))
+) |>
+  mutate(in_basin = coalesce(name == "PREP Basin", FALSE)) |> 
+  st_drop_geometry() |> 
+  pull(samplingfeatureid)
 results_summary |> 
+  mutate(
+    in_basin = samplingfeatureid %in% basin_samplingfeatureids,
+    .before = everything()
+  ) |> 
+  left_join(select(variables, variableid, variablenamecv), by = "variableid") |>
+  relocate(variablenamecv, .after = "variablecode") |> 
   write_csv("../export/db/results-summary.csv", na = "")
 station_parameter_summary |> 
+  mutate(
+    in_basin = samplingfeatureid %in% basin_samplingfeatureids,
+    .before = everything()
+  ) |> 
+  left_join(select(variables, variableid, variablenamecv), by = "variableid") |>
+  relocate(variablenamecv, .after = "variablecode") |> 
   write_csv("../export/db/station-parameter-summary.csv", na = "")
 samplingfeatures |> 
+  mutate(
+    in_basin = samplingfeatureid %in% basin_samplingfeatureids,
+    .before = everything()
+  ) |> 
   write_csv("../export/db/stations.csv", na = "")
 ```
-
-
-
-
