@@ -6,6 +6,7 @@ import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  // base: process.env.NODE_ENV === 'production' ? '/dev/prep/' : '/',
   plugins: [vue({ template: {transformAssetUrls}}), vuetify({ autoImport: true })],
   resolve: {
     alias: {

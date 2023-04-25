@@ -1,0 +1,16 @@
+# History files
+.Rhistory
+.Rapp.history
+
+# Session Data files
+.RData
+.RDataTmp
+
+# User-specific files
+.Ruserdata
+.Rproj.user
+
+data/nhd
+**/*.html
+export/**/*.csv
+.env

@@ -19,10 +19,12 @@ const links: any[] = [
 </script>
 
 <template>
-  <v-app id="prep">
+  <v-app>
     <v-app-bar>
       <v-img src="@/assets/prep_horiz.png" max-height="80%" max-width="200"/>
-      <v-app-bar-title text="Piscataqua Watershed Data Explorer" class="font-weight-medium text-h4"></v-app-bar-title>
+      <v-app-bar-title text="Piscataqua Watershed Data Explorer" class="font-weight-medium text-h4">
+        <span class="text-button font-weight-bold text-disabled">ALPHA</span>
+      </v-app-bar-title>
       <v-spacer></v-spacer>
       <v-tabs
         color="primary"

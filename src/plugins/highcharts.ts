@@ -1,5 +1,12 @@
 import Highcharts from 'highcharts'
 import HighchartsVue from 'highcharts-vue'
+import accessibility from 'highcharts/modules/accessibility'
+import boost from 'highcharts/modules/boost'
+import noData from 'highcharts/modules/no-data-to-display'
+
+accessibility(Highcharts)
+boost(Highcharts)
+noData(Highcharts)
 
 Highcharts.setOptions({
   colors: ['#0B8BCC', '#68C9D0', '#F15A29', '#9BD4F4', '#8D9FD0', '#C1E1C1', '#8CD35E', '#F5D482', '#F7AE1D',

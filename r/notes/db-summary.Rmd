@@ -1,7 +1,7 @@
 ---
 title: "PREP Database Summary"
 author: "Jeffrey Walker"
-date: "2023-03-21"
+date: "2023-04-19"
 output: 
   html_document: 
     toc: yes
@@ -110,14 +110,14 @@ tabyl(samplingfeatures, samplingfeaturetypecv) |>
   knitr::kable()
 ```
 
-The `sitetypecv` field is not useful (most rows are type "Stream"):
+The `sitetypecv` field contains waterbody types, need to confirm these are accurate:
 
 ```{r results="markdown"}
 tabyl(samplingfeatures, sitetypecv) |> 
   knitr::kable()
 ```
 
-> Aside from the ID, name, description, and coordinates of each station, the only useful field is `samplingfeaturetypecv`, which indicates the type of sampling performed at each station. The database does not contain any information about station ownership (`actionby` is empty) or water body type (see `sitetypecv` below).
+> Aside from the ID, name, description, and coordinates of each station, the only useful fields are potentially `samplingfeaturetypecv` and `siteteypecv`, which indicates the type of sampling performed at each station and the water body type. The database does not contain any information about station ownership (`actionby` is empty).
 
 # Results Table
 
@@ -143,7 +143,7 @@ The following summarizes each column of `results`:
 skimr::skim(results)
 ```
 
-The `sampledmediumcv` column only contains "Liquid aqueous" (plus 2 "Unknown"), and is therefore not useful.
+The `sampledmediumcv` column only contains "Liquid aqueous" (plus a few "Unknown"), and is therefore not useful.
 
 ```{r results="markdown"}
 tabyl(results, sampledmediumcv) |> 
@@ -195,7 +195,7 @@ tabyl(variables, nodatavalue) |>
   knitr::kable()
 ```
 
-The `variablenamecv` column references the `cv_variablename` table, which contains a Controlled Vocabulary (CV) list from [odm2.org](http://vocabulary.odm2.org/variablename/). In theory, this column would standardize the variable names to be consistent with the official variables published by ODM2. However, there are a number of mismatched variables. For example, `variablenamecv="Acidity, total acidity"` is associated with a number of coliform species: 
+The `variablenamecv` column references the `cv_variablename` table, which contains a Controlled Vocabulary (CV) list from [odm2.org](http://vocabulary.odm2.org/variablename/). In theory, this column would standardize the variable names to be consistent with the official variables published by ODM2. However, there are a few mismatched variables. For example, `variablenamecv="Acidity, total acidity"` is associated with `variablecode="Total Aquatic Macrophytes Cover"`: 
 
 ```{r}
 variables |> 
@@ -247,7 +247,6 @@ tabyl(timeseriesresults, aggregationstatisticcv) |>
 ### Timeseries Result Values
 
 The actual measurement values for each row in `timeseriesresults` are stored in `timeseriesresultvalues`.
-
 
 ```{r}
 timeseriesresultvalues <- prep_tbl("timeseriesresultvalues") |> 

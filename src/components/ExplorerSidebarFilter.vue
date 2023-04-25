@@ -31,11 +31,11 @@ const range = ref([0, 100])
   <v-divider class="my-4"></v-divider>
 
   <div class="d-flex">
-    <v-btn variant="tonal" color="accent">
+    <v-btn variant="tonal" color="accent" disabled>
       <v-icon icon="mdi-refresh" start></v-icon> Reset
     </v-btn>
     <v-spacer></v-spacer>
-    <v-btn variant="tonal" color="accent">
+    <v-btn variant="tonal" color="accent" disabled>
       <v-icon icon="mdi-download" start></v-icon> Batch Download
     </v-btn>
   </div>

@@ -31,7 +31,7 @@ const tab = ref('filter')
             type="error"
             title="Not Implemented Yet"
             text="This tab will contain the comparison chart and associated table listing user-selected station/parameter combos."
-            variant="outlined"
+            variant="tonal"
           ></v-alert>
         </v-window-item>
       </v-window>
