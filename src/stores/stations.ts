@@ -9,6 +9,17 @@ export const useStationsStore = defineStore('stations', {
     stations: [] as Station[],
     station: null as Station | null,
   }),
+  getters: {
+    getStationById (state) {
+      return (id: number) => state.stations.find(d => d.samplingfeatureid === id)
+    },
+    getStationCodeById () {
+      return (id: number) => {
+        const station = this.getStationById(id)
+        return station?.samplingfeaturecode
+      }
+    }
+  },
   actions: {
     async fetchStations () {
       this.stations = await getStations()

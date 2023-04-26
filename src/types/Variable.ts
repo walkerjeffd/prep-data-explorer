@@ -1,5 +1,5 @@
 export default interface Variable {
-  variable_id_pwde: number
+  variableid_prep: number
   variablenamecv: string
   unitsid: number
   unitsabbreviation: string

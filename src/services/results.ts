@@ -5,7 +5,7 @@ const API_URL = import.meta.env.VITE_API_URL
 export function filterResultsByVariableIds (items: Result[], variableIds: number[]) {
   if (variableIds.length === 0) return items
 
-  return items.filter(item => variableIds.includes(item.variable_id_pwde))
+  return items.filter(item => variableIds.includes(item.variableid_prep))
 }
 
 export function filterResultsByStations (items: Result[], stations: Station[]) {

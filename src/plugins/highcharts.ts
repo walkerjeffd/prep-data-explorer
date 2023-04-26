@@ -45,12 +45,12 @@ Highcharts.setOptions({
   tooltip: {
     style: {
       color: 'black',
-      fontSize: '16px'
+      fontSize: '12px'
     }
   },
   legend: {
     itemStyle: {
-      font: '18px "Roboto Condensed", sans-serif',
+      font: '12px "Roboto Condensed", sans-serif',
       color: 'black'
     },
     itemHoverStyle: {

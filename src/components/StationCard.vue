@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import type { Ref, ComputedRef } from 'vue'
-import type Result from '../types/Result'
 import type Variable from '../types/Variable'
 import type Value from '../types/Value'
+import type Result from '../types/Result'
 import { useStationsStore } from '../stores/stations'
 import { useResultsStore } from '../stores/results'
 import { useVariablesStore } from '../stores/variables'
+import { useCompareStore } from '../stores/compare'
 import { storeToRefs } from 'pinia'
 import { ref, computed, watch } from 'vue'
 import { getValues } from '@/services/values'
+import { downloadResults } from '@/services/download'
 
 const chart = ref(null)
 const show = ref(true)
@@ -20,18 +22,21 @@ const values: Ref<Value[]> = ref([])
 const { station } = storeToRefs(useStationsStore())
 const { getResultsByStation } = useResultsStore()
 const { variables } = storeToRefs(useVariablesStore())
+const { getVariableById } = useVariablesStore()
+const { addResult } = useCompareStore()
+
 const stationResults: ComputedRef<Result[]> = computed(() => getResultsByStation(station.value))
 const selectedVariableId: Ref<number | null> = ref(null)
 const selectedVariable: ComputedRef<Variable | null> = computed(() => {
   if (selectedVariableId.value === null) return null
-  return variables.value.find(variable => variable.variable_id_pwde === selectedVariableId.value) || null
+  return getVariableById(selectedVariableId.value) || null
 })
 const stationVariables: ComputedRef<Variable[]> = computed(() => {
-  const stationVariableIds = stationResults.value.map(d => d.variable_id_pwde)
-  return variables.value.filter(variable => stationVariableIds.includes(variable.variable_id_pwde))
+  const stationVariableIds = stationResults.value.map(d => d.variableid_prep)
+  return variables.value.filter(variable => stationVariableIds.includes(variable.variableid_prep))
 })
 watch(stationVariables, () => {
-  const stationVariableIds = stationVariables.value.map(d => d.variable_id_pwde)
+  const stationVariableIds = stationVariables.value.map(d => d.variableid_prep)
   if (selectedVariableId.value !== null && !stationVariableIds.includes(selectedVariableId.value)) {
     selectedVariableId.value = stationVariableIds[0]
   } else if (selectedVariableId.value === null && stationVariableIds.length > 0) {
@@ -76,7 +81,24 @@ function variableAxisLabel(variable: Variable | null) {
   return `${variable.variablenamecv} (${variable.unitsabbreviation})`
 }
 
-const options = computed(() => {
+function download(): void {
+  const result = stationResults.value.find(d => d.variableid_prep === selectedVariable.value?.variableid_prep)
+  if (!result) return
+  result.variable = selectedVariable.value!
+  result.station = station.value!
+  downloadResults([result])
+}
+
+function addToCompare(): void {
+  if (selectedVariable.value === null) return
+  const result = stationResults.value.find(d => d.variableid_prep === selectedVariable.value?.variableid_prep)
+  if (!result) return
+  result.values = values.value
+  result.visible = true
+  addResult(result)
+}
+
+const chartOptions = computed(() => {
   return {
     chart: {
       zoomType: 'xy'
@@ -146,7 +168,7 @@ const options = computed(() => {
             variant="underlined"
             label="Select Parameter"
             item-title="variablenamecv"
-            item-value="variable_id_pwde"
+            item-value="variableid_prep"
           ></v-autocomplete>
         </div>
 
@@ -166,14 +188,14 @@ const options = computed(() => {
           <v-window v-model="tab">
             <v-window-item value="chart">
               <p class="mb-4">Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus eveniet modi rerum quia eos odit velit totam itaque at, ipsa voluptate numquam, sapiente quae temporibus? Quo quae commodi harum doloribus?</p>
-              <highcharts :options="options" ref="chart"></highcharts>
+              <highcharts :options="chartOptions" ref="chart"></highcharts>
               <v-divider class="my-4"></v-divider>
               <div class="d-flex mt-4">
-                <v-btn variant="tonal" color="accent" disabled>
+                <v-btn variant="tonal" color="accent" :disabled="values.length === 0" @click="addToCompare">
                   <v-icon icon="mdi-plus" start></v-icon> Add to Compare
                 </v-btn>
                 <v-spacer></v-spacer>
-                <v-btn variant="tonal" color="accent" disabled>
+                <v-btn variant="tonal" color="accent" :disabled="values.length === 0" @click="download">
                   <v-icon icon="mdi-download" start></v-icon> Download
                 </v-btn>
               </div>

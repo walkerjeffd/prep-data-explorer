@@ -1,7 +1,17 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import ExplorerSidebarFilter from './ExplorerSidebarFilter.vue'
+import ExplorerFilter from './ExplorerFilter.vue'
+import ExplorerCompare from './ExplorerCompare.vue'
+import { useCompareStore } from '@/stores/compare'
+import { watch } from 'vue'
+
 const tab = ref('filter')
+const compareStore = useCompareStore()
+watch(compareStore.results, () => {
+  if (compareStore.results.length > 0) {
+    tab.value = 'compare'
+  }
+})
 </script>
 
 <template>
@@ -21,18 +31,13 @@ const tab = ref('filter')
     <v-divider></v-divider>
 
     <v-card-text>
-      <v-window v-model="tab" class="pt-4">
-        <v-window-item value="filter">
-          <ExplorerSidebarFilter></ExplorerSidebarFilter>
+      <v-window v-model="tab">
+        <v-window-item value="filter" class="pt-4">
+          <ExplorerFilter></ExplorerFilter>
         </v-window-item>
 
         <v-window-item value="compare">
-          <v-alert
-            type="error"
-            title="Not Implemented Yet"
-            text="This tab will contain the comparison chart and associated table listing user-selected station/parameter combos."
-            variant="tonal"
-          ></v-alert>
+          <ExplorerCompare></ExplorerCompare>
         </v-window-item>
       </v-window>
     </v-card-text>
@@ -40,7 +45,5 @@ const tab = ref('filter')
 </template>
 
 <style>
-.v-slide-group-item--active {
-  background-color: white;
-}
+
 </style>

@@ -122,20 +122,21 @@ list(
       ungroup() |> 
       filter(n_values > 1000) |> 
       arrange(variablenamecv) |>
-      mutate(variable_id_pwde = row_number()) |> 
-      select(variable_id_pwde, variablenamecv, unitsid, unitsabbreviation)
+      mutate(variableid_prep = row_number()) |> 
+      select(variableid_prep, variablenamecv, unitsid, unitsabbreviation)
   }),
   tar_target(pwde_variables_file, {
     filename <- "../src/mirage/fixtures/variables.json"
     pwde_variables |> 
       jsonlite::write_json(filename)
+    file.copy(filename, "../public/data/variables", overwrite = TRUE)
     filename
   }, format = "file"),
   tar_target(pwde_results, {
     db_results_all |> 
       filter(n_values > 0) |> 
       inner_join(pwde_variables, by = c("variablenamecv", "unitsid")) |> 
-      group_by(samplingfeatureid, variable_id_pwde) |> 
+      group_by(samplingfeatureid, variableid_prep) |> 
       summarise(
         start = min(start),
         end = max(end),
@@ -143,12 +144,14 @@ list(
         .groups = "drop"
       ) |> 
       filter(n_values >= 100) |> 
-      select(samplingfeatureid, variable_id_pwde, start, end, n_values)
+      mutate(resultid_prep = row_number()) |> 
+      select(resultid_prep, samplingfeatureid, variableid_prep, start, end, n_values)
   }),
   tar_target(pwde_results_file, {
     filename <- "../src/mirage/fixtures/results.json"
     pwde_results |> 
       jsonlite::write_json(filename)
+    file.copy(filename, "../public/data/results", overwrite = TRUE)
     filename
   }, format = "file"),
   tar_target(pwde_stations, {
@@ -170,6 +173,7 @@ list(
     filename <- "../src/mirage/fixtures/stations.json"
     pwde_stations |> 
       jsonlite::write_json(filename)
+    file.copy(filename, "../public/data/stations", overwrite = TRUE)
     filename
   }, format = "file")
 )

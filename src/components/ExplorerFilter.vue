@@ -50,7 +50,7 @@ function reset () {
     variant="underlined"
     label="Parameters"
     item-title="variablenamecv"
-    item-value="variable_id_pwde"
+    item-value="variableid_prep"
     multiple
     clearable
     chips
@@ -78,9 +78,9 @@ function reset () {
     <pre>Filtered Rows: {{ resultsFilteredByDatesAndVariables.length }} (of {{  results.length  }} total)</pre>
     <pre>Range: {{ valueCountSelectedRange }}</pre>
     <pre>Quantiles: {{ valueCountSelectedQuantiles }}</pre>
-  </div> -->
+  </div>
 
-  <v-divider class="my-4"></v-divider>
+  <v-divider class="my-4"></v-divider> -->
 
   <div class="d-flex">
     <v-btn variant="tonal" color="accent" @click="reset">
@@ -88,7 +88,7 @@ function reset () {
     </v-btn>
     <v-spacer></v-spacer>
     <v-btn variant="tonal" color="accent" disabled>
-      <v-icon icon="mdi-download" start></v-icon> Batch Download
+      <v-icon icon="mdi-download" start></v-icon> Bulk Download
     </v-btn>
   </div>
 </template>
