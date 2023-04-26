@@ -115,12 +115,13 @@ list(
     db_results_all |> 
       filter(n_values > 0) |> 
       group_by(variablenamecv, unitsid, unitsabbreviation) |> 
-      summarise(n_results = n(), n_values = sum(n_values), .groups = "drop_last") |> 
+      summarise(n_results = n(), n_values = sum(n_values), .groups = "drop") |> 
+      group_by(variablenamecv) |> 
       arrange(variablenamecv, desc(n_values)) |> 
       slice(1) |> 
       ungroup() |> 
       filter(n_values > 1000) |> 
-      arrange(desc(n_values)) |> 
+      arrange(variablenamecv) |>
       mutate(variable_id_pwde = row_number()) |> 
       select(variable_id_pwde, variablenamecv, unitsid, unitsabbreviation)
   }),
