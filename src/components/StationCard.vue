@@ -18,12 +18,9 @@ const error: Ref<string | null> = ref(null)
 const values: Ref<Value[]> = ref([])
 
 const { station } = storeToRefs(useStationsStore())
-const { results } = storeToRefs(useResultsStore())
+const { getResultsByStation } = useResultsStore()
 const { variables } = storeToRefs(useVariablesStore())
-const stationResults: ComputedRef<Result[]> = computed(() => {
-  if (station === null) return []
-  return results.value.filter((result) => result.samplingfeatureid === station.value?.samplingfeatureid)
-})
+const stationResults: ComputedRef<Result[]> = computed(() => getResultsByStation(station.value))
 const selectedVariableId: Ref<number | null> = ref(null)
 const selectedVariable: ComputedRef<Variable | null> = computed(() => {
   if (selectedVariableId.value === null) return null
@@ -108,7 +105,7 @@ const options = computed(() => {
     series: [
       {
         name: selectedVariable.value?.variablenamecv,
-        data: values.value.map(value => [value.datetime.valueOf(), value.value]),
+        data: values.value.map(value => [value.datetime.valueOf(), Number(value.value)]),
         marker: {
           enabled: values.value.length < 1000
         }

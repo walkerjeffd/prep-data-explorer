@@ -1,37 +1,89 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useResultsStore } from '@/stores/results'
+import { useVariablesStore } from '@/stores/variables'
 
-const range = ref([0, 100])
+const {
+  variableIds,
+  minDate,
+  maxDate,
+  valueCountTickLabels,
+  valueCountSelectedRange
+} = storeToRefs(useResultsStore())
+
+const { variables } = storeToRefs(useVariablesStore())
+
+function reset () {
+  minDate.value = null
+  maxDate.value = null
+  variableIds.value = []
+  valueCountSelectedRange.value = [0, 100]
+}
 </script>
 
 <template>
   <v-row>
     <v-col cols="6">
-      <v-text-field label="Start Date" type="date" variant="underlined"></v-text-field>
+      <v-text-field
+        v-model="minDate"
+        label="Start Date"
+        type="date"
+        variant="underlined"
+        clearable
+      ></v-text-field>
     </v-col>
     <v-col cols="6">
-      <v-text-field label="End Date" type="date" variant="underlined"></v-text-field>
+      <v-text-field
+        v-model="maxDate"
+        label="End Date"
+        type="date"
+        variant="underlined"
+        clearable
+      ></v-text-field>
     </v-col>
   </v-row>
-  <v-select variant="underlined" label="Sample Medium"></v-select>
-  <v-select variant="underlined" label="Parameter Types"></v-select>
-  <v-select variant="underlined" label="Parameters"></v-select>
+  <v-select variant="underlined" disabled label="Sample Medium"></v-select>
+  <v-select variant="underlined" disabled label="Parameter Types"></v-select>
+  <v-autocomplete
+    v-model="variableIds"
+    :items="variables"
+    variant="underlined"
+    label="Parameters"
+    item-title="variablenamecv"
+    item-value="variable_id_pwde"
+    multiple
+    clearable
+    chips
+    closable-chips
+  ></v-autocomplete>
   <v-range-slider
-    v-model="range"
+    v-model="valueCountSelectedRange"
     strict
     class="pr-4"
     label="# Samples"
     color="grey-darken-1"
     :ticks="[0, 50, 100]"
     :step="1"
-    thumb-label
     show-ticks="always"
-  ></v-range-slider>
+  >
+    <template v-slot:tick-label="//@ts-ignore
+                                { index }">
+      {{ valueCountTickLabels[index]?.toLocaleString() }}
+    </template>
+  </v-range-slider>
+
+  <v-divider class="my-4"></v-divider>
+
+  <!-- <div>
+    <pre>Filtered Rows: {{ resultsFilteredByDatesAndVariables.length }} (of {{  results.length  }} total)</pre>
+    <pre>Range: {{ valueCountSelectedRange }}</pre>
+    <pre>Quantiles: {{ valueCountSelectedQuantiles }}</pre>
+  </div> -->
 
   <v-divider class="my-4"></v-divider>
 
   <div class="d-flex">
-    <v-btn variant="tonal" color="accent" disabled>
+    <v-btn variant="tonal" color="accent" @click="reset">
       <v-icon icon="mdi-refresh" start></v-icon> Reset
     </v-btn>
     <v-spacer></v-spacer>

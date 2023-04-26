@@ -9,6 +9,9 @@ boost(Highcharts)
 noData(Highcharts)
 
 Highcharts.setOptions({
+  chart: {
+    animation: false
+  },
   colors: ['#0B8BCC', '#68C9D0', '#F15A29', '#9BD4F4', '#8D9FD0', '#C1E1C1', '#8CD35E', '#F5D482', '#F7AE1D',
     '#F3AF8F', '#CECDC9'],
   title: {

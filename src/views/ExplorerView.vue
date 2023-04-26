@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import type { ComputedRef } from 'vue'
 import type Station from '@/types/Station'
-import type Result from '@/types/Result'
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { interpolateViridis } from 'd3-scale-chromatic'
 import {
@@ -19,23 +17,24 @@ import { useResultsStore } from '@/stores/results'
 import { useVariablesStore } from '@/stores/variables'
 
 const { stations, station: selectedStation } = storeToRefs(useStationsStore())
-const { results } = storeToRefs(useResultsStore())
+const { valueCountByStation, valueCountMax, valueCountSelectedQuantiles } = storeToRefs(useResultsStore())
 const { fetchStations, selectStation } = useStationsStore()
 const { fetchResults } = useResultsStore()
 const { fetchVariables } = useVariablesStore()
 
 const loading = ref(false)
 
-const maxValueCount: ComputedRef<number> = computed(() => {
-  const nValues = results.value.map(d => d.n_values)
-  return Math.max(...nValues)
-})
+function showStation (station: Station): boolean {
+  if (!valueCountByStation.value) return true
+  const value = valueCountByStation.value.get(station.samplingfeatureid)
+  if (value === undefined) return false
+  return value >= valueCountSelectedQuantiles.value[0] && value <= valueCountSelectedQuantiles.value[1]
+}
 
 function stationColor (station: Station) {
   if (station === selectedStation.value) return 'rgb(255, 69, 0)'
-  const stationResults = results.value.filter(d => d.samplingfeatureid === station.samplingfeatureid)
-  const nValues = stationResults.reduce((acc: number, d: Result) => acc + d.n_values, 0)
-  return interpolateViridis(nValues / maxValueCount.value)
+  const valueCount = valueCountByStation.value.get(station.samplingfeatureid) || 0
+  return interpolateViridis(valueCount / valueCountMax.value)
 }
 
 onMounted(async () => {
@@ -62,6 +61,7 @@ onMounted(async () => {
             :latLng="[station.latitude, station.longitude]"
             :radius="station === selectedStation ? 10 : 5"
             :color="stationColor(station)"
+            :visible="showStation(station)"
             @click="selectStation(station.samplingfeatureid)"
           ></LCircleMarker>
         </LMap>
