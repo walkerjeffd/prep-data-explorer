@@ -34,6 +34,20 @@ db_connect <- function () {
 }
 
 list(
+  tar_target(gis_regions_file, "/Users/jeff/Dropbox/Work/prep/gis/GreatBayRegionsv4/GreatBayRegionsv4.shp", format = "file"),
+  tar_target(gis_regions, {
+    st_read(gis_regions_file)
+  }),
+  tar_target(pwde_gis_regions, {
+    filename <- "../public/gis/regions.geojson"
+    if (file.exists(filename)) {
+      unlink(filename)
+    }
+    gis_regions |> 
+      select(name) |> 
+      write_sf(filename, driver = "GeoJSON", delete_layer = TRUE, layer_options = c("COORDINATE_PRECISION=6", "ID_GENERATE=YES"))
+    filename
+  }, format = "file"),
   tar_target(gis_nhd_file, {
     download_dir <- nhdplusTools::download_nhdplushr("data/nhd", c("0106"))
     file.path(download_dir, list.files(download_dir, pattern = "*.gdb"))
@@ -53,6 +67,25 @@ list(
       st_as_sf() |> 
       transmute(name = "PREP Basin")
   }),
+  tar_target(pwde_gis_basin, {
+    filename <- "../public/gis/basin.geojson"
+    if (file.exists(filename)) {
+      unlink(filename)
+    }
+    gis_basin |> 
+      write_sf(filename, driver = "GeoJSON", delete_layer = TRUE)
+    filename
+  }, format = "file"),
+  tar_target(pwde_gis_huc12, {
+    filename <- "../public/gis/huc12.geojson"
+    if (file.exists(filename)) {
+      unlink(filename)
+    }
+    gis_nhd_wbdhu12 |> 
+      select(HUC12, Name) |> 
+      write_sf(filename, driver = "GeoJSON", delete_layer = TRUE, layer_options = c("COORDINATE_PRECISION=6", "ID_GENERATE=YES"))
+    filename
+  }, format = "file"),
   tar_target(db_stations_all, {
     con <- db_connect()
     sql <- "

@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { Ref, ComputedRef } from 'vue'
+import { useDisplay } from 'vuetify'
+
 import type Variable from '../types/Variable'
 import type Value from '../types/Value'
 import type Result from '../types/Result'
@@ -12,15 +14,16 @@ import { ref, computed, watch } from 'vue'
 import { getValues } from '@/services/values'
 import { downloadResults } from '@/services/download'
 
+const { lgAndUp } = useDisplay()
 const chart = ref(null)
 const show = ref(true)
 const loading = ref(false)
-const tab = ref('chart')
 const error: Ref<string | null> = ref(null)
 const values: Ref<Value[]> = ref([])
 
 const { station } = storeToRefs(useStationsStore())
 const { getResultsByStation } = useResultsStore()
+const { variableIds: resultsVariableIds } = storeToRefs(useResultsStore())
 const { variables } = storeToRefs(useVariablesStore())
 const { getVariableById } = useVariablesStore()
 const { addResult } = useCompareStore()
@@ -37,14 +40,20 @@ const stationVariables: ComputedRef<Variable[]> = computed(() => {
 })
 watch(stationVariables, () => {
   const stationVariableIds = stationVariables.value.map(d => d.variableid_prep)
-  if (selectedVariableId.value !== null && !stationVariableIds.includes(selectedVariableId.value)) {
-    selectedVariableId.value = stationVariableIds[0]
-  } else if (selectedVariableId.value === null && stationVariableIds.length > 0) {
+
+  // keep selected variable for new station
+  if (selectedVariableId.value !== null && stationVariableIds.includes(selectedVariableId.value)) return
+
+  if (resultsVariableIds.value.length > 0) {
+    // use first of selected variables for results filter
+    selectedVariableId.value = resultsVariableIds.value[0]
+  } else if (stationVariableIds.length > 0) {
+    // use first of station variables
     selectedVariableId.value = stationVariableIds[0]
   }
 })
 watch([station, selectedVariable], async () => {
-  if (!station) return
+  if (!station.value) return
   if (!selectedVariable.value) return
 
   error.value = null
@@ -86,6 +95,7 @@ function download(): void {
   if (!result) return
   result.variable = selectedVariable.value!
   result.station = station.value!
+  result.values = values.value
   downloadResults([result])
 }
 
@@ -123,6 +133,7 @@ const chartOptions = computed(() => {
     tooltip: {
       valueSuffix: ` ${selectedVariable.value?.unitsabbreviation}`,
       valueDecimals: 2,
+      xDateFormat: '%b %d, %Y %l:%M %p'
     },
     series: [
       {
@@ -140,7 +151,7 @@ const chartOptions = computed(() => {
 <template>
   <v-card>
     <v-toolbar class="pl-4">
-      <span class="text-h6">Selected Station: {{ error ? 'Error' : station === null ? 'None' : station?.samplingfeaturecode }}</span>
+      <span class="text-h6">Selected Station Data</span>
       <v-spacer></v-spacer>
       <v-btn disabled icon="mdi-arrow-expand-all" size="x-small"></v-btn>
       <v-btn :icon="show ? '$expand' : '$collapse'" size="x-small" @click="show = !show"></v-btn>
@@ -161,6 +172,27 @@ const chartOptions = computed(() => {
         <p>Select a station on the map to view its data.</p>
       </v-alert>
       <v-sheet v-else>
+        <v-container v-if="lgAndUp">
+          <v-row align="end">
+            <v-col cols="12" lg="8" xl="9">
+              <div class="text-h6 font-weight-black">{{ station.samplingfeaturecode }}</div>
+              <div>{{ station.samplingfeaturename }}</div>
+            </v-col>
+            <v-spacer></v-spacer>
+            <v-col cols="12" lg="4" xl="3" class="text-right">
+              <div>{{ station.sitetypecv }}</div>
+              <div>{{ station.latitude.toFixed(4) }}, {{ station.longitude.toFixed(4) }}</div>
+            </v-col>
+          </v-row>
+          <div class="text-caption">{{ station.samplingfeaturedescription }}</div>
+        </v-container>
+        <v-container v-else>
+          <div class="text-h6 font-weight-black">{{ station.samplingfeaturecode }}</div>
+          <div>{{ station.samplingfeaturename }}</div>
+          <div>{{ station.sitetypecv }} | {{ station.latitude.toFixed(4) }}, {{ station.longitude.toFixed(4) }}</div>
+          <div class="text-caption">{{ station.samplingfeaturedescription }}</div>
+        </v-container>
+        <v-divider class="mb-4"></v-divider>
         <div class="px-4 py-2">
           <v-autocomplete
             v-model="selectedVariableId"
@@ -172,76 +204,19 @@ const chartOptions = computed(() => {
           ></v-autocomplete>
         </div>
 
-        <v-tabs
-          v-model="tab"
-          bg-color="grey-lighten-4"
-          color="accent"
-          grow
-          class="px-4"
-        >
-          <v-tab value="chart" prepend-icon="mdi-chart-line">Chart</v-tab>
-          <v-tab value="table" prepend-icon="mdi-table">Table</v-tab>
-          <v-tab value="metadata" prepend-icon="mdi-map-marker">Station Metadata</v-tab>
-        </v-tabs>
-
         <div class="pa-4">
-          <v-window v-model="tab">
-            <v-window-item value="chart">
-              <p class="mb-4">Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus eveniet modi rerum quia eos odit velit totam itaque at, ipsa voluptate numquam, sapiente quae temporibus? Quo quae commodi harum doloribus?</p>
-              <highcharts :options="chartOptions" ref="chart"></highcharts>
-              <v-divider class="my-4"></v-divider>
-              <div class="d-flex mt-4">
-                <v-btn variant="tonal" color="accent" :disabled="values.length === 0" @click="addToCompare">
-                  <v-icon icon="mdi-plus" start></v-icon> Add to Compare
-                </v-btn>
-                <v-spacer></v-spacer>
-                <v-btn variant="tonal" color="accent" :disabled="values.length === 0" @click="download">
-                  <v-icon icon="mdi-download" start></v-icon> Download
-                </v-btn>
-              </div>
-            </v-window-item>
-
-            <v-window-item value="table">
-              <v-alert
-                type="error"
-                title="Not Implemented Yet"
-                text="This tab will contain a table of data for the selected station and variable."
-                variant="tonal"
-                class="my-8"
-              ></v-alert>
-            </v-window-item>
-
-            <v-window-item value="metadata">
-              <v-table>
-                <tbody>
-                  <tr>
-                    <td class="text-right" style="width:0px">ID</td>
-                    <td class="font-weight-bold">{{ station.samplingfeatureid }}</td>
-                  </tr>
-                  <tr>
-                    <td class="text-right">Code</td>
-                    <td class="font-weight-bold">{{ station.samplingfeaturecode }}</td>
-                  </tr>
-                  <tr>
-                    <td class="text-right">Name</td>
-                    <td class="font-weight-bold">{{ station.samplingfeaturename }}</td>
-                  </tr>
-                  <tr>
-                    <td class="text-right">Description</td>
-                    <td class="font-weight-bold">{{ station.samplingfeaturedescription }}</td>
-                  </tr>
-                  <tr>
-                    <td class="text-right">Type</td>
-                    <td class="font-weight-bold">{{ station.sitetypecv }}</td>
-                  </tr>
-                  <tr>
-                    <td class="text-right">Coordinates</td>
-                    <td class="font-weight-bold">{{ station.latitude.toFixed(4) }}, {{ station.longitude.toFixed(4) }}</td>
-                  </tr>
-                </tbody>
-              </v-table>
-            </v-window-item>
-          </v-window>
+          <highcharts :options="chartOptions" ref="chart"></highcharts>
+          <div class="text-caption"><v-icon size="small" start>mdi-information-outline</v-icon>Click + drag to zoom in</div>
+          <v-divider class="my-4"></v-divider>
+          <div class="d-flex mt-4">
+            <v-btn variant="tonal" color="accent" :disabled="values.length === 0" @click="addToCompare">
+              <v-icon icon="mdi-plus" start></v-icon> Add to Compare
+            </v-btn>
+            <v-spacer></v-spacer>
+            <v-btn variant="tonal" color="accent" :disabled="values.length === 0" @click="download">
+              <v-icon icon="mdi-download" start></v-icon> Download
+            </v-btn>
+          </div>
         </div>
       </v-sheet>
     </div>

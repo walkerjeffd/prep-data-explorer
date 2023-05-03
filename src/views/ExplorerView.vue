@@ -3,14 +3,23 @@ import type Station from '@/types/Station'
 import { onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { interpolateViridis } from 'd3-scale-chromatic'
+import type L from 'leaflet'
 import {
   LMap,
+  LControlLayers,
+  LControlScale,
+  LControl,
   LTileLayer,
-  LCircleMarker
+  LGeoJson,
+  LCircleMarker,
+  LTooltip
 } from '@vue-leaflet/vue-leaflet'
 
+import basemaps from '@/lib/basemaps'
+import overlays from '@/lib/overlays'
 import StationCard from '../components/StationCard.vue'
 import ExplorerSidebar from '../components/ExplorerSidebar.vue'
+import MapLegend from '@/components/MapLegend.vue'
 
 import { useStationsStore } from '@/stores/stations'
 import { useResultsStore } from '@/stores/results'
@@ -37,6 +46,21 @@ function stationColor (station: Station) {
   return interpolateViridis(valueCount / valueCountMax.value)
 }
 
+async function overlayAdd ({ layer }: { layer: L.GeoJSON }) {
+  if (layer.getLayers().length === 0) {
+    // @ts-ignore
+    const url = layer.options.url
+    const response = await fetch(url)
+    const geojson = await response.json()
+    layer.addData(geojson)
+  }
+  layer.bringToBack()
+}
+
+function mapReady (map: L.Map) {
+  map.on('overlayadd', overlayAdd)
+}
+
 onMounted(async () => {
   loading.value = true
   await Promise.all([fetchStations(), fetchResults(), fetchVariables()])
@@ -48,22 +72,46 @@ onMounted(async () => {
   <div class="explorer">
     <div class="explorer-map">
       <div style="height:100%;width:100%">
-        <LMap :zoom="11" :center="[43.2, -71]">
+        <LMap :zoom="11" :center="[43.2, -71]" @ready="mapReady">
+          <LControlLayers position="topleft"></LControlLayers>
+          <LControlScale position="bottomright"></LControlScale>
+          <LControl position="topright">
+            <MapLegend />
+          </LControl>
           <LTileLayer
+            v-for="tile in basemaps"
+            :key="tile.name"
+            :name="tile.name"
+            :visible="tile.visible"
+            :url="tile.url"
+            :attribution="tile.attribution"
+            :options="tile.options"
             layer-type="base"
-            url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-            name="CartoDB Positron"
-            attribution="&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors &copy; <a href='https://carto.com/attributions'>CARTO</a>"
-          />
+          ></LTileLayer>
+          <LGeoJson
+            v-for="overlay in overlays"
+            :key="overlay.name"
+            :name="overlay.name"
+            :visible="overlay.visible"
+            :options="overlay.options"
+            :options-style="overlay.style as L.StyleFunction"
+            layer-type="overlay"
+          ></LGeoJson>
           <LCircleMarker
             v-for="station in stations"
             :key="station.samplingfeatureid"
             :latLng="[station.latitude, station.longitude]"
-            :radius="station === selectedStation ? 10 : 5"
+            :radius="station === selectedStation ? 10 : 8"
             :color="stationColor(station)"
             :visible="showStation(station)"
+            :weight="2"
             @click="selectStation(station.samplingfeatureid)"
-          ></LCircleMarker>
+          >
+            <LTooltip>
+              <div class="font-weight-bold">{{ station.samplingfeaturecode }}</div>
+              <div class="text-grey-darken-2">{{ station.samplingfeaturename }}</div>
+            </LTooltip>
+          </LCircleMarker>
         </LMap>
         <div class="explorer-station">
           <StationCard></StationCard>
@@ -107,7 +155,8 @@ onMounted(async () => {
   position: fixed;
   bottom: 0;
   left: 0;
-  width: 800px;
+  width: 30%;
+  min-width: 400px;
   z-index:1000;
 }
 .explorer-loading {

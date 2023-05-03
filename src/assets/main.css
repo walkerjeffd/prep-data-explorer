@@ -1,3 +1,12 @@
 .v-slide-group-item--active {
   background-color: white;
 }
+
+/*
+override odd behavior of leaflet tooltips
+when <LTooltip> is present, the <LCircleMarker>
+element receives outline-style: auto on click
+*/
+path.leaflet-interactive {
+  outline-style: none !important;
+}

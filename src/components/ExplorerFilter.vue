@@ -1,17 +1,33 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import type { ComputedRef } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useStationsStore } from '@/stores/stations'
 import { useResultsStore } from '@/stores/results'
 import { useVariablesStore } from '@/stores/variables'
+import { sum } from 'd3-array'
 
 const {
   variableIds,
   minDate,
   maxDate,
   valueCountTickLabels,
-  valueCountSelectedRange
+  valueCountSelectedRange,
+  valueCountByStation,
+  valueCountSelectedQuantiles
 } = storeToRefs(useResultsStore())
 
+const { stations } = storeToRefs(useStationsStore())
 const { variables } = storeToRefs(useVariablesStore())
+
+const filteredStationCount: ComputedRef<number> = computed(() => {
+  const resultCounts = Array.from(valueCountByStation.value.values())
+  const showStation = resultCounts
+    .map(d => {
+      return d >= valueCountSelectedQuantiles.value[0] && d <= valueCountSelectedQuantiles.value[1] ? 1 : 0
+    })
+  return sum(showStation)
+})
 
 function reset () {
   minDate.value = null
@@ -60,7 +76,7 @@ function reset () {
     v-model="valueCountSelectedRange"
     strict
     class="pr-4"
-    label="# Samples"
+    label="# Values per Station"
     color="grey-darken-1"
     :ticks="[0, 50, 100]"
     :step="1"
@@ -71,6 +87,13 @@ function reset () {
       {{ valueCountTickLabels[index]?.toLocaleString() }}
     </template>
   </v-range-slider>
+  <div class="text-caption text-right">
+    Number of values across all selected parameters at each station.
+  </div>
+
+  <v-divider class="my-4"></v-divider>
+
+  <div>Showing {{ filteredStationCount.toLocaleString() }} of {{ stations.length.toLocaleString() }} stations</div>
 
   <v-divider class="my-4"></v-divider>
 

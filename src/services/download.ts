@@ -34,6 +34,7 @@ export function downloadResults (results: Result[]) {
   const header = generateHeader()
   const rows = results
     .map(({station, variable, values}) => {
+      if (!values?.length) return []
       return values?.map(d => ({
         station_id: station?.samplingfeatureid,
         station_code: station?.samplingfeaturecode,
@@ -47,6 +48,8 @@ export function downloadResults (results: Result[]) {
       }))
     })
     .flat()
+  if (!rows.length) return
+
   const parser = new Parser()
   const csv = parser.parse(rows)
 
