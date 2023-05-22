@@ -1,4 +1,7 @@
 import type Result from '@/types/Result'
+import type Variable from '@/types/Variable'
+import type Value from '@/types/Value'
+import type Station from '@/types/Station'
 // @ts-ignore
 import { Parser } from '@json2csv/plainjs'
 import { saveAs } from 'file-saver'
@@ -30,22 +33,29 @@ export function downloadCsvFile (filename: string, body: string): void {
   saveAs(blob, filename)
 }
 
+function formatRow(station: Station | undefined, variable: Variable | undefined, value: Value | undefined) {
+  return {
+    station_id: station?.samplingfeatureid,
+    station_code: station?.samplingfeaturecode,
+    station_name: station?.samplingfeaturename,
+    variable: variable?.variablenamecv,
+    units: variable?.unitsabbreviation,
+    datetime: value?.datetime,
+    // TODO: find efficient date formatter
+    // Date.to*String() are very slow (20 seconds each for GRBGB DO dataset, 300k rows)
+    // datetime: value.datetime.toISOString(),
+    // date: value.datetime.toLocaleDateString('en-US', { timeZone: 'America/New_York' }),
+    // time: value.datetime.toLocaleTimeString('en-US', { timeZone: 'America/New_York' }),
+    value: value?.value
+  }
+}
+
 export function downloadResults (results: Result[]) {
   const header = generateHeader()
   const rows = results
     .map(({station, variable, values}) => {
       if (!values?.length) return []
-      return values?.map(d => ({
-        station_id: station?.samplingfeatureid,
-        station_code: station?.samplingfeaturecode,
-        station_name: station?.samplingfeaturename,
-        variable: variable?.variablenamecv,
-        units: variable?.unitsabbreviation,
-        datetime: d.datetime?.toISOString(),
-        date: d.datetime?.toLocaleDateString('en-US', { timeZone: 'America/New_York' }),
-        time: d.datetime?.toLocaleTimeString('en-US', { timeZone: 'America/New_York' }),
-        value: d.value
-      }))
+      return values?.map(value => formatRow(station, variable, value))
     })
     .flat()
   if (!rows.length) return

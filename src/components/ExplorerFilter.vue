@@ -65,7 +65,7 @@ function reset () {
     :items="variables"
     variant="underlined"
     label="Parameters"
-    item-title="variablenamecv"
+    item-title="variable_label"
     item-value="variableid_prep"
     multiple
     clearable

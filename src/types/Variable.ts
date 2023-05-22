@@ -3,4 +3,5 @@ export default interface Variable {
   variablenamecv: string
   unitsid: number
   unitsabbreviation: string
+  variable_label?: string
 }

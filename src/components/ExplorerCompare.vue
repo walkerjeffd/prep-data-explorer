@@ -35,7 +35,8 @@ const chartOptions = computed(() => {
   }))
   return {
     chart: {
-      zoomType: 'xy'
+      zoomType: 'xy',
+      height: '70%'
     },
     title: {
       text: null

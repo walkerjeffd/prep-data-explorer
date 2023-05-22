@@ -25,7 +25,7 @@ export const useStationsStore = defineStore('stations', {
       this.stations = await getStations()
     },
     selectStation (id?: number) {
-      if (this.station && this.station.samplingfeatureid === id) {
+      if (!id || this.station && this.station.samplingfeatureid === id) {
         this.station = null
       } else {
         const station = this.stations.find(station => station.samplingfeatureid === id)

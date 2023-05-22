@@ -13,7 +13,7 @@ export const useVariablesStore = defineStore('variables', {
     getVariableCodeById () {
       return (id: number) => {
         const variable = this.getVariableById(id)
-        return variable?.variablenamecv
+        return variable?.variable_label
       }
     }
   },

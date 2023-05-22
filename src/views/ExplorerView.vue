@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type Station from '@/types/Station'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
-import { interpolateViridis } from 'd3-scale-chromatic'
+import { interpolateViridis as interpolateColor } from 'd3-scale-chromatic'
 import type L from 'leaflet'
 import {
   LMap,
@@ -14,6 +14,8 @@ import {
   LCircleMarker,
   LTooltip
 } from '@vue-leaflet/vue-leaflet'
+import { range } from 'd3-array'
+import { scaleQuantile } from 'd3-scale'
 
 import basemaps from '@/lib/basemaps'
 import overlays from '@/lib/overlays'
@@ -26,12 +28,18 @@ import { useResultsStore } from '@/stores/results'
 import { useVariablesStore } from '@/stores/variables'
 
 const { stations, station: selectedStation } = storeToRefs(useStationsStore())
-const { valueCountByStation, valueCountMax, valueCountSelectedQuantiles } = storeToRefs(useResultsStore())
+const { valueCountByStation, valueCountSelectedQuantiles, valueCountArray } = storeToRefs(useResultsStore())
 const { fetchStations, selectStation } = useStationsStore()
 const { fetchResults } = useResultsStore()
 const { fetchVariables } = useVariablesStore()
 
 const loading = ref(false)
+
+const valueCountQuantileScale = computed(() => {
+  return scaleQuantile()
+    .domain(valueCountArray.value)
+    .range(range(0, 1.1, 0.1))
+})
 
 function showStation (station: Station): boolean {
   if (!valueCountByStation.value) return true
@@ -43,7 +51,7 @@ function showStation (station: Station): boolean {
 function stationColor (station: Station) {
   if (station === selectedStation.value) return 'rgb(255, 69, 0)'
   const valueCount = valueCountByStation.value.get(station.samplingfeatureid) || 0
-  return interpolateViridis(valueCount / valueCountMax.value)
+  return interpolateColor(valueCountQuantileScale.value(valueCount))
 }
 
 async function overlayAdd ({ layer }: { layer: L.GeoJSON }) {
@@ -63,8 +71,18 @@ function mapReady (map: L.Map) {
 
 onMounted(async () => {
   loading.value = true
-  await Promise.all([fetchStations(), fetchResults(), fetchVariables()])
-  loading.value = false
+  try {
+    await Promise.all([fetchStations(), fetchResults(), fetchVariables()])
+  } catch (err) {
+    if (err instanceof Error) {
+      alert(err.message)
+    } else {
+      console.log(err)
+      alert('unknown error')
+    }
+  } finally {
+    loading.value = false
+  }
 })
 </script>
 
@@ -72,7 +90,7 @@ onMounted(async () => {
   <div class="explorer">
     <div class="explorer-map">
       <div style="height:100%;width:100%">
-        <LMap :zoom="11" :center="[43.2, -71]" @ready="mapReady">
+        <LMap :zoom="10" :center="[43.2, -71.2]" @ready="mapReady">
           <LControlLayers position="topleft"></LControlLayers>
           <LControlScale position="bottomright"></LControlScale>
           <LControl position="topright">

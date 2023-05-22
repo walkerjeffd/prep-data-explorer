@@ -6,5 +6,9 @@ export async function getVariables (): Promise<Variable[]> {
   if (!response.ok) {
     throw new Error('Failed to fetch variables')
   }
-  return await response.json()
+  const data = await response.json()
+  for (const variable of data) {
+    variable.variable_label = variable.unitsabbreviation ? `${variable.variablenamecv} (${variable.unitsabbreviation})` : variable.variablenamecv
+  }
+  return data
 }

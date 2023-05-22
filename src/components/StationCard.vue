@@ -22,6 +22,7 @@ const error: Ref<string | null> = ref(null)
 const values: Ref<Value[]> = ref([])
 
 const { station } = storeToRefs(useStationsStore())
+const { selectStation } = useStationsStore()
 const { getResultsByStation } = useResultsStore()
 const { variableIds: resultsVariableIds } = storeToRefs(useResultsStore())
 const { variables } = storeToRefs(useVariablesStore())
@@ -111,7 +112,8 @@ function addToCompare(): void {
 const chartOptions = computed(() => {
   return {
     chart: {
-      zoomType: 'xy'
+      zoomType: 'xy',
+      height: '70%'
     },
     title: {
       text: null
@@ -155,6 +157,7 @@ const chartOptions = computed(() => {
       <v-spacer></v-spacer>
       <v-btn disabled icon="mdi-arrow-expand-all" size="x-small"></v-btn>
       <v-btn :icon="show ? '$expand' : '$collapse'" size="x-small" @click="show = !show"></v-btn>
+      <v-btn icon="$close" size="x-small" @click="selectStation()"></v-btn>
     </v-toolbar>
 
     <v-progress-linear
@@ -180,7 +183,7 @@ const chartOptions = computed(() => {
             </v-col>
             <v-spacer></v-spacer>
             <v-col cols="12" lg="4" xl="3" class="text-right">
-              <div>{{ station.sitetypecv }}</div>
+              <!-- <div>{{ station.sitetypecv }}</div> -->
               <div>{{ station.latitude.toFixed(4) }}, {{ station.longitude.toFixed(4) }}</div>
             </v-col>
           </v-row>
@@ -199,7 +202,7 @@ const chartOptions = computed(() => {
             :items="stationVariables"
             variant="underlined"
             label="Select Parameter"
-            item-title="variablenamecv"
+            item-title="variable_label"
             item-value="variableid_prep"
           ></v-autocomplete>
         </div>

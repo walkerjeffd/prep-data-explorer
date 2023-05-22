@@ -1,0 +1,341 @@
+﻿variablegroup,variablenamecv,unitsabbreviation,variablenamelabel
+Biological,"Blue-green algae (cyanobacteria), phycocyanin",ug/l,Phycocyanin
+Biological,Chlorophyll a,ug/l,Chlorophyll a
+Biological,"Chlorophyll a, corrected for pheophytin",ug/l,"Chlorophyll a, corrected for pheophytin"
+Biological,"Chlorophyll a, uncorrected for pheophytin",ug/l,"Chlorophyll a, uncorrected for pheophytin"
+Biological,"Coliform, fecal",mpn/100ml,Fecal coliform
+Biological,Enterococcus,mpn/100ml,Enterococcus
+Biological,Escherichia Coli,#/100ml,Escherichia coli
+Biological,Microcystin,ng/ml,Microcystin
+Biological,Algal Growth,(blank),Algal growth
+Biological,Clostridium Perfringens,#/100ml,Clostridium perfringens
+Biological,"Coliform, total",mpn/100ml,Total coliform
+Biological,Coliphage,pfu/100ml,Coliphage
+Biological,Pheophytin-A,ug/l,Pheophytin-A
+Biological,"Primary productivity, gross",umol,Gross primary productivity
+Biological,"Respiration, ecosystem",umol,Ecosystem respiration
+Biological,"Streptococci, fecal",mpn/100ml,Fecal streptococci
+Chemical Property,Acid neutralizing capacity,mg/l,Acid neutralizing capacity
+Chemical Property,"Alkalinity, total",mg/l,Total alkalinity
+Chemical Property,"Oxygen, dissolved",mg/l,Dissolved oxygen
+Chemical Property,"Oxygen, dissolved percent of saturation",%,Dissolved oxygen percent saturation
+Chemical Property,pH,none,pH
+Chemical Property,Salinity,ppt,Salinity
+Chemical Property,Specific conductance,us/cm,Specific conductance
+Chemical Property,"Alkalinity, bicarbonate",mg/l,Bicarbonate alkalinity
+Chemical Property,Bulk electrical conductivity,us/cm,Bulk electrical conductivity
+Chemical Property,Carbonate,mg/l,Carbonate
+Chemical Property,Electrical conductivity,us/cm,Electrical conductivity
+Chemical Property,"Hardness, carbonate",mg/l,Carbonate Hardness
+Chemical Property,Hydrogen,mg/l,Hydrogen
+Chemical Property,Optical Brighteners,(blank),Optical Brighteners
+Chemical Property,Reduction potential,mv,Reduction potential
+Metal,Aluminum,ug/l,Aluminum
+Metal,Arsenic,mg/l,Arsenic
+Metal,Cadmium,mg/l,Cadmium
+Metal,Calcium Total,mg/l,Total calcium
+Metal,Chromium,mg/l,Chromium
+Metal,Copper,mg/l,Copper
+Metal,Iron,mg/l,Iron
+Metal,Lead,mg/l,Lead
+Metal,Magnesium Total,mg/l,Total magnesium
+Metal,Manganese,mg/l,Manganese
+Metal,"Mercury, dissolved",ng/l,Dissolved mercury
+Metal,Nickel,mg/l,Nickel
+Metal,Potassium,mg/l,Potassium
+Metal,Potassium Total,mg/l,Total potassium
+Metal,Sodium,mg/l,Sodium
+Metal,Sodium Total,mg/l,Total sodium
+Metal,Zinc,mg/l,Zinc
+Metal,"Aluminum, dissolved",mg/l,Dissolved aluminum
+Metal,"Aluminum, particulate",mg/l,Particulate aluminum
+Metal,"Calcium, dissolved",mg/l,Dissolved calcium
+Metal,"Hardness, Calcium",mg/l,Calcium hardness
+Metal,"Hardness, Magnesium",mg/l,Magnesium hardness
+Metal,Magnesium Dissolved,mg/l,Dissolved magnesium
+Metal,Methylmercury(1+),ng/l,Methylmercury(1+)
+Metal,Potassium Dissolved,mg/l,Dissolved potassium
+Metal,Sodium Dissolved,mg/l,Dissolved sodium
+Mineral,Chloride,mg/l,Chloride
+Mineral,Chloride Total,mg/l,Total chloride
+Mineral,Silica,mg/l,Silica
+Mineral,Sulfate,mg/l,Sulfate
+Mineral,Sulfate Total,mg/l,Total sulfate
+Mineral,Biogenic silica,mg/l,Biogenic silica
+Mineral,Bromide,ug/l,Bromide
+Mineral,Chloride Dissolved,mg/l,Dissolved chloride
+Mineral,Fluoride,mg/l,Fluoride
+Mineral,"Selenium, dissolved",mg/l,Dissolved selenium
+Mineral,Silica As Si Dissolved,mg/l,Dissolved silica
+Mineral,Silica As Sio2 Dissolved,mg/l,Dissolved silicon dioxide
+Mineral,Sulfate Dissolved,mg/l,Dissolved sulfate
+Nutrient,Nitrogen,mg/l,Nitrogen
+Nutrient,"Nitrogen, dissolved organic",mg/l,Organic nitrogen
+Nutrient,"Nitrogen, NH3",mg/l,Ammonia
+Nutrient,"Nitrogen, NH4",mg/l,Ammonium
+Nutrient,"Nitrogen, nitrate (NO3)",mg/l,Nitrate
+Nutrient,"Nitrogen, nitrite (NO2) + nitrate (NO3)",mg/l,Nitrite + Nitrate
+Nutrient,"Nitrogen, Particulate",mg/l,Particulate nitrogen
+Nutrient,"Nitrogen, total",mg/l,Total nitrogen
+Nutrient,"Nitrogen, total dissolved",mg/l,Total dissolved nitrogen
+Nutrient,"Nitrogen, total kjeldahl",mg/l,Total Kjeldahl nitrogen
+Nutrient,Phosphorus,ug/l,Phosphorus
+Nutrient,Phosphorus As P Dissolved,mg/l,Dissolved phosphorus
+Nutrient,Phosphorus As P Total,mg/l,Total phosphorus
+Nutrient,"Phosphorus, organic",mg/l,Organic phosphorus
+Nutrient,"Phosphorus, phosphate (PO4)",ug/l,Orthophosphate
+Organic Matter/Compound,BOD1,mg/l,Biological oxygen demand (1-day)
+Organic Matter/Compound,"BOD20, nitrogenous",mg/l,Nitrogenous biological oxygen demand (20-day)
+Organic Matter/Compound,Colored dissolved organic matter,1/m,Colored dissolved organic matter
+Organic Matter/Compound,"Fluorescence, dissolved organic matter (DOM)",rfu,"Fluorescence, dissolved organic matter"
+Organic Matter/Compound,4-Cymene,ug/l,4-Cymene
+Organic Matter/Compound,Cymene,ug/l,Cymene
+Organic/Inorganic Carbon,Carbon,ug/l,Carbon disulfide
+Organic/Inorganic Carbon,Carbon dioxide,ppm,Carbon dioxide
+Organic/Inorganic Carbon,Carbon disulfide,ug/l,Carbon disulfide
+Organic/Inorganic Carbon,Carbon tetrachloride,mg/l,Carbon tetrachloride
+Organic/Inorganic Carbon,"Carbon, dissolved inorganic",mg/l,Dissolved inorganic carbon
+Organic/Inorganic Carbon,"Carbon, dissolved organic",mg/l,Dissolved organic carbon
+Organic/Inorganic Carbon,"Carbon, Inorganic Total",mg/l,Total inorganic carbon
+Organic/Inorganic Carbon,"Carbon, Organic Total",%,Total organic carbon
+Organic/Inorganic Carbon,"Carbon, particulate organic",mg/l,Particulate organic carbon
+Organic/Inorganic Carbon,"Carbon, suspended inorganic",mg/l,Suspended sediment
+Organic/Inorganic Carbon,"Carbon, suspended total",mg/l,Total suspended carbon
+Other Chemicals,"1,2-Dinitrobenzene",ug/l,"1,2-Dinitrobenzene"
+Other Chemicals,2-Butoxyethanol,ng/l,2-Butoxyethanol
+Other Chemicals,2-Chloronaphthalene,ug/l,2-Chloronaphthalene
+Other Chemicals,2-Chlorophenol,ug/l,2-Chlorophenol
+Other Chemicals,2-Nitroaniline,ug/l,2-Nitroaniline
+Other Chemicals,"3,3-Dichlorobenzidine",ug/l,"3,3-Dichlorobenzidine"
+Other Chemicals,3-Nitroaniline,ug/l,3-Nitroaniline
+Other Chemicals,4-Bromophenylphenyl ether,ug/l,4-Bromophenylphenyl ether
+Other Chemicals,4-Chloro-3-methylphenol,ug/l,4-Chloro-3-methylphenol
+Other Chemicals,4-Chloroaniline,ug/l,4-Chloroaniline
+Other Chemicals,4-Chlorophenylphenyl ether,ug/l,4-Chlorophenylphenyl ether
+Other Chemicals,4-Nitroaniline,ug/l,4-Nitroaniline
+Other Chemicals,Azobenzene,ug/l,Azobenzene
+Other Chemicals,Benzoic acid,ug/l,Benzoic acid
+Other Chemicals,Benzyl alcohol,ug/l,Benzyl alcohol
+Other Chemicals,Bis-(2-ethylhexyl) phthalate,ug/l,Bis-(2-ethylhexyl) phthalate
+Other Chemicals,Bromomethane (Methyl bromide),ug/l,Bromomethane (Methyl bromide)
+Other Chemicals,Dibenzofuran,ug/l,Dibenzofuran
+Other Chemicals,Diethyl phthalate,ug/l,Diethyl phthalate
+Other Chemicals,Dimethyl Phthalate,ug/l,Dimethyl Phthalate
+Other Chemicals,Di-n-octyl phthalate,ug/l,Di-n-octyl phthalate
+Other Chemicals,Hexachlorocyclopentadiene,ug/l,Hexachlorocyclopentadiene
+Other Chemicals,Hexachloroethane,ug/l,Hexachloroethane
+Other Chemicals,Isophorone,ug/l,Isophorone
+Other Chemicals,M-Cresol,ug/l,M-Cresol
+Other Chemicals,N-Nitrosodimethylamine,ug/l,N-Nitrosodimethylamine
+Other Chemicals,N-Nitrosodi-n-propylamine,ug/l,N-Nitrosodi-n-propylamine
+Other Chemicals,N-Nitrosodiphenylamine,ug/l,N-Nitrosodiphenylamine
+Other Chemicals,O-Cresol,ug/l,O-Cresol
+Other Chemicals,Pyridine,ug/l,Pyridine
+Other Chemicals,Rhodamine Wt,ppb,Rhodamine Wt
+Other Metrics,Trophic Class,(blank),Trophic Class
+PAH,"1,2-Dimethylnaphthalene",ug/l,"1,2-Dimethylnaphthalene"
+PAH,1-Methylanthracene,ug/l,1-Methylanthracene
+PAH,1-Methylphenanthrene,ug/l,1-Methylphenanthrene
+PAH,2-Fluorobiphenyl,ug/l,2-Fluorobiphenyl
+PAH,2-Methylnaphthalene,ug/l,2-Methylnaphthalene
+PAH,4-Bromofluorobenzene,%,4-Bromofluorobenzene
+PAH,4-Methylchrysene,ug/l,4-Methylchrysene
+PAH,4-Nitrophenol,ug/l,4-Nitrophenol
+PAH,Acenaphthene,ug/l,Acenaphthene
+PAH,Acenaphthylene,ug/l,Acenaphthylene
+PAH,Benzo[A]Anthracene,ug/l,Benzo[A]Anthracene
+PAH,Benzo[A]Pyrene,ug/l,Benzo[A]Pyrene
+PAH,Benzo[B]Fluoranthene,ug/l,Benzo[B]Fluoranthene
+PAH,"Benzo[G,H,I]Perylene",ug/l,"Benzo[G,H,I]Perylene"
+PAH,Benzo[K]Fluoranthene,ug/l,Benzo[K]Fluoranthene
+PAH,Carbazole,ug/l,Carbazole
+PAH,Cumene,ug/l,Cumene
+PAH,"Dibenzo[A,H]Anthracene",ug/l,"Dibenzo[A,H]Anthracene"
+PAH,"Indeno[1,2,3-Cd]Pyrene",ug/l,"Indeno[1,2,3-Cd]Pyrene"
+PAH,Naphthalene,ug/l,Naphthalene
+PAH,P-Terphenyl-D14,%,P-Terphenyl-D14
+Pesticide,"1,2,4,5-tetrachlorobenzene",ug/l,"1,2,4,5-Tetrachlorobenzene"
+Pesticide,"2,2-dichlorovinyl dimethyl phosphate",ug/l,"2,2-dichlorovinyl dimethyl phosphate"
+Pesticide,"2,4,5-Trichlorophenol",ug/l,"2,4,5-Trichlorophenol"
+Pesticide,"2,4,6-Trichlorophenol",ug/l,"2,4,6-Trichlorophenol"
+Pesticide,"2,4-Dichlorophenol",ug/l,"2,4-Dichlorophenol"
+Pesticide,"2,4-Dimethylphenol",ug/l,"2,4-Dimethylphenol"
+Pesticide,"2,4-Dinitro-6-Methylphenol",ug/l,"2,4-Dinitro-6-Methylphenol"
+Pesticide,"2,4-Dinitrophenol",ug/l,"2,4-Dinitrophenol"
+Pesticide,"2,4-Dinitrotoluene",ug/l,"2,4-Dinitrotoluene"
+Pesticide,"2,6-Diethylaniline",ug/l,"2,6-Diethylaniline"
+Pesticide,"2,6-Dinitrotoluene",ug/l,"2,6-Dinitrotoluene"
+Pesticide,2-Chloro-4-Isopropylamino-6-Amino-S-Triazine,ug/l,2-Chloro-4-Isopropylamino-6-Amino-S-Triazine
+Pesticide,2-Nitrophenol,ug/l,2-Nitrophenol
+Pesticide,"4,4'-Dde",ug/l,"4,4'-DDE"
+Pesticide,"4,6-Dinitro-2-Sec-Butylphenol (Dnbp)",ug/l,"4,6-Dinitro-2-Sec-Butylphenol (Dnbp)"
+Pesticide,Acetochlor,ug/l,Acetochlor
+Pesticide,Acifluorfen,ug/l,Acifluorfen
+Pesticide,Alachlor,ug/l,Alachlor
+Pesticide,Alpha-Hexachlorocyclohexane (Alpha-Bhc),ug/l,Alpha-Hexachlorocyclohexane (Alpha-Bhc)
+Pesticide,Atrazine,ug/l,Atrazine
+Pesticide,Azinphos-Methyl,ug/l,Azinphos-Methyl
+Pesticide,Azoxystrobin,ug/l,Azoxystrobin
+Pesticide,Bendiocarb,ug/l,Bendiocarb
+Pesticide,Benfluralin,ug/l,Benfluralin
+Pesticide,Bentazon,ug/l,Bentazon
+Pesticide,Butylate,ug/l,Butylate
+Pesticide,Carbaryl,ug/l,Carbaryl
+Pesticide,Carbofuran,ug/l,Carbofuran
+Pesticide,Chloramben,ug/l,Chloramben
+Pesticide,Chlorothalonil,ug/l,Chlorothalonil
+Pesticide,Chlorpyrifos,ug/l,Chlorpyrifos
+Pesticide,Chlorthal-Dimethyl,ug/l,Chlorthal-Dimethyl
+Pesticide,Cis-Permethrin,ug/l,Cis-Permethrin
+Pesticide,Cyanazine,ug/l,Cyanazine
+Pesticide,Diazinon,ug/l,Diazinon
+Pesticide,Dicamba,ug/l,Dicamba
+Pesticide,Dichlorprop,ug/l,Dichlorprop
+Pesticide,Dieldrin,ug/l,Dieldrin
+Pesticide,Dipropylthiocarbamic Acid S-Ethyl Ester (Eptc),ug/l,Dipropylthiocarbamic Acid S-Ethyl Ester (Eptc)
+pesticide,Diquat Dibromide (Reglone),ug/l,Diquat Dibromide (Reglone)
+Pesticide,Disulfoton,ug/l,Disulfoton
+Pesticide,Endosulfan Sulfate,mg/l,Endosulfan Sulfate
+Pesticide,Ethalfluralin,ug/l,Ethalfluralin
+Pesticide,Ethoprop,ug/l,Ethoprop
+Pesticide,Fluridone,ppm,Fluridone
+Pesticide,Fonofos,ug/l,Fonofos
+Pesticide,Gamma-Hexachlorocyclohexane (Lindane),ug/l,Gamma-Hexachlorocyclohexane (Lindane)
+Pesticide,Halofenozide,ug/l,Halofenozide
+Pesticide,Hexachlorobenzene,ug/l,Hexachlorobenzene
+Pesticide,Imidacloprid,ug/l,Imidacloprid
+Pesticide,Iprodione,ug/l,Iprodione
+Pesticide,Linuron,ug/l,Linuron
+Pesticide,Malathion,ug/l,Malathion
+Pesticide,Mecoprop,ug/l,Mecoprop
+Pesticide,Metalaxyl,ug/l,Metalaxyl
+Pesticide,Metolachlor,ug/l,Metolachlor
+Pesticide,Metribuzin,ug/l,Metribuzin
+Pesticide,Molinate,ug/l,Molinate
+Pesticide,Napropamide,ug/l,Napropamide
+Pesticide,Paclobutrazol,ug/l,Paclobutrazol
+Pesticide,Parathion-ethyl,ug/l,Parathion-ethyl
+Pesticide,Pebulate,ug/l,Pebulate
+Pesticide,Pendimethalin,ug/l,Pendimethalin
+Pesticide,Pentachloronitrobenzene,ug/l,Pentachloronitrobenzene
+Pesticide,Pentachlorophenol,ug/l,Pentachlorophenol
+Pesticide,Phorate,ug/l,Phorate
+Pesticide,Picloram,ug/l,Picloram
+Pesticide,Prometon,ug/l,Prometon
+Pesticide,Pronamide,ug/l,Pronamide
+Pesticide,Propachlor,ug/l,Propachlor
+Pesticide,Propanil,ug/l,Propanil
+Pesticide,Propargite,ug/l,Propargite
+Pesticide,Propiconazole,ug/l,Propiconazole
+Pesticide,Silvex,ug/l,Silvex
+Pesticide,Simazine,ug/l,Simazine
+Pesticide,Tebuthiuron,ug/l,Tebuthiuron
+Pesticide,Terbacil,ug/l,Terbacil
+Pesticide,Terbufos,ug/l,Terbufos
+Pesticide,Terbuthylazine,ug/l,Terbuthylazine
+Pesticide,Thiobencarb,ug/l,Thiobencarb
+Pesticide,Triallate,ug/l,Triallate
+Pesticide,Trifluralin,ug/l,Trifluralin
+Pesticide,Trinexapac-Ethyl,ug/l,Trinexapac-Ethyl
+PFAS,Perfluorobutanoic Acid - Pfba,ng/l,Perfluorobutanoic Acid - Pfba
+PFAS,Perfluorohexadecanoic Acid - Pfhxda,ng/l,Perfluorohexadecanoic Acid - Pfhxda
+PFAS,Perfluorotridecanoic Acid - Pftra,ng/l,Perfluorotridecanoic Acid - Pftra
+Physical Property,Baseflow,cfs,Baseflow
+Physical Property,Color,pcu,Color
+Physical Property,Secchi depth,m,Secchi depth
+Physical Property,"Solids, Dissolved Total",mg/l,Total dissolved solids
+Physical Property,"Solids, Suspended Total",mg/l,Total suspended solids
+Physical Property,Streamflow,cfs,Streamflow
+Physical Property,Temperature,deg c,Water temperature
+Physical Property,Tide stage,none,Tide stage
+Physical Property,Turbidity,ntu,Turbidity
+Physical Property,Depth,cm,Depth
+Physical Property,Friction velocity,ft/sec,Friction velocity
+Physical Property,Gage height,m,Gage height
+Physical Property,Groundwater Depth,ft,Groundwater Depth
+Physical Property,Height,ft,Height
+Physical Property,Light attenuation coefficient,1/m,Light attenuation coefficient
+Physical Property,"Load, suspended",count,Suspended load
+Physical Property,Odor,(blank),Odor
+Physical Property,"Solids, fixed suspended",mg/l,Fixed suspended solids
+Physical Property,"Solids, Suspended Volatile",mg/l,Suspended volatile solids
+Physical Property,"Solids, Total Total",mg/l,Total solids
+Physical Property,"Time, elapsed",seconds,Elapsed time
+Physical Property,Uv-254,units/cm,UV-254
+Physical Property,Water level,ft,Water level
+VOC,"1,1,1,2-Tetrachloroethane",ug/l,"1,1,1,2-Tetrachloroethane"
+VOC,"1,1,1-Trichloroethane",ug/l,"1,1,1-Trichloroethane"
+VOC,"1,1,2,2-Tetrachloroethane",ug/l,"1,1,2,2-Tetrachloroethane"
+VOC,"1,1,2-Trichloroethane",ug/l,"1,1,2-Trichloroethane"
+VOC,"1,1-Dichloroethane",ug/l,"1,1-Dichloroethane"
+VOC,"1,1-Dichloroethylene",ug/l,"1,1-Dichloroethylene"
+VOC,"1,1-Dichloropropene",ug/l,"1,1-Dichloropropene"
+VOC,"1,2,3-Trichlorobenzene",ug/l,"1,2,3-Trichlorobenzene"
+VOC,"1,2,3-Trichloropropane",ug/l,"1,2,3-Trichloropropane"
+VOC,"1,2,3-Trimethylbenzene",ug/l,"1,2,3-Trimethylbenzene"
+VOC,"1,2,4-Trichlorobenzene",ug/l,"1,2,4-Trichlorobenzene"
+VOC,"1,2,4-Trimethylbenzene",ug/l,"1,2,4-Trimethylbenzene"
+VOC,"1,2-Dibromo-3-chloropropane",ug/l,"1,2-Dibromo-3-chloropropane"
+VOC,"1,2-Dichlorobenzene",ug/l,"1,2-Dichlorobenzene"
+VOC,"1,2-Dichlorobenzene-D4",ug/l,"1,2-Dichlorobenzene"
+VOC,"1,2-Dichloroethane",ug/l,"1,2-Dichloroethane"
+VOC,"1,2-Dichloroethane-D4",ug/l,"1,2-Dichloroethane"
+VOC,"1,2-Dichloropropane",ug/l,"1,2-Dichloropropane"
+VOC,"1,3,5-Trichlorobenzene",ug/l,"1,3,5-Trichlorobenzene"
+VOC,"1,3,5-Trimethylbenzene",ug/l,"1,3,5-Trimethylbenzene"
+VOC,"1,3-Dichlorobenzene",ug/l,"1,3-Dichlorobenzene"
+VOC,"1,3-Dichloropropane",ug/l,"1,3-Dichloropropane"
+VOC,"1,4-Dichlorobenzene",ug/l,"1,4-Dichlorobenzene"
+VOC,"1,4-Dioxane",ug/l,"1,4-Dioxane"
+VOC,1-Methylfluorene,ug/l,1-Methylfluorene
+VOC,1-Methylnaphthalene,ug/l,1-Methylnaphthalene
+VOC,"2,2-Dichloropropane",ug/l,"2,2-Dichloropropane"
+VOC,2-Chlorotoluene,ug/l,2-Chlorotoluene
+VOC,2-Hexanone,ug/l,2-Hexanone
+VOC,4-Chlorotoluene,ug/l,4-Chlorotoluene
+VOC,Acetate,ug/l,Acetate
+VOC,Acetic Acid,ug/l,Acetic Acid
+VOC,Acetone,ug/l,Acetone
+VOC,Benzene,ug/l,Benzene
+VOC,Bis(2-chloroethoxy)methane,ug/l,Bis(2-chloroethoxy)methane
+VOC,bis(2-Chloroethyl)ether,ug/l,Bis(2-Chloroethyl)ether
+VOC,Bromobenzene,ug/l,Bromobenzene
+VOC,Bromodichloromethane,ug/l,Bromodichloromethane
+VOC,Chlorobenzene,ug/l,Chlorobenzene
+VOC,Chlorodibromomethane,ug/l,Chlorodibromomethane
+VOC,Chloroethane,ug/l,Chloroethane
+VOC,Chloroform,ug/l,Chloroform
+VOC,Chloromethane,ug/l,Chloromethane
+VOC,"Cis-1,2-Dichloroethylene",ug/l,"Cis-1,2-Dichloroethylene"
+VOC,"cis-1,3-Dichloropropene",ug/l,"Cis-1,3-Dichloropropene"
+VOC,Dibromofluoromethane,%,Dibromofluoromethane
+VOC,Dichlorobromomethane,ug/l,Dichlorobromomethane
+VOC,Dichlorodifluoromethane (Cfc-12),ug/l,Dichlorodifluoromethane (Cfc-12)
+VOC,Diisopropyl Ether,ug/l,Diisopropyl Ether
+VOC,Ethanol,ng/l,Ethanol
+VOC,Ethyl tert-Butyl Ether,ug/l,Ethyl tert-Butyl Ether
+VOC,Ethylbenzene,ug/l,Ethylbenzene
+VOC,Ethylene,ug/l,Ethylene
+VOC,Hexachlorobutadiene,ug/l,Hexachlorobutadiene
+VOC,"M,P-Xylene",ug/l,"M,P-Xylene"
+VOC,Methyl tert-butyl ether (MTBE),ug/l,Methyl tert-butyl ether (MTBE)
+VOC,Methylene blue active substances,ue/m2/sec,Methylene blue active substances
+VOC,N-Butylbenzene,ug/l,N-Butylbenzene
+VOC,Nitrobenzene-D5,%,Nitrobenzene-D5
+VOC,N-Propylbenzene,ug/l,N-Propylbenzene
+VOC,o-Xylene,ug/l,O-Xylene
+VOC,Sec-Butylbenzene,ug/l,Sec-Butylbenzene
+VOC,Styrene,ug/l,Styrene
+VOC,Tert-Amyl Methyl Ether,ug/l,Tert-Amyl Methyl Ether
+VOC,Tert-Butyl Alcohol (Tba),ug/l,Tert-Butyl Alcohol
+VOC,Tert-Butylbenzene,ug/l,Tert-Butylbenzene
+VOC,Tetrachloroethylene,ug/l,Tetrachloroethylene
+VOC,Tetrahydrofuran,ug/l,Tetrahydrofuran
+VOC,Toluene,ug/l,Toluene
+VOC,"Trans-1,2-Dichloroethylene",ug/l,"Trans-1,2-Dichloroethylene"
+VOC,"trans-1,3-Dichloropropene",ug/l,"Trans-1,3-Dichloropropene"
+VOC,Tribromomethane,ug/l,Tribromomethane
+VOC,Trichloroethylene,ug/l,Trichloroethylene
+VOC,Trichlorofluoromethane (Cfc-11),ug/l,Trichlorofluoromethane (Cfc-11)
+VOC,Trichlorotrifluoroethane,ug/l,Trichlorotrifluoroethane
+VOC,"Xylenes, total",ug/l,Total xylenes
