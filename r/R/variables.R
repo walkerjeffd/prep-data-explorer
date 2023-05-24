@@ -8,8 +8,8 @@ targets_variables <- list(
     
     # tally values by name, units (wq only)
     x <- results_stations |> 
-      filter(variabletypecv == "Water quality") |> 
-      group_by(variablenamecv, unitsid, unitsabbreviation) |> 
+      filter(variabletypecv %in% c("Water quality", "Hydrology")) |> 
+      group_by(variabletypecv, variablenamecv, unitsid, unitsabbreviation) |> 
       summarise(n_values = sum(n_values), .groups = "drop") |> 
       filter(n_values > 0)
 
@@ -21,6 +21,6 @@ targets_variables <- list(
       ungroup()
     
     y |> 
-      transmute(variablenamecv, unitsid, unitsabbreviation)
+      transmute(variabletypecv, variablenamecv, unitsid, unitsabbreviation)
   })
 )

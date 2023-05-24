@@ -67,6 +67,13 @@ async function overlayAdd ({ layer }: { layer: L.GeoJSON }) {
 
 function mapReady (map: L.Map) {
   map.on('overlayadd', overlayAdd)
+  map.eachLayer(d => {
+    // @ts-ignore
+    if (d.options?.visibleOnLoad) {
+    // @ts-ignore
+      overlayAdd({ layer: d })
+    }
+  })
 }
 
 onMounted(async () => {
@@ -90,7 +97,7 @@ onMounted(async () => {
   <div class="explorer">
     <div class="explorer-map">
       <div style="height:100%;width:100%">
-        <LMap :zoom="10" :center="[43.2, -71.2]" @ready="mapReady">
+        <LMap :zoom="11" :center="[43.1, -71.0]" @ready="mapReady">
           <LControlLayers position="topleft"></LControlLayers>
           <LControlScale position="bottomright"></LControlScale>
           <LControl position="topright">
@@ -114,7 +121,8 @@ onMounted(async () => {
             :options="overlay.options"
             :options-style="overlay.style as L.StyleFunction"
             layer-type="overlay"
-          ></LGeoJson>
+          >
+          </LGeoJson>
           <LCircleMarker
             v-for="station in stations"
             :key="station.samplingfeatureid"

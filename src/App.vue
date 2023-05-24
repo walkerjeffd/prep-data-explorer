@@ -6,14 +6,9 @@ const links: any[] = [
     icon: 'mdi-home',
   },
   {
-    label: 'About',
-    name: 'about',
-    icon: 'mdi-information',
-  },
-  {
-    label: 'Contact',
-    name: 'contact',
-    icon: 'mdi-email',
+    label: 'User Guide',
+    name: 'user-guide',
+    icon: 'mdi-help-circle',
   },
 ]
 </script>
@@ -21,11 +16,10 @@ const links: any[] = [
 <template>
   <v-app>
     <v-app-bar>
-      <v-img src="@/assets/prep_horiz.png" max-height="80%" max-width="200"/>
+      <v-img src="@/assets/prep_horiz.png" max-height="80%" max-width="200" />
       <v-app-bar-title text="Piscataqua Watershed Data Explorer" class="font-weight-medium text-h4">
-        <span class="text-button font-weight-bold text-disabled">ALPHA</span>
+        <span class="text-button font-weight-bold text-disabled">BETA</span>
       </v-app-bar-title>
-      <v-spacer></v-spacer>
       <v-tabs
         color="primary"
         class="mr-4"
@@ -45,7 +39,7 @@ const links: any[] = [
           prepend-icon="mdi-earth"
           :to="{ name: 'explorer' }"
         >
-          Explorer
+          EXPLORER
         </v-tab>
       </v-tabs>
     </v-app-bar>

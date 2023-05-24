@@ -8,9 +8,7 @@ import { watch } from 'vue'
 const tab = ref('filter')
 const compareStore = useCompareStore()
 watch(compareStore.results, () => {
-  if (compareStore.results.length > 0) {
-    tab.value = 'compare'
-  }
+  tab.value = 'compare'
 })
 </script>
 
@@ -32,7 +30,7 @@ watch(compareStore.results, () => {
 
     <v-card-text>
       <v-window v-model="tab">
-        <v-window-item value="filter" class="pt-4">
+        <v-window-item value="filter">
           <ExplorerFilter></ExplorerFilter>
         </v-window-item>
 

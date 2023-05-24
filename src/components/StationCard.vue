@@ -53,15 +53,18 @@ watch(stationVariables, () => {
     selectedVariableId.value = stationVariableIds[0]
   }
 })
-watch([station, selectedVariable], async () => {
-  if (!station.value) return
-  if (!selectedVariable.value) return
+watch([station, selectedVariable], async ([newStation, newSelectedVariable]) => {
+  if (!newStation) return
+  if (!newSelectedVariable) return
 
   error.value = null
   loading.value = true
   try {
     // @ts-ignore
-    values.value = await getValues(station.value, selectedVariable.value)
+    const newValues = await getValues(newStation, newSelectedVariable)
+    if (station.value?.samplingfeatureid === newStation.samplingfeatureid) {
+      values.value = newValues
+    }
   } catch (err) {
     if (err instanceof Error) {
       error.value = err.message
@@ -113,7 +116,7 @@ const chartOptions = computed(() => {
   return {
     chart: {
       zoomType: 'xy',
-      height: '70%'
+      height: '50%'
     },
     title: {
       text: null
@@ -132,6 +135,13 @@ const chartOptions = computed(() => {
     legend: {
       enabled: false
     },
+    exporting: {
+      chartOptions: {
+        title: {
+          text: `${station.value?.samplingfeaturecode} - ${variableAxisLabel(selectedVariable.value)}`
+        }
+      }
+    },
     tooltip: {
       valueSuffix: ` ${selectedVariable.value?.unitsabbreviation}`,
       valueDecimals: 2,
@@ -141,8 +151,14 @@ const chartOptions = computed(() => {
       {
         name: selectedVariable.value?.variablenamecv,
         data: values.value.map(value => [value.datetime.valueOf(), Number(value.value)]),
+        lineWidth: values.value.length < 25 ? 0 : 1,
         marker: {
-          enabled: values.value.length < 1000
+          enabled: values.value.length < 500
+        },
+        states: {
+          hover: {
+            lineWidthPlus: values.value.length < 25 ? 0 : 1,
+          }
         }
       }
     ]
@@ -155,7 +171,6 @@ const chartOptions = computed(() => {
     <v-toolbar class="pl-4">
       <span class="text-h6">Selected Station Data</span>
       <v-spacer></v-spacer>
-      <v-btn disabled icon="mdi-arrow-expand-all" size="x-small"></v-btn>
       <v-btn :icon="show ? '$expand' : '$collapse'" size="x-small" @click="show = !show"></v-btn>
       <v-btn icon="$close" size="x-small" @click="selectStation()"></v-btn>
     </v-toolbar>
@@ -170,11 +185,10 @@ const chartOptions = computed(() => {
       <v-alert v-if="error !== null" type="error" class="ma-4" variant="tonal" border="start">
         <div class="text-h5">{{ error }}</div>
       </v-alert>
-      <v-alert v-if="station === null" type="info" class="mx-4 my-8" variant="tonal" border="start">
-        <div class="text-h5">No Station Selected</div>
-        <p>Select a station on the map to view its data.</p>
+      <v-alert v-if="station === null" type="info" class="mx-4 my-4" variant="tonal" border="start" title="No Station Selected">
+        <div class="font-weight-bold">Select a station on the map to view its data.</div>
       </v-alert>
-      <v-sheet v-else>
+      <v-sheet v-else class="prep-station-sheet">
         <v-container v-if="lgAndUp">
           <v-row align="end">
             <v-col cols="12" lg="8" xl="9">
@@ -183,7 +197,6 @@ const chartOptions = computed(() => {
             </v-col>
             <v-spacer></v-spacer>
             <v-col cols="12" lg="4" xl="3" class="text-right">
-              <!-- <div>{{ station.sitetypecv }}</div> -->
               <div>{{ station.latitude.toFixed(4) }}, {{ station.longitude.toFixed(4) }}</div>
             </v-col>
           </v-row>
@@ -192,7 +205,7 @@ const chartOptions = computed(() => {
         <v-container v-else>
           <div class="text-h6 font-weight-black">{{ station.samplingfeaturecode }}</div>
           <div>{{ station.samplingfeaturename }}</div>
-          <div>{{ station.sitetypecv }} | {{ station.latitude.toFixed(4) }}, {{ station.longitude.toFixed(4) }}</div>
+          <div>{{ station.latitude.toFixed(4) }}, {{ station.longitude.toFixed(4) }}</div>
           <div class="text-caption">{{ station.samplingfeaturedescription }}</div>
         </v-container>
         <v-divider class="mb-4"></v-divider>
@@ -209,7 +222,10 @@ const chartOptions = computed(() => {
 
         <div class="pa-4">
           <highcharts :options="chartOptions" ref="chart"></highcharts>
-          <div class="text-caption"><v-icon size="small" start>mdi-information-outline</v-icon>Click + drag to zoom in</div>
+          <div class="text-caption d-flex align-center">
+            <v-icon size="small" start>$info</v-icon>
+            <div>Click + drag to zoom in</div>
+          </div>
           <v-divider class="my-4"></v-divider>
           <div class="d-flex mt-4">
             <v-btn variant="tonal" color="accent" :disabled="values.length === 0" @click="addToCompare">
@@ -225,3 +241,10 @@ const chartOptions = computed(() => {
     </div>
   </v-card>
 </template>
+
+<style>
+.prep-station-sheet {
+  max-height: calc(100vh - 210px);
+  overflow-y: auto;
+}
+</style>

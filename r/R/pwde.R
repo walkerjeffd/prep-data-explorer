@@ -32,10 +32,10 @@ targets_pwde <- list(
   }, format = "file"),
   tar_target(pwde_variables, {
     variables_inp |> 
-      semi_join(results_stations, by = c("variablenamecv", "unitsid")) |> 
+      semi_join(results_stations, by = c("variabletypecv", "variablenamecv", "unitsid")) |> 
       arrange(variablenamecv) |>
       mutate(variableid_prep = row_number()) |> 
-      select(variableid_prep, variablenamecv, unitsid, unitsabbreviation)
+      select(variableid_prep, variabletypecv, variablenamecv, unitsid, unitsabbreviation)
   }),
   tar_target(pwde_variables_file, {
     filename <- "../public/api/variables"
@@ -46,7 +46,7 @@ targets_pwde <- list(
   tar_target(pwde_results, {
     results_variables |> 
       select(-unitsabbreviation) |> 
-      inner_join(pwde_variables, by = c("variablenamecv", "unitsid")) |> 
+      inner_join(pwde_variables, by = c("variabletypecv", "variablenamecv", "unitsid")) |> 
       group_by(samplingfeatureid, variableid_prep) |>
       summarise(
         start = min(start),
@@ -54,8 +54,16 @@ targets_pwde <- list(
         n_values = sum(n_values),
         .groups = "drop"
       ) |> 
-      mutate(resultid_prep = row_number()) |>
-      select(resultid_prep, samplingfeatureid, variableid_prep, start, end, n_values)
+      inner_join(select(db_stations, samplingfeatureid, samplingfeaturecode), by = c("samplingfeatureid")) |> 
+      mutate(
+        resultid_prep = row_number(),
+        samplingfeaturecore = samplingfeaturecode %in% c(
+          "GRBAP", "GRBCL", "GRBLR", "GRBCML", "GRBGB", "GRBGBE", "GRBGBW", "GRBOR",
+          "GRBSF", "GRBSQ", "GRBULB", "GRBUPR", "HHHR", "02-GWR", "05-SFR", "07-CCH",
+          "05-OYS", "05-LMP", "09-EXT", "05-BLM", "02-WNC"
+        )
+      ) |>
+      select(resultid_prep, samplingfeatureid, samplingfeaturecore, variableid_prep, start, end, n_values)
   }),
   tar_target(pwde_results_file, {
     filename <- "../public/api/results"

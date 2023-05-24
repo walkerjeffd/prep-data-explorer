@@ -47,6 +47,7 @@ targets_db <- list(
       left_join(tbl(con, "units"), by = "unitsid") |> 
       left_join(
         tbl(con, "timeseriesresultvalues") |>
+          filter(qualitycodecv != "Bad", datavalue != "NaN") |> 
           group_by(resultid) |> 
           summarise(
             start = min(valuedatetime, na.rm = TRUE),

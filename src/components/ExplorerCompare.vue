@@ -26,13 +26,50 @@ function download(): void {
 }
 
 const chartOptions = computed(() => {
-  const series = visibleResults.value.map(d => ({
-    name: `${getStationCodeById(d.samplingfeatureid)} - ${getVariableCodeById(d.variableid_prep)}`,
-    data: d.values ? d.values.map((value: Value) => [value.datetime.valueOf(), Number(value.value)]) : [],
-    marker: {
-      enabled: d.values ? d.values.length < 1000 : false
+  const resultsGroupedByVariable = visibleResults.value.reduce((acc, cur) => {
+    if (!acc[cur.variableid_prep]) {
+      acc[cur.variableid_prep] = []
     }
-  }))
+    acc[cur.variableid_prep].push(cur)
+    return acc
+  }, {} as Record<number, Result[]>)
+  const groupedSeries = Object
+    // @ts-ignore
+    .entries(resultsGroupedByVariable)
+    .map(([variableId, series]: [string, Result[]], i: number) => {
+      const variable = getVariableById(Number(variableId))
+      return {
+        variable,
+        series,
+        yAxis: {
+          gridLineWidth: i === 0 ? 1 : 0,
+          title: {
+            text: variable?.variable_label,
+            style: {
+              font: '14px "Roboto Condensed", sans-serif'
+            }
+          },
+          labels: {
+            format: '{value}'
+          },
+          opposite: i > 0
+        },
+        data: series.map((d: Result) => ({
+          name: `${getStationCodeById(d.samplingfeatureid)} - ${getVariableCodeById(d.variableid_prep)}`,
+          data: d.values ? d.values.map((value: Value) => [value.datetime.valueOf(), Number(value.value)]) : [],
+          marker: {
+            enabled: d.values ? d.values.length < 500 : false
+          },
+          lineWidth: d.values && d.values.length >= 25 ? 1 : 0,
+          states: {
+            hover: {
+              lineWidthPlus: d.values && d.values.length >= 25 ? 1 : 0,
+            }
+          },
+          yAxis: i
+        }))
+      }
+    })
   return {
     chart: {
       zoomType: 'xy',
@@ -47,37 +84,33 @@ const chartOptions = computed(() => {
         text: 'Date'
       }
     },
-    yAxis: {
-      title: {
-        enabled: false
-        // text: variableAxisLabel(selectedVariable.value)
-      }
-    },
+    // @ts-ignore
+    yAxis: groupedSeries.map(d => d.yAxis),
     legend: {
       enabled: true
     },
     tooltip: {
-      // valueSuffix: ` ${selectedVariable.value?.unitsabbreviation}`,
       valueDecimals: 2,
+      xDateFormat: '%b %d, %Y %l:%M %p'
     },
-    series
+    // @ts-ignore
+    series: groupedSeries.map(d => d.data).flat()
   }
 })
 </script>
 
 <template>
-  <v-alert v-if="results.length === 0" type="warning" class="mx-4 my-8" variant="flat" border="start">
-    <div class="text-h5">No Data Selected</div>
-    <p>Click the <code>Add to Compare</code> button below a timeseries in the selected station box.</p>
+  <v-alert v-if="results.length === 0" type="warning" class="mx-4 my-4" variant="tonal" border="start" title="No Data Selected">
+    <div class="font-weight-bold">
+      Click the <code>Add to Compare</code> button below a timeseries in the selected station box.
+    </div>
   </v-alert>
   <div v-else>
     <highcharts :options="chartOptions" ref="chart"></highcharts>
-    <pre>TODO: multiple y-axes</pre>
     <v-divider class="mb-4"></v-divider>
     <v-table>
       <thead>
         <tr>
-          <!-- <th></th> -->
           <th class="text-center">
             Station
           </th>

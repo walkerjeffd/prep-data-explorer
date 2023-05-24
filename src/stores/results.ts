@@ -12,14 +12,19 @@ export const useResultsStore = defineStore('results', {
     minDate: null as string | null,
     maxDate: null as string | null,
     variableIds: [] as number[],
+    coreStationsOnly: true,
     valueCountSelectedRange: [0, 100]
   }),
   getters: {
-    resultsFilteredByDates: (state) => {
-      if (!state.minDate && !state.maxDate) return state.results
+    resultsFilteredByCoreStations (state): Result[] {
+      if (!state.coreStationsOnly) return state.results
+      return state.results.filter(d => d.samplingfeaturecore)
+    },
+    resultsFilteredByDates (state): Result[] {
+      if (!state.minDate && !state.maxDate) return this.resultsFilteredByCoreStations
       const minDate = state.minDate ? new Date(state.minDate) : new Date(0)
       const maxDate = state.maxDate ? new Date(state.maxDate) : new Date()
-      return state.results.filter(d => d.start <= maxDate && d.end >= minDate)
+      return this.resultsFilteredByCoreStations.filter(d => d.start <= maxDate && d.end >= minDate)
     },
     resultsFilteredByDatesAndVariables (state): Result[] {
       if (state.variableIds.length === 0) return this.resultsFilteredByDates

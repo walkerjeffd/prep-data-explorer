@@ -10,3 +10,19 @@ element receives outline-style: auto on click
 path.leaflet-interactive {
   outline-style: none !important;
 }
+
+.font-size-larger {
+  font-size: larger;
+}
+
+.prep-splash {
+  height: calc(100vh - 64px);
+}
+.prep-splash > img {
+  object-position: top;
+}
+.prep-hero {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  overflow-y: auto;
+  max-height: calc(100vh - 100px - 64px);
+}

@@ -8,20 +8,20 @@ targets_results <- list(
   }),
   tar_target(results_variables_tally, {
     results_stations |> 
-      group_by(variablenamecv, unitsid, unitsabbreviation) |> 
+      group_by(variabletypecv, variablenamecv, unitsid, unitsabbreviation) |> 
       summarise(n_values = sum(n_values), .groups = "drop") |> 
       arrange(desc(n_values))
   }),
   tar_target(results_variables_tally_exclude, {
     results_variables_tally |> 
-      anti_join(variables_inp, by = c("variablenamecv", "unitsid"))
+      anti_join(variables_inp, by = c("variabletypecv", "variablenamecv", "unitsid"))
   }),
   tar_target(results_variables_tally_include, {
     results_variables_tally |> 
-      semi_join(variables_inp, by = c("variablenamecv", "unitsid"))
+      semi_join(variables_inp, by = c("variabletypecv", "variablenamecv", "unitsid"))
   }),
   tar_target(results_variables, {
     results_stations |> 
-      semi_join(variables_inp, by = c("variablenamecv", "unitsid"))
+      semi_join(variables_inp, by = c("variabletypecv", "variablenamecv", "unitsid"))
   })
 )

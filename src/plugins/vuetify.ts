@@ -20,7 +20,10 @@ export default createVuetify({
   directives,
   icons: {
     defaultSet: 'mdi',
-    aliases,
+    aliases: {
+      ...aliases,
+      info: 'mdi-information-outline'
+    },
     sets: {
       mdi,
     }

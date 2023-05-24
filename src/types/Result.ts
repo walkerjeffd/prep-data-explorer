@@ -5,6 +5,7 @@ import type Station from './Station'
 export default interface Result {
   resultid_prep: number
   samplingfeatureid: number
+  samplingfeaturecore: boolean
   variableid_prep: number
   start: Date
   end: Date

@@ -4,7 +4,7 @@ import type Variable from '@/types/Variable'
 const API_URL = 'http://data.prepestuaries.org:3001'
 
 export async function getValues (station: Station, variable: Variable): Promise<Value[]> {
-  const response = await fetch(`${API_URL}/results?featureaction.samplingfeatureid=eq.${station.samplingfeatureid}&variable.variablenamecv=eq.${variable.variablenamecv}&unitsid=eq.${variable.unitsid}&select=*,variable:variables!inner(*),featureaction:featureactions!inner(*),timeseriesresults(*,timeseriesresultvalues(*))`)
+  const response = await fetch(`${API_URL}/results?featureaction.samplingfeatureid=eq.${station.samplingfeatureid}&variable.variablenamecv=eq.${variable.variablenamecv}&unitsid=eq.${variable.unitsid}&timeseriesresults.timeseriesresultvalues.qualitycodecv=neq.Bad&timeseriesresults.timeseriesresultvalues.datavalue=neq.NaN&select=*,variable:variables!inner(*),featureaction:featureactions!inner(*),timeseriesresults(*,timeseriesresultvalues(*))`)
   if (!response.ok) {
     throw new Error('Failed to fetch values')
   }

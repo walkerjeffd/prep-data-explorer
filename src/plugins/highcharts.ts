@@ -3,12 +3,19 @@ import HighchartsVue from 'highcharts-vue'
 import accessibility from 'highcharts/modules/accessibility'
 import boost from 'highcharts/modules/boost'
 import noData from 'highcharts/modules/no-data-to-display'
+import exporting from 'highcharts/modules/exporting'
+import offlineExporting from 'highcharts/modules/offline-exporting'
 
 accessibility(Highcharts)
 boost(Highcharts)
 noData(Highcharts)
+exporting(Highcharts)
+offlineExporting(Highcharts)
 
 Highcharts.setOptions({
+  lang: {
+    thousandsSep: ','
+  },
   chart: {
     animation: false
   },
@@ -55,6 +62,27 @@ Highcharts.setOptions({
     },
     itemHoverStyle: {
       color: 'gray'
+    }
+  },
+  credits: {
+    enabled: false
+  },
+  exporting: {
+    sourceHeight: 800,
+    sourceWidth: 1200,
+    chartOptions: {
+      credits: {
+        enabled: true,
+        text: 'Piscataqua Watershed Data Explorer'
+      },
+      legend: {
+        itemDistance: 50
+      }
+    },
+    buttons: {
+      contextButton: {
+        menuItems: ['viewFullscreen', 'printChart', 'separator', 'downloadPNG', 'downloadJPEG', 'downloadPDF']
+      }
     }
   }
 })
