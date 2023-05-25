@@ -22,7 +22,8 @@ export default createVuetify({
     defaultSet: 'mdi',
     aliases: {
       ...aliases,
-      info: 'mdi-information-outline'
+      info: 'mdi-information-outline',
+      download: 'mdi-download'
     },
     sets: {
       mdi,

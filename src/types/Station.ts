@@ -3,7 +3,6 @@ export default interface Station {
   samplingfeaturecode: string
   samplingfeaturename: string
   samplingfeaturedescription: string
-  sitetypecv: string
   longitude: number
   latitude: number
 }

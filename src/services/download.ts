@@ -1,10 +1,12 @@
-import type Result from '@/types/Result'
-import type Variable from '@/types/Variable'
+import type ResultValues from '@/types/ResultValues'
 import type Value from '@/types/Value'
 import type Station from '@/types/Station'
 // @ts-ignore
 import { Parser } from '@json2csv/plainjs'
 import { saveAs } from 'file-saver'
+import { useStationsStore } from '@/stores/stations'
+
+const { getStationById } = useStationsStore()
 
 function currentTimestamp (): string {
   const now = new Date();
@@ -16,11 +18,14 @@ function currentTimestamp (): string {
   return `${year}${month}${day}_${hours}${minutes}`;
 }
 
-const hr = '# ------------------------------------------------------------------------------'
+function hr (n: number): string {
+  return `# ${Array(n).fill('-').join('')}`
+}
 
-function generateHeader () {
+function writeHeader () {
   const now = new Date()
-  const body = `# PREP | Piscataqua Watershed Data Explorer
+  const body = `# Piscataqua Watershed Data Explorer
+# Piscataqua Region Estuaries Partnership (PREP)
 # https://prepestuaries.org/
 #
 # Downloaded at: ${now.toLocaleDateString('en-US', { timeZone: 'America/New_York' })} ${now.toLocaleTimeString('en-US', { timeZone: 'America/New_York' })}
@@ -33,71 +38,48 @@ export function downloadCsvFile (filename: string, body: string): void {
   saveAs(blob, filename)
 }
 
-function formatValueRow(station: Station | undefined, variable: Variable | undefined, value: Value | undefined) {
-  return {
-    station_id: station?.samplingfeatureid,
-    station_code: station?.samplingfeaturecode,
-    station_name: station?.samplingfeaturename,
-    variable: variable?.variablenamecv,
-    units: variable?.unitsabbreviation,
-    datetime: value?.datetime,
-    // TODO: find efficient date formatter
-    // Date.to*String() are very slow (20 seconds each for GRBGB DO dataset, 300k rows)
-    // datetime: value.datetime.toISOString(),
-    // date: value.datetime.toLocaleDateString('en-US', { timeZone: 'America/New_York' }),
-    // time: value.datetime.toLocaleTimeString('en-US', { timeZone: 'America/New_York' }),
-    value: value?.value
-  }
-}
-
-function formatStationRow(station: Station | undefined) {
-  return {
-    station_id: station?.samplingfeatureid,
-    station_code: station?.samplingfeaturecode,
-    station_name: station?.samplingfeaturename,
-    station_description: station?.samplingfeaturedescription,
-    latitude: station?.latitude,
-    longitude: station?.longitude
-  }
-}
-
-function generateStationsTable (stations: (Station | undefined)[]) {
-  if (!stations.length) return
-
-  const rows = stations.map(station => formatStationRow(station))
-
+function writeTable (data: any[]) {
+  if (!data.length) return
   const parser = new Parser()
-  return parser.parse(rows)
+  return parser.parse(data)
 }
 
-function generateValuesTable (results: Result[]) {
-  const rows = results
-    .map(({station, variable, values}) => {
-      if (!values?.length) return []
-      return values?.map(value => formatValueRow(station, variable, value))
+export function downloadFile (resultValues: ResultValues[]) {
+  const results = resultValues.map(({ values, ...d }) => d) // eslint-disable-line @typescript-eslint/no-unused-vars
+  results.sort((a: any, b: any) => a.resultid - b.resultid)
+  const stations: Station[] = [...new Set(resultValues.map((d: ResultValues) => getStationById(d.samplingfeatureid)!))]
+  stations.sort((a: Station, b: Station) => a.samplingfeatureid - b.samplingfeatureid)
+  const values = resultValues
+    .map((d: ResultValues) => {
+      return d.values.map((v: Value) => ({
+        resultid: d.resultid,
+        samplingfeatureid: d.samplingfeatureid,
+        samplingfeaturecode: d.samplingfeaturecode,
+        variablenamecv: d.variablenamecv,
+        unitsabbreviation: d.unitsabbreviation,
+        valueid: v.valueid,
+        valuedatetime: v.valuedatetime,
+        valuedatetimeutcoffset: v.valuedatetimeutcoffset,
+        datavalue: v.datavalue,
+        censorcodecv: v.censorcodecv,
+      })).sort((a, b) => (new Date(a.valuedatetime)).valueOf() - (new Date(b.valuedatetime)).valueOf())
     })
+    .sort((a, b) => a[0].resultid - b[0].resultid)
     .flat()
-  if (!rows.length) return
 
-  const parser = new Parser()
-  return parser.parse(rows)
-}
-
-export function downloadResults (results: Result[]) {
-  const header = generateHeader()
-  const stations = Array.from(new Set(results.map(({station}) => station)))
-  const stationsTable = generateStationsTable(stations)
-  const valuesTable = generateValuesTable(results)
-  const body = `${header}
-${hr}
-# Stations Table
+  const body = `${writeHeader()}
+${hr(200)}
+# Stations
 #
-${stationsTable}
+${writeTable(stations)}
+${hr(200)}
+# Sampling Metadata
 #
-${hr}
-# Values Table
+${writeTable(results)}
+${hr(200)}
+# Values
 #
-${valuesTable}
+${writeTable(values)}
   `
   const filename = `PREP_${currentTimestamp()}.csv`
   downloadCsvFile(filename, body)

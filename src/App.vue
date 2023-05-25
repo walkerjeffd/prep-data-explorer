@@ -1,5 +1,11 @@
 <script setup lang="ts">
-const links: any[] = [
+interface Link {
+  label: string
+  name: string
+  icon: string
+}
+
+const links: Link[] = [
   {
     label: 'Home',
     name: 'home',

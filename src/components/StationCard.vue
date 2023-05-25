@@ -2,24 +2,27 @@
 import type { Ref, ComputedRef } from 'vue'
 import { useDisplay } from 'vuetify'
 
-import type Variable from '../types/Variable'
-import type Value from '../types/Value'
-import type Result from '../types/Result'
-import { useStationsStore } from '../stores/stations'
-import { useResultsStore } from '../stores/results'
-import { useVariablesStore } from '../stores/variables'
-import { useCompareStore } from '../stores/compare'
+import type Variable from '@/types/Variable'
+import type ResultValues from '@/types/ResultValues'
+import type Result from '@/types/Result'
+import type Value from '@/types/Value'
+
+import { useStationsStore } from '@/stores/stations'
+import { useResultsStore } from '@/stores/results'
+import { useVariablesStore } from '@/stores/variables'
+import { useCompareStore } from '@/stores/compare'
+
 import { storeToRefs } from 'pinia'
 import { ref, computed, watch } from 'vue'
-import { getValues } from '@/services/values'
-import { downloadResults } from '@/services/download'
+import { getResultValues } from '@/services/resultValues'
+import { downloadFile } from '@/services/download'
 
 const { lgAndUp } = useDisplay()
 const chart = ref(null)
 const show = ref(true)
 const loading = ref(false)
 const error: Ref<string | null> = ref(null)
-const values: Ref<Value[]> = ref([])
+const resultValues: Ref<ResultValues[]> = ref([])
 
 const { station } = storeToRefs(useStationsStore())
 const { selectStation } = useStationsStore()
@@ -59,11 +62,12 @@ watch([station, selectedVariable], async ([newStation, newSelectedVariable]) => 
 
   error.value = null
   loading.value = true
+  resultValues.value = []
   try {
     // @ts-ignore
-    const newValues = await getValues(newStation, newSelectedVariable)
+    const newResultValues = await getResultValues([newStation], newSelectedVariable)
     if (station.value?.samplingfeatureid === newStation.samplingfeatureid) {
-      values.value = newValues
+      resultValues.value = newResultValues
     }
   } catch (err) {
     if (err instanceof Error) {
@@ -95,24 +99,24 @@ function variableAxisLabel(variable: Variable | null) {
 }
 
 function download(): void {
-  const result = stationResults.value.find(d => d.variableid_prep === selectedVariable.value?.variableid_prep)
-  if (!result) return
-  result.variable = selectedVariable.value!
-  result.station = station.value!
-  result.values = values.value
-  downloadResults([result])
+  if (!station.value) return
+  if (!resultValues.value || resultValues.value.length === 0) return
+  downloadFile(resultValues.value)
 }
 
 function addToCompare(): void {
   if (selectedVariable.value === null) return
   const result = stationResults.value.find(d => d.variableid_prep === selectedVariable.value?.variableid_prep)
   if (!result) return
-  result.values = values.value
-  result.visible = true
+  result.resultValues = resultValues.value
   addResult(result)
 }
 
 const chartOptions = computed(() => {
+  const values = resultValues.value
+    .map((d: ResultValues) => d.values)
+    // @ts-ignore
+    .flat()
   return {
     chart: {
       zoomType: 'xy',
@@ -125,6 +129,16 @@ const chartOptions = computed(() => {
       type: 'datetime',
       title: {
         text: 'Date'
+      },
+      dateTimeLabelFormats: {
+        millisecond: '%H:%M:%S.%L',
+        second: '%H:%M:%S',
+        minute: '%H:%M',
+        hour: '%H:%M',
+        day: '%b %d, %Y',
+        week: '%b %d, %Y',
+        month: '%b %Y',
+        year: '%Y'
       }
     },
     yAxis: {
@@ -150,14 +164,16 @@ const chartOptions = computed(() => {
     series: [
       {
         name: selectedVariable.value?.variablenamecv,
-        data: values.value.map(value => [value.datetime.valueOf(), Number(value.value)]),
-        lineWidth: values.value.length < 25 ? 0 : 1,
+        data: values
+          .map((d: Value) => [(new Date(d.valuedatetime)).valueOf(), Number(d.datavalue)])
+          .sort((a: number[], b: number[]) => a[0] - b[0]),
+        lineWidth: values.length < 25 ? 0 : 1,
         marker: {
-          enabled: values.value.length < 500
+          enabled: values.length < 500
         },
         states: {
           hover: {
-            lineWidthPlus: values.value.length < 25 ? 0 : 1,
+            lineWidthPlus: values.length < 25 ? 0 : 1,
           }
         }
       }
@@ -228,12 +244,12 @@ const chartOptions = computed(() => {
           </div>
           <v-divider class="my-4"></v-divider>
           <div class="d-flex mt-4">
-            <v-btn variant="tonal" color="accent" :disabled="values.length === 0" @click="addToCompare">
+            <v-btn variant="tonal" color="accent" :disabled="resultValues.length === 0" @click="addToCompare">
               <v-icon icon="mdi-plus" start></v-icon> Add to Compare
             </v-btn>
             <v-spacer></v-spacer>
-            <v-btn variant="tonal" color="accent" :disabled="values.length === 0" @click="download">
-              <v-icon icon="mdi-download" start></v-icon> Download
+            <v-btn variant="tonal" color="accent" :disabled="resultValues.length === 0" @click="download">
+              <v-icon icon="$download" start></v-icon> Download
             </v-btn>
           </div>
         </div>

@@ -20,6 +20,7 @@ import { scaleQuantile } from 'd3-scale'
 
 import basemaps from '@/lib/basemaps'
 import overlays from '@/lib/overlays'
+
 import StationCard from '../components/StationCard.vue'
 import ExplorerSidebar from '../components/ExplorerSidebar.vue'
 import MapLegend from '@/components/MapLegend.vue'
@@ -28,8 +29,8 @@ import { useStationsStore } from '@/stores/stations'
 import { useResultsStore } from '@/stores/results'
 import { useVariablesStore } from '@/stores/variables'
 
-const { stations, station: selectedStation } = storeToRefs(useStationsStore())
-const { valueCountByStation, valueCountSelectedQuantiles, valueCountArray } = storeToRefs(useResultsStore())
+const { filteredStations, station: selectedStation } = storeToRefs(useStationsStore())
+const { valueCountByStation, valueCountArray } = storeToRefs(useResultsStore())
 const { fetchStations, selectStation } = useStationsStore()
 const { fetchResults } = useResultsStore()
 const { fetchVariables } = useVariablesStore()
@@ -42,13 +43,6 @@ const valueCountQuantileScale = computed(() => {
     .domain(valueCountArray.value)
     .range(range(0, 1.1, 0.1))
 })
-
-function showStation (station: Station): boolean {
-  if (!valueCountByStation.value) return true
-  const value = valueCountByStation.value.get(station.samplingfeatureid)
-  if (value === undefined) return false
-  return value >= valueCountSelectedQuantiles.value[0] && value <= valueCountSelectedQuantiles.value[1]
-}
 
 function stationColor (station: Station) {
   if (station === selectedStation.value) return 'rgb(255, 69, 0)'
@@ -136,12 +130,11 @@ onMounted(async () => {
           >
           </LGeoJson>
           <LCircleMarker
-            v-for="station in stations"
+            v-for="station in filteredStations"
             :key="station.samplingfeatureid"
             :latLng="[station.latitude, station.longitude]"
             :radius="station === selectedStation ? 10 : 8"
             :color="stationColor(station)"
-            :visible="showStation(station)"
             :weight="2"
             @click="selectStation(station.samplingfeatureid)"
           >
@@ -195,7 +188,7 @@ onMounted(async () => {
   left: 0;
   width: 30%;
   min-width: 400px;
-  z-index:1000;
+  z-index:500;
 }
 .explorer-loading {
   position: absolute;

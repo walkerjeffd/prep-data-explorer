@@ -1,6 +1,6 @@
-import type Value from './Value'
-import type Variable from './Variable'
-import type Station from './Station'
+import type ResultValues from '@/types/ResultValues'
+import type Station from '@/types/Station'
+import type Variable from '@/types/Variable'
 
 export default interface Result {
   resultid_prep: number
@@ -9,9 +9,8 @@ export default interface Result {
   variableid_prep: number
   start: Date
   end: Date
-  n_values: number,
-  visible?: boolean
-  values?: Value[],
-  variable?: Variable,
+  n_values: number
+  variable?: Variable
   station?: Station
+  resultValues?: ResultValues[]
 }

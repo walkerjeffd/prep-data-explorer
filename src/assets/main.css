@@ -18,9 +18,11 @@ path.leaflet-interactive {
 .prep-splash {
   height: calc(100vh - 64px);
 }
+
 .prep-splash > img {
   object-position: top;
 }
+
 .prep-hero {
   background-color: rgba(255, 255, 255, 0.8) !important;
   overflow-y: auto;

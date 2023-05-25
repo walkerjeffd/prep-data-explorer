@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import type { ComputedRef } from 'vue'
+import { watch, computed, ref } from 'vue'
+import type { ComputedRef, Ref } from 'vue'
 import { storeToRefs } from 'pinia'
+
+import BulkDownload from '../components/BulkDownload.vue'
+
 import { useStationsStore } from '@/stores/stations'
 import { useResultsStore } from '@/stores/results'
 import { useVariablesStore } from '@/stores/variables'
+
 import type Variable from '@/types/Variable'
-import { sum } from 'd3-array'
-import { watch } from 'vue'
 
 const {
   resultsFilteredByCoreStations,
@@ -16,12 +18,10 @@ const {
   minDate,
   maxDate,
   valueCountTickLabels,
-  valueCountSelectedRange,
-  valueCountByStation,
-  valueCountSelectedQuantiles
+  valueCountSelectedRange
 } = storeToRefs(useResultsStore())
 
-const { stations, station: selectedStation } = storeToRefs(useStationsStore())
+const { stations, station: selectedStation, filteredStations } = storeToRefs(useStationsStore())
 const { selectStation } = useStationsStore()
 const { variables } = storeToRefs(useVariablesStore())
 
@@ -32,6 +32,15 @@ const availableVariables: ComputedRef<Variable[]> = computed(() => {
   }
   return variables.value.filter(d => availableVariableIds.has(d.variableid_prep))
 })
+
+const firstSelectedVariable: ComputedRef<Variable | null> = computed(() => {
+  if (variableIds.value.length > 0) {
+    return variables.value.find(d => d.variableid_prep === variableIds.value[0]) as Variable
+  } else {
+    return null
+  }
+})
+
 watch(resultsFilteredByCoreStations, () => {
   if (selectedStation.value) {
     const availableStations = resultsFilteredByCoreStations.value.map(d => d.samplingfeatureid)
@@ -46,21 +55,14 @@ watch(availableVariables, () => {
   variableIds.value = variableIds.value.filter(d => availableVariableIds.includes(d))
 })
 
-const filteredStationCount: ComputedRef<number> = computed(() => {
-  const resultCounts = Array.from(valueCountByStation.value.values())
-  const showStation = resultCounts
-    .map(d => {
-      return d >= valueCountSelectedQuantiles.value[0] && d <= valueCountSelectedQuantiles.value[1] ? 1 : 0
-    })
-  return sum(showStation)
-})
-
 function reset () {
   minDate.value = null
   maxDate.value = null
   variableIds.value = []
   valueCountSelectedRange.value = [0, 100]
 }
+
+const showBulkDownload: Ref<boolean> = ref(false)
 </script>
 
 <template>
@@ -160,7 +162,7 @@ function reset () {
 
   <v-divider class="my-4"></v-divider>
 
-  <div>Showing {{ filteredStationCount.toLocaleString() }} of {{ stations.length.toLocaleString() }} available stations</div>
+  <div>Showing {{ filteredStations.length.toLocaleString() }} of {{ stations.length.toLocaleString() }} available stations</div>
 
   <v-divider class="my-4"></v-divider>
 
@@ -177,8 +179,17 @@ function reset () {
       <v-icon icon="mdi-refresh" start></v-icon> Reset
     </v-btn>
     <v-spacer></v-spacer>
-    <v-btn variant="tonal" color="accent" disabled>
-      <v-icon icon="mdi-download" start></v-icon> Bulk Download
-    </v-btn>
+    <v-dialog
+      v-model="showBulkDownload"
+      scrollable
+      width="800px"
+    >
+      <template v-slot:activator="{ props }">
+        <v-btn variant="tonal" color="accent" v-bind="props">
+          <v-icon icon="$download" start></v-icon> Bulk Download
+        </v-btn>
+      </template>
+      <BulkDownload :variables="availableVariables" :selected-variable="firstSelectedVariable" :min-date="minDate" :max-date="maxDate" @close="showBulkDownload = false" />
+    </v-dialog>
   </div>
 </template>

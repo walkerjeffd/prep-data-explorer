@@ -6,9 +6,6 @@ export const useCompareStore = defineStore('compare', {
     results: [] as Result[],
   }),
   getters: {
-    visibleResults: (state) => {
-      return state.results.filter(d => d.visible)
-    }
   },
   actions: {
     async addResult (result: Result) {

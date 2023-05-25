@@ -1,8 +1,10 @@
-import { defineStore } from 'pinia'
-import type Station from '../types/Station'
-import { getStations } from '../services/stations'
+import { defineStore, storeToRefs } from 'pinia'
+import type Station from '@/types/Station'
+import { getStations } from '@/services/stations'
+import { useResultsStore } from '@/stores/results'
 
 // const API_URL = import.meta.env.VITE_API_URL
+const { valueCountByStation, valueCountSelectedQuantiles } = storeToRefs(useResultsStore())
 
 export const useStationsStore = defineStore('stations', {
   state: () => ({
@@ -11,13 +13,21 @@ export const useStationsStore = defineStore('stations', {
   }),
   getters: {
     getStationById (state) {
-      return (id: number) => state.stations.find(d => d.samplingfeatureid === id)
+      return (id: number): Station | undefined => state.stations.find(d => d.samplingfeatureid === id)
     },
     getStationCodeById () {
       return (id: number) => {
         const station = this.getStationById(id)
         return station?.samplingfeaturecode
       }
+    },
+    filteredStations (state) {
+      return state.stations.filter(d => {
+        if (!valueCountByStation.value) return true
+        const value = valueCountByStation.value.get(d.samplingfeatureid)
+        if (value === undefined) return false
+        return value >= valueCountSelectedQuantiles.value[0] && value <= valueCountSelectedQuantiles.value[1]
+      })
     }
   },
   actions: {
