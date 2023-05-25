@@ -82,9 +82,14 @@
               <li>To download data from the SELECTED STATION DATA pop-up, make sure that the timeseries that you wish to download is displayed on the figure in the pop-up and click the DOWNLOAD button in the bottom right corner.</li>
             </ul>
 
-            <div class="text-center mt-12">
-              <v-btn :to="{name: 'explorer'}" color="accent" size="x-large">
+            <v-divider class="my-8"></v-divider>
+
+            <div class="d-flex justify-space-around">
+              <v-btn :to="{name: 'home'}" color="accent" size="large" variant="outlined">
                 <v-icon icon="mdi-arrow-left" start></v-icon> Back to Home
+              </v-btn>
+              <v-btn :to="{name: 'explorer'}" color="accent" size="large">
+                Open Explorer <v-icon icon="mdi-arrow-right" end></v-icon>
               </v-btn>
             </div>
           </v-sheet>

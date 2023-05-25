@@ -4,6 +4,7 @@ import { onMounted, ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { interpolateViridis as interpolateColor } from 'd3-scale-chromatic'
 import type L from 'leaflet'
+import type { Ref } from 'vue'
 import {
   LMap,
   LControlLayers,
@@ -33,6 +34,7 @@ const { fetchStations, selectStation } = useStationsStore()
 const { fetchResults } = useResultsStore()
 const { fetchVariables } = useVariablesStore()
 
+const overlayRefs = ref(overlays)
 const loading = ref(false)
 
 const valueCountQuantileScale = computed(() => {
@@ -54,7 +56,10 @@ function stationColor (station: Station) {
   return interpolateColor(valueCountQuantileScale.value(valueCount))
 }
 
+const visibleLayers: Ref<Array<L.GeoJSON>> = ref([])
+
 async function overlayAdd ({ layer }: { layer: L.GeoJSON }) {
+  // console.log('add', layer.options.id)
   if (layer.getLayers().length === 0) {
     // @ts-ignore
     const url = layer.options.url
@@ -63,13 +68,20 @@ async function overlayAdd ({ layer }: { layer: L.GeoJSON }) {
     layer.addData(geojson)
   }
   layer.bringToBack()
+  visibleLayers.value.push(layer)
+}
+
+async function overlayRemove ({ layer }: { layer: L.GeoJSON }) {
+  // console.log('remove', layer.options.id)
+  visibleLayers.value = visibleLayers.value.filter(d => d !== layer)
 }
 
 function mapReady (map: L.Map) {
   map.on('overlayadd', overlayAdd)
+  map.on('overlayremove', overlayRemove)
   map.eachLayer(d => {
     // @ts-ignore
-    if (d.options?.visibleOnLoad) {
+    if (d.options?.visible) {
     // @ts-ignore
       overlayAdd({ layer: d })
     }
@@ -101,7 +113,7 @@ onMounted(async () => {
           <LControlLayers position="topleft"></LControlLayers>
           <LControlScale position="bottomright"></LControlScale>
           <LControl position="topright">
-            <MapLegend />
+            <MapLegend :layers="visibleLayers"/>
           </LControl>
           <LTileLayer
             v-for="tile in basemaps"
@@ -114,10 +126,10 @@ onMounted(async () => {
             layer-type="base"
           ></LTileLayer>
           <LGeoJson
-            v-for="overlay in overlays"
-            :key="overlay.name"
-            :name="overlay.name"
-            :visible="overlay.visible"
+            v-for="overlay in overlayRefs"
+            :key="overlay.options.title"
+            :name="overlay.options.title"
+            :visible="overlay.options.visible"
             :options="overlay.options"
             :options-style="overlay.style as L.StyleFunction"
             layer-type="overlay"

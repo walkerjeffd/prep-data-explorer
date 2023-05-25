@@ -33,7 +33,7 @@ export function downloadCsvFile (filename: string, body: string): void {
   saveAs(blob, filename)
 }
 
-function formatRow(station: Station | undefined, variable: Variable | undefined, value: Value | undefined) {
+function formatValueRow(station: Station | undefined, variable: Variable | undefined, value: Value | undefined) {
   return {
     station_id: station?.samplingfeatureid,
     station_code: station?.samplingfeaturecode,
@@ -50,22 +50,54 @@ function formatRow(station: Station | undefined, variable: Variable | undefined,
   }
 }
 
-export function downloadResults (results: Result[]) {
-  const header = generateHeader()
+function formatStationRow(station: Station | undefined) {
+  return {
+    station_id: station?.samplingfeatureid,
+    station_code: station?.samplingfeaturecode,
+    station_name: station?.samplingfeaturename,
+    station_description: station?.samplingfeaturedescription,
+    latitude: station?.latitude,
+    longitude: station?.longitude
+  }
+}
+
+function generateStationsTable (stations: (Station | undefined)[]) {
+  if (!stations.length) return
+
+  const rows = stations.map(station => formatStationRow(station))
+
+  const parser = new Parser()
+  return parser.parse(rows)
+}
+
+function generateValuesTable (results: Result[]) {
   const rows = results
     .map(({station, variable, values}) => {
       if (!values?.length) return []
-      return values?.map(value => formatRow(station, variable, value))
+      return values?.map(value => formatValueRow(station, variable, value))
     })
     .flat()
   if (!rows.length) return
 
   const parser = new Parser()
-  const csv = parser.parse(rows)
+  return parser.parse(rows)
+}
 
+export function downloadResults (results: Result[]) {
+  const header = generateHeader()
+  const stations = Array.from(new Set(results.map(({station}) => station)))
+  const stationsTable = generateStationsTable(stations)
+  const valuesTable = generateValuesTable(results)
   const body = `${header}
 ${hr}
-${csv}
+# Stations Table
+#
+${stationsTable}
+#
+${hr}
+# Values Table
+#
+${valuesTable}
   `
   const filename = `PREP_${currentTimestamp()}.csv`
   downloadCsvFile(filename, body)

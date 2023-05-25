@@ -1,16 +1,25 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
+import type L from 'leaflet'
+import type { Feature } from 'geojson'
 import { useResultsStore } from '@/stores/results'
-import { watch } from 'vue';
 const {
   valueCountTickLabels
 } = storeToRefs(useResultsStore())
+
+defineProps<{
+  layers: Array<L.GeoJSON>
+}>()
+
+function getLayers (layer: L.GeoJSON): L.Layer[] {
+  return layer.getLayers() as L.LayerGroup[]
+}
 </script>
 
 <template>
   <v-sheet class="py-2 px-4" elevation="2">
     <div class="d-flex mb-0 align-center">
-      <div class="text-caption"># Values per Station</div>
+      <div class="text-subtitle-1"># Values per Station</div>
       <v-spacer></v-spacer>
       <v-tooltip dir="left">
         <template v-slot:activator="{ props }">
@@ -40,7 +49,57 @@ const {
         </g>
       </svg>
     </div>
-    <div>
+    <div v-if="layers.length > 0">
+      <v-divider class="my-4"></v-divider>
+      <div v-for="layer in layers" :key="// @ts-ignore
+                                         layer.options.id" class="my-1">
+        <div v-if="// @ts-ignore
+                   layer.options.legend?.byFeature" class="mb-4">
+          <div class="text-subtitle-2 mb-1">{{ // @ts-ignore
+                                                    layer.options.title }}</div>
+          <div v-for="// @ts-ignore
+                      layer in layer.getLayers()" :key="layer.feature.id" class="ml-4">
+            <svg width="20" height="20" style="display:inline">
+              <rect
+                x="2"
+                y="2"
+                width="15"
+                height="15"
+                rx="3"
+                :fill="layer.options.color"
+                :fill-opacity="layer.options.fillOpacity"
+                :stroke="layer.options.color"
+                :stroke-width="layer.options.weight"
+              ></rect>
+            </svg>
+            <span style="vertical-align: top;" class="ml-2">
+              {{layer.feature.properties[layer.options.legend.featureLabel]}}
+            </span>
+          </div>
+        </div>
+        <div v-else>
+          <div v-for="(x, i) in (getLayers(layer) as L.LayerGroup[])" :key="(x.feature as Feature).id">
+            <div v-if="i === 0">
+              <svg width="20" height="20" style="display:inline">
+                <rect
+                  x="2"
+                  y="2"
+                  width="15"
+                  height="15"
+                  rx="3"
+                  :fill="(x.options as any).color"
+                  :fill-opacity="(x.options as any).fillOpacity"
+                  :stroke="(x.options as any).color"
+                  :stroke-width="(x.options as any).weight"
+                ></rect>
+              </svg>
+              <span style="vertical-align: top;" class="ml-2">
+                {{(layer.options as any).title}}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </v-sheet>
 </template>
