@@ -1,18 +1,38 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useCompareStore } from '@/stores/compare'
+import { useResultsStore } from '@/stores/results'
 import { useStationsStore } from '@/stores/stations'
 import { useVariablesStore } from '@/stores/variables'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
+import { watch } from 'vue'
+import { useElementVisibility } from '@vueuse/core'
+
 import type Result from '@/types/Result'
 import type ResultValues from '@/types/ResultValues'
 import type Value from '@/types/Value'
 import { downloadFile } from '@/services/download'
+import { parseDate } from '@/lib/utils'
 
 const { results } = storeToRefs(useCompareStore())
 const { reset, removeResult } = useCompareStore()
 const { getStationCodeById } = useStationsStore()
 const { getVariableCodeById, getVariableById } = useVariablesStore()
+const { minDate, maxDate } = storeToRefs(useResultsStore())
+
+const chart = ref<HTMLInputElement | null>(null)
+const chartIsVisible = useElementVisibility(chart)
+const logScale = ref(false)
+const lockPeriod = ref(true)
+
+watch(chartIsVisible, () => {
+  // re-render chart to fix range options (needs to know el width)
+  if (!chart.value || chartIsVisible.value === false) return
+  // @ts-ignore
+  const chartObj = chart.value.chart
+  chartObj.render()
+})
 
 function download(): void {
   const resultValues: ResultValues[] = results.value
@@ -21,6 +41,31 @@ function download(): void {
     .flat()
   downloadFile(resultValues)
 }
+
+watch([minDate, maxDate], () => {
+  if (!chart.value) return
+  // @ts-ignore
+  const chartObj = chart.value.chart
+  updateChartPeriod(chartObj)
+})
+
+function updateChartPeriod (chart: any) {
+  console.log('updateChartPeriod')
+  if (!chart || !lockPeriod.value) return
+
+  let minDateValue, maxDateValue
+  if (minDate.value !== null) {
+    minDateValue = parseDate(minDate.value).valueOf()
+  }
+  if (maxDate.value !== null) {
+    maxDateValue = parseDate(maxDate.value).valueOf()
+  }
+
+  console.log(minDateValue, maxDateValue)
+  chart.xAxis[0].setExtremes(minDateValue, maxDateValue)
+  chart.render()
+}
+
 
 const chartOptions = computed(() => {
   const resultsGroupedByVariable = results.value.reduce((acc, cur) => {
@@ -40,6 +85,7 @@ const chartOptions = computed(() => {
         series,
         yAxis: {
           gridLineWidth: i === 0 ? 1 : 0,
+          type: logScale.value ? 'logarithmic' : 'linear',
           title: {
             text: variable?.variable_label,
             style: {
@@ -61,24 +107,38 @@ const chartOptions = computed(() => {
             data: values
               .map((value: Value) => [(new Date(value.valuedatetime)).valueOf(), Number(value.datavalue)])
               .sort((a: number[], b: number[]) => a[0] - b[0]),
+            // lineWidth: values && values.length >= 25 ? 1 : 0,
+            lineWidth: 1,
             marker: {
-              enabled: values ? values.length < 500 : false
+              enabled: values ? values.length < 200 : false,
+              radius: 3
             },
-            lineWidth: values && values.length >= 25 ? 1 : 0,
             states: {
               hover: {
                 lineWidthPlus: values && values.length >= 25 ? 1 : 0,
               }
             },
-            yAxis: i
+            dataGrouping: {
+              enabled: false
+            },
+            yAxis: i,
+            showInNavigator: true
           }
         })
       }
     })
   return {
     chart: {
-      zoomType: 'xy',
-      height: '70%'
+      zoomType: 'x',
+      width: 600,
+      height: '80%',
+      events: {
+        load: function (event: any) {
+          // @ts-ignore
+          const chart = event.target
+          updateChartPeriod(chart)
+        }
+      }
     },
     title: {
       text: null
@@ -88,6 +148,8 @@ const chartOptions = computed(() => {
       title: {
         text: 'Date'
       },
+      ordinal: false,
+      minRange: 24 * 3600 * 1000,
       dateTimeLabelFormats: {
         millisecond: '%H:%M:%S.%L',
         second: '%H:%M:%S',
@@ -111,6 +173,29 @@ const chartOptions = computed(() => {
         }
       }
     },
+    rangeSelector: {
+      selected: 4,
+      buttons: [{
+        type: 'month',
+        count: 1,
+        text: '1m',
+        title: 'View 1 month'
+      }, {
+        type: 'month',
+        count: 6,
+        text: '6m',
+        title: 'View 6 months'
+      }, {
+        type: 'year',
+        count: 1,
+        text: '1y',
+        title: 'View 1 year'
+      }, {
+        type: 'all',
+        text: 'All',
+        title: 'View all'
+      }]
+    },
     // @ts-ignore
     yAxis: groupedSeries.map(d => d.yAxis),
     legend: {
@@ -133,7 +218,36 @@ const chartOptions = computed(() => {
     </div>
   </v-alert>
   <div v-else>
-    <highcharts :options="chartOptions" ref="chart"></highcharts>
+    <highcharts :constructor-type="'stockChart'" :options="chartOptions" ref="chart"></highcharts>
+
+    <div class=" d-flex align-center mb-4">
+      <div class="ml-4">
+        <v-menu open-on-hover :close-on-content-click="false">
+          <template v-slot:activator="{ props }">
+            <v-btn prepend-icon="mdi-cog" variant="text" size="small" v-bind="props">
+              Chart Options
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-item>
+              <v-list-item-action class="px-2">
+                <v-switch v-model="logScale" color="primary" label="Log Scale" hide-details dense></v-switch>
+              </v-list-item-action>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-action class="px-2">
+                <v-switch v-model="lockPeriod" color="primary" label="Lock to Time Period" hide-details dense></v-switch>
+              </v-list-item-action>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+      </div>
+      <v-spacer></v-spacer>
+      <div class="text-caption d-flex align-center">
+        <v-icon size="small" start>$info</v-icon>
+        <div>Click + drag to zoom in</div>
+      </div>
+    </div>
     <v-divider class="mb-4"></v-divider>
     <v-table density="compact">
       <thead>
@@ -167,7 +281,7 @@ const chartOptions = computed(() => {
           </td>
           <td class="text-right">{{ result.n_values.toLocaleString() }}</td>
           <td class="text-center px-0" style="max-width:60px">
-            <v-btn size="x-small" icon="mdi-close-circle" variant="icon" @click="removeResult(result)">
+            <v-btn size="x-small" icon="mdi-close-circle" variant="flat" @click="removeResult(result)">
             </v-btn>
           </td>
         </tr>

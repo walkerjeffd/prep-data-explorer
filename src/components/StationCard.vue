@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import type { Ref, ComputedRef } from 'vue'
 import { useDisplay } from 'vuetify'
+import { storeToRefs } from 'pinia'
+import { ref, computed, watch } from 'vue'
 
+import { parseDate } from '@/lib/utils'
 import type Variable from '@/types/Variable'
 import type ResultValues from '@/types/ResultValues'
 import type Result from '@/types/Result'
@@ -12,13 +15,13 @@ import { useResultsStore } from '@/stores/results'
 import { useVariablesStore } from '@/stores/variables'
 import { useCompareStore } from '@/stores/compare'
 
-import { storeToRefs } from 'pinia'
-import { ref, computed, watch } from 'vue'
 import { getResultValues } from '@/services/resultValues'
 import { downloadFile } from '@/services/download'
 
 const { lgAndUp } = useDisplay()
 const chart = ref(null)
+const lockPeriod = ref(true)
+const logScale = ref(false)
 const show = ref(true)
 const loading = ref(false)
 const error: Ref<string | null> = ref(null)
@@ -27,7 +30,7 @@ const resultValues: Ref<ResultValues[]> = ref([])
 const { station } = storeToRefs(useStationsStore())
 const { selectStation } = useStationsStore()
 const { getResultsByStation } = useResultsStore()
-const { variableIds: resultsVariableIds } = storeToRefs(useResultsStore())
+const { variableIds: resultsVariableIds, minDate, maxDate } = storeToRefs(useResultsStore())
 const { variables } = storeToRefs(useVariablesStore())
 const { getVariableById } = useVariablesStore()
 const { addResult } = useCompareStore()
@@ -42,6 +45,21 @@ const stationVariables: ComputedRef<Variable[]> = computed(() => {
   const stationVariableIds = stationResults.value.map(d => d.variableid_prep)
   return variables.value.filter(variable => stationVariableIds.includes(variable.variableid_prep))
 })
+const chartKey: ComputedRef<string> = computed(() => {
+  if (!station.value) return ''
+  return `${station.value.samplingfeatureid}-${selectedVariableId.value}`
+})
+const seriesValues: ComputedRef<Array<Array<number>>> = computed(() => {
+  const values = resultValues.value
+    .map((d: ResultValues) => d.values)
+    // @ts-ignore
+    .flat()
+
+  return values
+    .map((d: Value) => [(new Date(d.valuedatetime)).valueOf(), Number(d.datavalue)])
+    .sort((a: number[], b: number[]) => a[0] - b[0])
+})
+
 watch(stationVariables, () => {
   const stationVariableIds = stationVariables.value.map(d => d.variableid_prep)
 
@@ -93,6 +111,13 @@ watch(loading, () => {
   }
 })
 
+watch([minDate, maxDate], () => {
+  if (!chart.value) return
+  // @ts-ignore
+  const chartObj = chart.value.chart
+  updateChartPeriod(chartObj)
+})
+
 function variableAxisLabel(variable: Variable | null) {
   if (variable === null) return ''
   return `${variable.variablenamecv} (${variable.unitsabbreviation})`
@@ -112,24 +137,73 @@ function addToCompare(): void {
   addResult(result)
 }
 
+function updateChartPeriod (chart: any) {
+  if (!chart || !lockPeriod.value) return
+
+  let minDateValue, maxDateValue
+  if (minDate.value !== null) {
+    minDateValue = parseDate(minDate.value).valueOf()
+  }
+  if (maxDate.value !== null) {
+    maxDateValue = parseDate(maxDate.value).valueOf()
+  }
+
+  chart.xAxis[0].setExtremes(minDateValue, maxDateValue)
+  chart.render()
+}
+
 const chartOptions = computed(() => {
-  const values = resultValues.value
-    .map((d: ResultValues) => d.values)
-    // @ts-ignore
-    .flat()
   return {
     chart: {
-      zoomType: 'xy',
-      height: '50%'
+      zoomType: 'x',
+      height: '70%',
+      events: {
+        // addSeries: () => console.log('addSeries'),
+        // drilldown: () => console.log('drilldown'),
+        // drillup: () => console.log('drillup'),
+        // drillupall: () => console.log('drillupall'),
+        load: (event: any) => {
+          const chart = event.target
+          updateChartPeriod(chart)
+        },
+        // redraw: () => console.log('redraw'),
+        // render: () => console.log('render'),
+        // selection: () => console.log('selection')
+      }
     },
     title: {
       text: null
     },
+    rangeSelector: {
+      selected: 4,
+      buttons: [{
+        type: 'month',
+        count: 1,
+        text: '1m',
+        title: 'View 1 month'
+      }, {
+        type: 'month',
+        count: 6,
+        text: '6m',
+        title: 'View 6 months'
+      }, {
+        type: 'year',
+        count: 1,
+        text: '1y',
+        title: 'View 1 year'
+      }, {
+        type: 'all',
+        text: 'All',
+        title: 'View all'
+      }]
+    },
     xAxis: {
-      type: 'datetime',
+      // type: 'datetime',
       title: {
         text: 'Date'
       },
+      ordinal: false,
+      minRange: 24 * 3600 * 1000,
       dateTimeLabelFormats: {
         millisecond: '%H:%M:%S.%L',
         second: '%H:%M:%S',
@@ -142,9 +216,11 @@ const chartOptions = computed(() => {
       }
     },
     yAxis: {
+      type: logScale.value ? 'logarithmic' : 'linear',
       title: {
         text: variableAxisLabel(selectedVariable.value)
-      }
+      },
+      opposite: false
     },
     legend: {
       enabled: false
@@ -164,17 +240,21 @@ const chartOptions = computed(() => {
     series: [
       {
         name: selectedVariable.value?.variablenamecv,
-        data: values
-          .map((d: Value) => [(new Date(d.valuedatetime)).valueOf(), Number(d.datavalue)])
-          .sort((a: number[], b: number[]) => a[0] - b[0]),
-        lineWidth: values.length < 25 ? 0 : 1,
+        data: seriesValues.value,
+        // gapSize: values.length < 500 ? 0 : 7,
+        // lineWidth: values.length < 25 ? 0 : 1,
+        lineWidth: 1,
         marker: {
-          enabled: values.length < 500
+          enabled: seriesValues.value.length < 500,
+          radius: 3
         },
         states: {
           hover: {
-            lineWidthPlus: values.length < 25 ? 0 : 1,
+            lineWidthPlus: seriesValues.value.length < 25 ? 0 : 1,
           }
+        },
+        dataGrouping: {
+          enabled: false
         }
       }
     ]
@@ -233,14 +313,39 @@ const chartOptions = computed(() => {
             label="Select Parameter"
             item-title="variable_label"
             item-value="variableid_prep"
+            hide-details
           ></v-autocomplete>
         </div>
 
-        <div class="pa-4">
-          <highcharts :options="chartOptions" ref="chart"></highcharts>
-          <div class="text-caption d-flex align-center">
-            <v-icon size="small" start>$info</v-icon>
-            <div>Click + drag to zoom in</div>
+        <div class="py-4 px-4">
+          <highcharts :constructor-type="'stockChart'" :options="chartOptions" ref="chart" :key="chartKey"></highcharts>
+          <div class=" d-flex align-center">
+            <div class="ml-4">
+              <v-menu open-on-hover :close-on-content-click="false">
+                <template v-slot:activator="{ props }">
+                  <v-btn prepend-icon="mdi-cog" variant="text" size="small" v-bind="props">
+                    Chart Options
+                  </v-btn>
+                </template>
+                <v-list>
+                  <v-list-item>
+                    <v-list-item-action class="px-2">
+                      <v-switch v-model="logScale" color="primary" label="Log Scale" hide-details dense></v-switch>
+                    </v-list-item-action>
+                  </v-list-item>
+                  <v-list-item>
+                    <v-list-item-action class="px-2">
+                      <v-switch v-model="lockPeriod" color="primary" label="Lock to Time Period" hide-details></v-switch>
+                    </v-list-item-action>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+            </div>
+            <v-spacer></v-spacer>
+            <div class="text-caption d-flex align-center">
+              <v-icon size="small" start>$info</v-icon>
+              <div>Click + drag to zoom in</div>
+            </div>
           </div>
           <v-divider class="my-4"></v-divider>
           <div class="d-flex mt-4">

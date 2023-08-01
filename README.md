@@ -67,3 +67,7 @@ npm run test:e2e
 ```sh
 npm run lint
 ```
+
+## License
+
+This application is licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).

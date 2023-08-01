@@ -1,11 +1,13 @@
 import Highcharts from 'highcharts'
 import HighchartsVue from 'highcharts-vue'
+import stock from 'highcharts/modules/stock'
 import accessibility from 'highcharts/modules/accessibility'
 import boost from 'highcharts/modules/boost'
 import noData from 'highcharts/modules/no-data-to-display'
 import exporting from 'highcharts/modules/exporting'
 import offlineExporting from 'highcharts/modules/offline-exporting'
 
+stock(Highcharts)
 accessibility(Highcharts)
 boost(Highcharts)
 noData(Highcharts)
