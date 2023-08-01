@@ -3,7 +3,13 @@ tar_option_set(packages = c("tidyverse", "lubridate", "sf", "janitor", "glue"))
 targets_gis <- list(
   tar_target(gis_regions_file, "/Users/jeff/Dropbox/Work/prep/gis/GreatBayRegionsv4/GreatBayRegionsv4.shp", format = "file"),
   tar_target(gis_regions, {
-    st_read(gis_regions_file)
+    st_read(gis_regions_file) |> 
+      mutate(
+        name = case_when(
+          name == "Gulf of Main (Ocean Region)" ~ "Gulf of Maine (Ocean Region)",
+          TRUE ~ name
+        )
+      )
   }),
   tar_target(gis_nhd_file, {
     download_dir <- nhdplusTools::download_nhdplushr("data/nhd", c("0106"))
