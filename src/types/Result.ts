@@ -3,10 +3,10 @@ import type Station from '@/types/Station'
 import type Variable from '@/types/Variable'
 
 export default interface Result {
-  resultid_prep: number
+  prep_resultid: number
   samplingfeatureid: number
   samplingfeaturecore: boolean
-  variableid_prep: number
+  prep_variableid: number
   start: Date
   end: Date
   n_values: number

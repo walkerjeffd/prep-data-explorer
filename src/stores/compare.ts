@@ -9,7 +9,7 @@ export const useCompareStore = defineStore('compare', {
   },
   actions: {
     async addResult (result: Result) {
-      if (this.results.map(d => d.resultid_prep).includes(result.resultid_prep)) return
+      if (this.results.map(d => d.prep_resultid).includes(result.prep_resultid)) return
       this.results.push(result)
     },
     async removeResult (result: Result) {

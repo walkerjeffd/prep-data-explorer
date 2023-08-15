@@ -19,23 +19,28 @@ import { range } from 'd3-array'
 import { scaleQuantile } from 'd3-scale'
 
 import basemaps from '@/lib/basemaps'
-import overlays from '@/lib/overlays'
+// import overlays from '@/lib/overlays'
 
 import StationCard from '../components/StationCard.vue'
 import ExplorerSidebar from '../components/ExplorerSidebar.vue'
 import MapLegend from '@/components/MapLegend.vue'
 
 import { useStationsStore } from '@/stores/stations'
-import { useResultsStore } from '@/stores/results'
-import { useVariablesStore } from '@/stores/variables'
-
 const { filteredStations, station: selectedStation } = storeToRefs(useStationsStore())
-const { valueCountByStation, valueCountArray } = storeToRefs(useResultsStore())
 const { fetchStations, selectStation } = useStationsStore()
+
+import { useResultsStore } from '@/stores/results'
+const { valueCountByStation, valueCountArray } = storeToRefs(useResultsStore())
 const { fetchResults } = useResultsStore()
+
+import { useVariablesStore } from '@/stores/variables'
 const { fetchVariables } = useVariablesStore()
 
-const overlayRefs = ref(overlays)
+import { useMapStore } from '@/stores/map'
+const { selectedOverlays } = storeToRefs(useMapStore())
+
+
+// const overlayRefs = ref(overlays)
 const loading = ref(false)
 
 const valueCountQuantileScale = computed(() => {
@@ -53,10 +58,11 @@ function stationColor (station: Station) {
 const visibleLayers: Ref<Array<L.GeoJSON>> = ref([])
 
 async function overlayAdd ({ layer }: { layer: L.GeoJSON }) {
-  // console.log('add', layer.options.id)
+  // console.log('add', layer.options)
   if (layer.getLayers().length === 0) {
     // @ts-ignore
     const url = layer.options.url
+    if (!url) return
     const response = await fetch(url)
     const geojson = await response.json()
     layer.addData(geojson)
@@ -120,15 +126,14 @@ onMounted(async () => {
             layer-type="base"
           ></LTileLayer>
           <LGeoJson
-            v-for="overlay in overlayRefs"
-            :key="overlay.options.title"
-            :name="overlay.options.title"
-            :visible="overlay.options.visible"
-            :options="overlay.options"
+            v-for="overlay in selectedOverlays"
+            :key="overlay.title"
+            :name="overlay.title"
+            :visible="overlay.visible"
+            :options="overlay"
             :options-style="overlay.style as L.StyleFunction"
             layer-type="overlay"
-          >
-          </LGeoJson>
+          ></LGeoJson>
           <LCircleMarker
             v-for="station in filteredStations"
             :key="station.samplingfeatureid"

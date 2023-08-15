@@ -11,6 +11,14 @@ path.leaflet-interactive {
   outline-style: none !important;
 }
 
+.leaflet-control-layers-separator {
+  display: none;
+}
+
+.leaflet-control-layers-overlays {
+  display: none;
+}
+
 .font-size-larger {
   font-size: larger;
 }

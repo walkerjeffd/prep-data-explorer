@@ -42,8 +42,8 @@ const selectedVariable: ComputedRef<Variable | null> = computed(() => {
   return getVariableById(selectedVariableId.value) || null
 })
 const stationVariables: ComputedRef<Variable[]> = computed(() => {
-  const stationVariableIds = stationResults.value.map(d => d.variableid_prep)
-  return variables.value.filter(variable => stationVariableIds.includes(variable.variableid_prep))
+  const stationVariableIds = stationResults.value.map(d => d.prep_variableid)
+  return variables.value.filter(variable => stationVariableIds.includes(variable.prep_variableid))
 })
 const chartKey: ComputedRef<string> = computed(() => {
   if (!station.value) return ''
@@ -61,7 +61,7 @@ const seriesValues: ComputedRef<Array<Array<number>>> = computed(() => {
 })
 
 watch(stationVariables, () => {
-  const stationVariableIds = stationVariables.value.map(d => d.variableid_prep)
+  const stationVariableIds = stationVariables.value.map(d => d.prep_variableid)
 
   // keep selected variable for new station
   if (selectedVariableId.value !== null && stationVariableIds.includes(selectedVariableId.value)) return
@@ -131,7 +131,7 @@ function download(): void {
 
 function addToCompare(): void {
   if (selectedVariable.value === null) return
-  const result = stationResults.value.find(d => d.variableid_prep === selectedVariable.value?.variableid_prep)
+  const result = stationResults.value.find(d => d.prep_variableid === selectedVariable.value?.prep_variableid)
   if (!result) return
   result.resultValues = resultValues.value
   addResult(result)
@@ -143,9 +143,11 @@ function updateChartPeriod (chart: any) {
   let minDateValue, maxDateValue
   if (minDate.value !== null) {
     minDateValue = parseDate(minDate.value).valueOf()
+    if (minDate.value.length != 10 || minDateValue < 0) return
   }
   if (maxDate.value !== null) {
     maxDateValue = parseDate(maxDate.value).valueOf()
+    if (maxDate.value.length != 10 || maxDateValue < 0) return
   }
 
   chart.xAxis[0].setExtremes(minDateValue, maxDateValue)
@@ -153,6 +155,7 @@ function updateChartPeriod (chart: any) {
 }
 
 const chartOptions = computed(() => {
+  console.log('compute: chartOptions', seriesValues.value.length)
   return {
     chart: {
       zoomType: 'x',
@@ -312,7 +315,7 @@ const chartOptions = computed(() => {
             variant="underlined"
             label="Select Parameter"
             item-title="variable_label"
-            item-value="variableid_prep"
+            item-value="prep_variableid"
             hide-details
           ></v-autocomplete>
         </div>

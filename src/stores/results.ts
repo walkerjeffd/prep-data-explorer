@@ -30,7 +30,7 @@ export const useResultsStore = defineStore('results', {
       if (state.variableIds.length === 0) return this.resultsFilteredByDates
 
       return this.resultsFilteredByDates.filter((d) => {
-        return state.variableIds.includes(d.variableid_prep)
+        return state.variableIds.includes(d.prep_variableid)
       })
     },
     valueCountByStation (): Map<number, number> {
@@ -71,7 +71,7 @@ export const useResultsStore = defineStore('results', {
       }
     },
     getResultsByVariables: (state) => {
-      return (variables: Variable[]) => state.results.filter(result => variables.some(variable => result.variableid_prep === variable.variableid_prep))
+      return (variables: Variable[]) => state.results.filter(result => variables.some(variable => result.prep_variableid === variable.prep_variableid))
     }
   },
   actions: {

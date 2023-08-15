@@ -3,9 +3,9 @@ import { storeToRefs } from 'pinia'
 import type L from 'leaflet'
 import type { Feature } from 'geojson'
 import { useResultsStore } from '@/stores/results'
-const {
-  valueCountTickLabels
-} = storeToRefs(useResultsStore())
+const { valueCountTickLabels } = storeToRefs(useResultsStore())
+import { useMapStore } from '@/stores/map'
+const { overlays, selectedOverlays } = storeToRefs(useMapStore())
 
 defineProps<{
   layers: Array<L.GeoJSON>
@@ -49,14 +49,34 @@ function getLayers (layer: L.GeoJSON): L.Layer[] {
         </g>
       </svg>
     </div>
+    <v-divider class="my-4"></v-divider>
+    <div class="mb-4">
+      <v-autocomplete
+        variant="underlined"
+        density="compact"
+        v-model="selectedOverlays"
+        :items="overlays"
+        item-title="title"
+        placeholder="Select layer(s)"
+        return-object
+        multiple
+        clearable
+        hide-details
+      >
+        <template v-slot:selection="{ index }">
+          <span class="grey--text text-body-1" v-if="index === 0">
+            {{ selectedOverlays.length  }} {{ selectedOverlays.length > 1 ? 'layers' : 'layer' }} selected
+          </span>
+        </template>
+      </v-autocomplete>
+    </div>
     <div v-if="layers.length > 0">
-      <v-divider class="my-4"></v-divider>
       <div v-for="layer in layers" :key="// @ts-ignore
                                          layer.options.id" class="my-1">
         <div v-if="// @ts-ignore
                    layer.options.legend?.byFeature" class="mb-4">
           <div class="text-subtitle-2 mb-1">{{ // @ts-ignore
-                                                    layer.options.title }}</div>
+                                               layer.options.title }}</div>
           <div v-for="// @ts-ignore
                       layer in layer.getLayers()" :key="layer.feature.id" class="ml-4">
             <svg width="20" height="20" style="display:inline">

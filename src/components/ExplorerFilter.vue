@@ -28,14 +28,14 @@ const { variables } = storeToRefs(useVariablesStore())
 const availableVariables: ComputedRef<Variable[]> = computed(() => {
   const availableVariableIds = new Set()
   for (let i = 0; i < resultsFilteredByCoreStations.value.length; i++) {
-    availableVariableIds.add(resultsFilteredByCoreStations.value[i].variableid_prep)
+    availableVariableIds.add(resultsFilteredByCoreStations.value[i].prep_variableid)
   }
-  return variables.value.filter(d => availableVariableIds.has(d.variableid_prep))
+  return variables.value.filter(d => availableVariableIds.has(d.prep_variableid))
 })
 
 const firstSelectedVariable: ComputedRef<Variable | null> = computed(() => {
   if (variableIds.value.length > 0) {
-    return variables.value.find(d => d.variableid_prep === variableIds.value[0]) as Variable
+    return variables.value.find(d => d.prep_variableid === variableIds.value[0]) as Variable
   } else {
     return null
   }
@@ -51,7 +51,7 @@ watch(resultsFilteredByCoreStations, () => {
 })
 
 watch(availableVariables, () => {
-  const availableVariableIds = availableVariables.value.map(d => d.variableid_prep)
+  const availableVariableIds = availableVariables.value.map(d => d.prep_variableid)
   variableIds.value = variableIds.value.filter(d => availableVariableIds.includes(d))
 })
 
@@ -128,7 +128,7 @@ const showBulkDownload: Ref<boolean> = ref(false)
     variant="underlined"
     placeholder="Select parameter(s)"
     item-title="variable_label"
-    item-value="variableid_prep"
+    item-value="prep_variableid"
     multiple
     clearable
     chips

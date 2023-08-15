@@ -109,7 +109,7 @@ async function download () {
             :items="variables"
             variant="underlined"
             item-title="variable_label"
-            item-value="variableid_prep"
+            item-value="prep_variableid"
             placeholder="Select parameter"
             clearable
             return-object

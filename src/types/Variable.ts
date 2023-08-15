@@ -1,5 +1,5 @@
 export default interface Variable {
-  variableid_prep: number
+  prep_variableid: number
   variablenamecv: string
   unitsid: number
   unitsabbreviation: string

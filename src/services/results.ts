@@ -5,7 +5,7 @@ const API_URL = import.meta.env.VITE_API_URL
 export function filterResultsByVariableIds (items: Result[], variableIds: number[]) {
   if (variableIds.length === 0) return items
 
-  return items.filter(item => variableIds.includes(item.variableid_prep))
+  return items.filter(item => variableIds.includes(item.prep_variableid))
 }
 
 export function filterResultsByStations (items: Result[], stations: Station[]) {
@@ -15,7 +15,7 @@ export function filterResultsByStations (items: Result[], stations: Station[]) {
 }
 
 export async function getResults (): Promise<Result[]> {
-  const response = await fetch(`${API_URL}/results`)
+  const response = await fetch(`${API_URL}/prep_results`)
   if (!response.ok) {
     throw new Error('Failed to fetch results')
   }

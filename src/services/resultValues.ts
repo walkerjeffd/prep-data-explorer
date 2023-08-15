@@ -3,7 +3,7 @@ import type Station from '@/types/Station'
 import type Value from '@/types/Value'
 import type Variable from '@/types/Variable'
 
-const API_URL = 'http://data.prepestuaries.org:3001'
+const API_URL = import.meta.env.VITE_API_URL
 
 export async function getResultValues (stations: Station[],
                                        variable: Variable,

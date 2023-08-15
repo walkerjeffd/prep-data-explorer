@@ -8,7 +8,7 @@ export const useVariablesStore = defineStore('variables', {
   }),
   getters: {
     getVariableById (state) {
-      return (id: number) => state.variables.find(d => d.variableid_prep === id)
+      return (id: number) => state.variables.find(d => d.prep_variableid === id)
     },
     getVariableCodeById () {
       return (id: number) => {

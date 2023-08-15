@@ -69,10 +69,10 @@ function updateChartPeriod (chart: any) {
 
 const chartOptions = computed(() => {
   const resultsGroupedByVariable = results.value.reduce((acc, cur) => {
-    if (!acc[cur.variableid_prep]) {
-      acc[cur.variableid_prep] = []
+    if (!acc[cur.prep_variableid]) {
+      acc[cur.prep_variableid] = []
     }
-    acc[cur.variableid_prep].push(cur)
+    acc[cur.prep_variableid].push(cur)
     return acc
   }, {} as Record<number, Result[]>)
   const groupedSeries = Object
@@ -103,7 +103,7 @@ const chartOptions = computed(() => {
             // @ts-ignore
             .flat()
           return {
-            name: `${getStationCodeById(d.samplingfeatureid)} - ${getVariableCodeById(d.variableid_prep)}`,
+            name: `${getStationCodeById(d.samplingfeatureid)} - ${getVariableCodeById(d.prep_variableid)}`,
             data: values
               .map((value: Value) => [(new Date(value.valuedatetime)).valueOf(), Number(value.datavalue)])
               .sort((a: number[], b: number[]) => a[0] - b[0]),
@@ -271,11 +271,11 @@ const chartOptions = computed(() => {
       <tbody>
         <tr
           v-for="result in results"
-          :key="`${result.samplingfeatureid}:${result.variableid_prep}`"
+          :key="`${result.samplingfeatureid}:${result.prep_variableid}`"
         >
           <!-- <td><v-checkbox hide-details v-model="result.visible"></v-checkbox></td> -->
           <td class="text-left truncate" style="max-width:200px;">{{ getStationCodeById(result?.samplingfeatureid) }}</td>
-          <td class="text-left truncate" style="max-width:200px;">{{ getVariableCodeById(result?.variableid_prep) }}</td>
+          <td class="text-left truncate" style="max-width:200px;">{{ getVariableCodeById(result?.prep_variableid) }}</td>
           <td class="text-right">
             {{ result.start?.toLocaleDateString() }} to {{ result.end?.toLocaleDateString() }}
           </td>
