@@ -15,11 +15,11 @@ import {
   LCircleMarker,
   LTooltip
 } from '@vue-leaflet/vue-leaflet'
-import { range } from 'd3-array'
+import { map, range } from 'd3-array'
 import { scaleQuantile } from 'd3-scale'
 
+import { distance } from '@/lib/utils'
 import basemaps from '@/lib/basemaps'
-// import overlays from '@/lib/overlays'
 
 import StationCard from '../components/StationCard.vue'
 import ExplorerSidebar from '../components/ExplorerSidebar.vue'
@@ -27,7 +27,7 @@ import MapLegend from '@/components/MapLegend.vue'
 
 import { useStationsStore } from '@/stores/stations'
 const { filteredStations, station: selectedStation } = storeToRefs(useStationsStore())
-const { fetchStations, selectStation } = useStationsStore()
+const { fetchStations, selectStation, setNearbyStations } = useStationsStore()
 
 import { useResultsStore } from '@/stores/results'
 const { valueCountByStation, valueCountArray } = storeToRefs(useResultsStore())
@@ -41,6 +41,7 @@ const { selectedOverlays } = storeToRefs(useMapStore())
 
 
 // const overlayRefs = ref(overlays)
+const mapEl = ref()
 const loading = ref(false)
 
 const valueCountQuantileScale = computed(() => {
@@ -103,13 +104,33 @@ onMounted(async () => {
     loading.value = false
   }
 })
+
+const MAX_DISTANCE = 10
+function onClickStation (station: Station) {
+  if (!mapEl.value) return
+  const targetPosition = mapEl.value.leafletObject
+    .latLngToContainerPoint({
+      lat: station.latitude,
+      lng: station.longitude
+    })
+  const nearbyStations = filteredStations.value.filter(d => {
+    const dPosition = mapEl.value.leafletObject
+      .latLngToContainerPoint({
+        lat: d.latitude,
+        lng: d.longitude
+      })
+    return d.samplingfeatureid !== station.samplingfeatureid && distance(targetPosition, dPosition) < MAX_DISTANCE
+  })
+  setNearbyStations([station, ...nearbyStations])
+  selectStation(station.samplingfeatureid)
+}
 </script>
 
 <template>
   <div class="explorer">
     <div class="explorer-map">
       <div style="height:100%;width:100%">
-        <LMap :zoom="11" :center="[43.1, -71.0]" @ready="mapReady">
+        <LMap :zoom="11" :center="[43.1, -71.0]" @ready="mapReady" ref="mapEl">
           <LControlLayers position="topleft"></LControlLayers>
           <LControlScale position="bottomright"></LControlScale>
           <LControl position="topright">
@@ -141,7 +162,7 @@ onMounted(async () => {
             :radius="station === selectedStation ? 10 : 8"
             :color="stationColor(station)"
             :weight="2"
-            @click="selectStation(station.samplingfeatureid)"
+            @click="onClickStation(station)"
           >
             <LTooltip>
               <div class="font-weight-bold">{{ station.samplingfeaturecode }}</div>

@@ -9,6 +9,7 @@ const { valueCountByStation, valueCountSelectedQuantiles } = storeToRefs(useResu
 export const useStationsStore = defineStore('stations', {
   state: () => ({
     stations: [] as Station[],
+    nearbyStations: [] as Station[],
     station: null as Station | null,
   }),
   getters: {
@@ -34,9 +35,13 @@ export const useStationsStore = defineStore('stations', {
     async fetchStations () {
       this.stations = await getStations()
     },
+    setNearbyStations (stations: Station[]) {
+      this.nearbyStations = stations
+    },
     selectStation (id?: number) {
       if (!id || this.station && this.station.samplingfeatureid === id) {
         this.station = null
+        this.setNearbyStations([])
       } else {
         const station = this.stations.find(station => station.samplingfeatureid === id)
         if (station) {
