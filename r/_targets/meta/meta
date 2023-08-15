@@ -3,19 +3,30 @@ db_connect|function|d38b70dc0f0f083b|||||||||||||||
 db_results|stem|eb91cb79f2836383|912c8f8491611244|a3c9ccf1088e8068|1335982367||t19503.7470352767s|144966aaf236f3d3|769912|rds|local|vector|||8.896||
 db_stations|stem|272a176daa3f045b|0f4b485fe11a808c|f88df4fc583082c4|-365592673||t19503.7470446662s|9c2c96cfa40664e7|170134|rds|local|vector|||0.782||
 gis_basin|stem|b21135726ec72c43|0ee7ed9471685a2c|bccddf624640ee95|-1111799825||t19503.7470527583s|167445307f1f60f6|211800|rds|local|vector|||0.466||
+gis_basin_shp|stem|59fd99eb632d9363|2ed045654e8e0767|bc6fecb8507eef3b|570874324|data/gis/prep-basin/prep-basin.shp|t19584.7536210473s|da3436e3f191e4c4|266812|file|local|vector|||0.015||
 gis_nhd_file|stem|c023f4c213731288|0dabfcac6ac7cfe3|1412aab1f2262a2a|-1133111941|data/nhd/01/NHDPLUS_H_0106_HU4_GDB.gdb|t18088.8284722222s|a56dab17a4c32a5f|11904|file|local|vector|||1.386||
+gis_nhd_wbdhu10|stem|7da9f6b1ffb2139f|07dd0e006f07ee84|1f15eae194bfa0f3|-545445264||t19584.7541062696s|f9448fc180d85f77|655838|rds|local|vector|||0.331|attribute variables are assumed to be spatially constant throughout all geometries|
 gis_nhd_wbdhu12|stem|97cbbdb504f9c95e|a04fd88c91c40b5d|4edc8c9570676606|-356597557||t19503.7470466365s|672ed30cc8f472f7|790325|rds|local|vector|||0.088|GDAL Message 1 organizePolygons received a polygon with more than 100 parts.  The processing may be really slow.  You can skip the processing by setting METHODSKIP.|
 gis_regions|stem|c74c223c9a2a0d93|e8d41677875cc9ca|6dc8de1e04beb9d7|833120119||t19522.5464714868s|c724313ee30c09c3|155125|rds|local|vector|||0.091||
-gis_regions_file|stem|3edb5d038d8f0dcf|c2ef150daacb24d8|ef46db3751d8e999|-2015336350|/Users/jeff/Dropbox/Work/prep/gis/GreatBayRegionsv4/GreatBayRegionsv4.shp|t19478.7666666667s|e0ccac28dd949f4f|389468|file|local|vector|||0||
+gis_regions_file|stem|3edb5d038d8f0dcf|0fe2d9c9e7c94998|ef46db3751d8e999|-2015336350|data/gis/GreatBayRegionsv4/GreatBayRegionsv4.shp|t19478.7666666667s|e0ccac28dd949f4f|389468|file|local|vector|||0.506||
+gis_towns|stem|36efa530671ef1d0|7f67775c3222004c|6370b2cb91037912|377513302||t19584.7491043456s|ccc6f48ad594877d|473762|rds|local|vector|||0.177|attribute variables are assumed to be spatially constant throughout all geometries|
+gis_towns_ma|stem|f866ce4118f5d8ee|6a135330cfe75119|d94fdfa72cd17b05|386229584||t19584.7490041212s|e15903d46f30d0b9|70531|rds|local|vector|||0.912||
+gis_towns_ma_file|stem|e6058195eca65c56|0cc1c5dd632ad3eb|ef46db3751d8e999|158810880|data/gis/towns/townssurvey_shp/TOWNSSURVEY_POLY.shp|t19109.9328935185s|723bc3d8fa7b55e9|10503656|file|local|vector|||0.558||
+gis_towns_me|stem|c89f45b641d971b8|6fcf8b8fe1173e44|77955c6099ff093b|-127293419||t19584.7464626482s|bbfbe8ddec128c78|247178|rds|local|vector|||2.121||
+gis_towns_me_file|stem|2d130feeca6b1478|d7b830b0c27390e7|ef46db3751d8e999|-1647558631|data/gis/towns/Maine_Town_and_Townships_Boundary_Polygons_Feature/Maine_Town_and_Townships_Boundary_Polygons_Feature.shp|t19386.7466435185s|e2e54e40500881fb|20700088|file|local|vector|||0.525||
+gis_towns_nh|stem|7488fa8e5aa62585|701336d32c58609a|fafcf18222446770|1220427309||t19584.7451570997s|e104167c89a1af61|196602|rds|local|vector|||0.188||
+gis_towns_nh_file|stem|56bf22d89ad0c7ac|3157a680e4a0eb43|ef46db3751d8e999|145006462|data/gis/towns/Base_Layers_for_New_Hampshire/Base_Layers_for_New_Hampshire.shp|t19584.7385300926s|b5a5b92dd0d1af85|1478108|file|local|vector|||0.543||
 pwde_gis_basin|stem|2fb3a2d14ac076bd|dc2988d60c178da7|5a42f819a6cc1f43|-186905764|../public/gis/basin.geojson|t19503.747054238s|4b139ccc9fcd90f5|746484|file|local|vector|||0.028||
+pwde_gis_huc10|stem|65a6c1517fd8af2b|73bd5d5a88516938|85a35624249b647f|-1359141109|../public/gis/huc10.geojson|t19584.7544429353s|cb47d8152eac2294|1390509|file|local|vector|||0.071||
 pwde_gis_huc12|stem|351c72c589472117|319cecb3510213a8|741a76e06a75dd3d|447315558|../public/gis/huc12.geojson|t19503.7470536558s|28ea5a03eaa6cdaf|1726115|file|local|vector|||0.075||
 pwde_gis_regions|stem|c1853a873f769c97|35a1ca70d94314ea|4cccd65bb51ca5c0|278672740|../public/gis/regions.geojson|t19522.5465395441s|b3f032bd74d5fd48|349272|file|local|vector|||0.026||
-pwde_results|stem|5a98a225c53dacf4|8a54a1e4691beaa7|911b709bf1d597d7|73590875||t19503.7470680508s|897f2f13a9b05916|72791|rds|local|vector|||0.832||
-pwde_results_file|stem|faec94374a7420ae|448e55d7816070b0|03138593c9097323|-742844914|../public/api/results|t19503.7470690711s|73dc773f04c39000|2678714|file|local|vector|||0.087||
-pwde_stations|stem|eaaaa7934a831e2d|ab67374c07132087|b861ab969721475c|-1841260108||t19503.747069287s|4f7f1f1910fba342|76672|rds|local|vector|||0.006||
-pwde_stations_file|stem|b75da7c249fd9999|62bdbfe1fef6a02d|891a3039116e79e6|191491580|../public/api/stations|t19503.747069418s|687fa4e7acba540c|481219|file|local|vector|||0.009||
-pwde_variables|stem|6d6c174f690225a4|714894de9a0c96e5|326a639d378b1d0d|-12841556||t19503.747057074s|d36a920f80ef96db|2350|rds|local|vector|||0.01||
-pwde_variables_file|stem|190753490fdb4ac4|0f1696bd369ac51c|ca1975980824db65|-1647780999|../public/api/variables|t19503.7470582268s|86d46915ba47bc65|22935|file|local|vector|||0.002||
+pwde_gis_towns|stem|3d64c90bad6a6989|0e3333411ea05907|098d94c0507a9be6|-1233939158|../public/gis/towns.geojson|t19584.7512950758s|0b2f7a1e6c8ffd39|1026487|file|local|vector|||0.051||
+pwde_results|stem|f3c2d89a0f307c5a|ce68bf44b6c01d6c|18308de05bff960d|73590875||t19584.7615667615s|e670cb0c65328e30|72788|rds|local|vector|||0.778||
+pwde_results_file|stem|871b272d86ca2d24|7dfb40c81d172a99|714d9827b0739baa|-742844914|../public/api/prep_results|t19584.7615681044s|73dc773f04c39000|2678714|file|local|vector|||0.091||
+pwde_stations|stem|eaaaa7934a831e2d|ab67374c07132087|3eb52b5455887f53|-1841260108||t19584.7615670371s|4f7f1f1910fba342|76672|rds|local|vector|||0.006||
+pwde_stations_file|stem|b75da7c249fd9999|f1d21136255cc29a|891a3039116e79e6|191491580|../public/api/prep_stations|t19584.7615682406s|687fa4e7acba540c|481219|file|local|vector|||0.007||
+pwde_variables|stem|a8064ad088513ae7|13330e976f2ccf28|005cc21167f691f0|-12841556||t19584.761448993s|929d352ccddafb50|2349|rds|local|vector|||0.02||
+pwde_variables_file|stem|6345e6dba25d55de|742ae4c6b16e1519|acb1853850f8e248|-1647780999|../public/api/prep_variables|t19584.7615572273s|86d46915ba47bc65|22935|file|local|vector|||0.011||
 results_stations|stem|9020865f9114fcea|705a327a8d09b526|60c590c9c8119d68|-2110413309||t19503.7470563665s|e561329250efd7a7|372184|rds|local|vector|||0.021||
 results_variables|stem|40747595be645d1f|986087ed8f25e68c|20a174d2ed6417a5|-1142118984||t19503.7470581718s|4d3ed07e6fccc319|267384|rds|local|vector|||0.007||
 results_variables_tally|stem|116009a79f940176|cdc2b0b1e2120a92|a02836a4c4a47e29|-393045787||t19503.7470565156s|904102f045693ea3|6066|rds|local|vector|||0.009||
@@ -23,8 +34,8 @@ results_variables_tally_exclude|stem|54771f184cb28818|b85148d36bcd4b46|ff844f782
 results_variables_tally_include|stem|aadc7d2404097db4|7a06a5a0e13f6e57|785b67e460037415|-1851454156||t19503.7470569274s|726e682652896a62|2818|rds|local|vector|||0.002||
 stations_basin|stem|4c78324e3a4a8dfd|f73f5f556fd1ad60|2f81307f533287cf|-435621523||t19503.7470550032s|12bbe686853f1f47|110811|rds|local|vector|||0.051||
 targets_db|object|b731f703c80e1b22|||||||||||||||
-targets_gis|object|941ba77582762c33|||||||||||||||
-targets_pwde|object|0c7f121cac4f5d3c|||||||||||||||
+targets_gis|object|be39a9de3a0ae153|||||||||||||||
+targets_pwde|object|5981f4551a2ad5e3|||||||||||||||
 targets_results|object|f324962d6853cf60|||||||||||||||
 targets_stations|object|9eb1b28d27508338|||||||||||||||
 targets_variables|object|efd2bb8416446308|||||||||||||||

@@ -11,6 +11,16 @@ targets_pwde <- list(
       write_sf(filename, driver = "GeoJSON", delete_layer = TRUE, layer_options = c("COORDINATE_PRECISION=6", "ID_GENERATE=YES"))
     filename
   }, format = "file"),
+  tar_target(pwde_gis_towns, {
+    filename <- "../public/gis/towns.geojson"
+    if (file.exists(filename)) {
+      unlink(filename)
+    }
+    gis_towns |> 
+      select(name, state) |> 
+      write_sf(filename, driver = "GeoJSON", delete_layer = TRUE, layer_options = c("COORDINATE_PRECISION=6", "ID_GENERATE=YES"))
+    filename
+  }, format = "file"),
   tar_target(pwde_gis_basin, {
     filename <- "../public/gis/basin.geojson"
     if (file.exists(filename)) {
@@ -18,6 +28,16 @@ targets_pwde <- list(
     }
     gis_basin |> 
       write_sf(filename, driver = "GeoJSON", delete_layer = TRUE)
+    filename
+  }, format = "file"),
+  tar_target(pwde_gis_huc10, {
+    filename <- "../public/gis/huc10.geojson"
+    if (file.exists(filename)) {
+      unlink(filename)
+    }
+    gis_nhd_wbdhu10 |> 
+      select(HUC10, Name) |> 
+      write_sf(filename, driver = "GeoJSON", delete_layer = TRUE, layer_options = c("COORDINATE_PRECISION=6", "ID_GENERATE=YES"))
     filename
   }, format = "file"),
   tar_target(pwde_gis_huc12, {
@@ -34,11 +54,11 @@ targets_pwde <- list(
     variables_inp |> 
       semi_join(results_stations, by = c("variabletypecv", "variablenamecv", "unitsid")) |> 
       arrange(variablenamecv) |>
-      mutate(variableid_prep = row_number()) |> 
-      select(variableid_prep, variabletypecv, variablenamecv, unitsid, unitsabbreviation)
+      mutate(prep_variableid = row_number()) |> 
+      select(prep_variableid, variabletypecv, variablenamecv, unitsid, unitsabbreviation)
   }),
   tar_target(pwde_variables_file, {
-    filename <- "../public/api/variables"
+    filename <- "../public/api/prep_variables"
     pwde_variables |> 
       jsonlite::write_json(filename)
     filename
@@ -47,7 +67,7 @@ targets_pwde <- list(
     results_variables |> 
       select(-unitsabbreviation) |> 
       inner_join(pwde_variables, by = c("variabletypecv", "variablenamecv", "unitsid")) |> 
-      group_by(samplingfeatureid, variableid_prep) |>
+      group_by(samplingfeatureid, prep_variableid) |>
       summarise(
         start = min(start),
         end = max(end),
@@ -56,17 +76,17 @@ targets_pwde <- list(
       ) |> 
       inner_join(select(db_stations, samplingfeatureid, samplingfeaturecode), by = c("samplingfeatureid")) |> 
       mutate(
-        resultid_prep = row_number(),
+        prep_resultid = row_number(),
         samplingfeaturecore = samplingfeaturecode %in% c(
           "GRBAP", "GRBCL", "GRBLR", "GRBCML", "GRBGB", "GRBGBE", "GRBGBW", "GRBOR",
           "GRBSF", "GRBSQ", "GRBULB", "GRBUPR", "HHHR", "02-GWR", "05-SFR", "07-CCH",
           "05-OYS", "05-LMP", "09-EXT", "05-BLM", "02-WNC"
         )
       ) |>
-      select(resultid_prep, samplingfeatureid, samplingfeaturecore, variableid_prep, start, end, n_values)
+      select(prep_resultid, samplingfeatureid, samplingfeaturecore, prep_variableid, start, end, n_values)
   }),
   tar_target(pwde_results_file, {
-    filename <- "../public/api/results"
+    filename <- "../public/api/prep_results"
     pwde_results |> 
       jsonlite::write_json(filename)
     filename
@@ -86,7 +106,7 @@ targets_pwde <- list(
       )
   }),
   tar_target(pwde_stations_file, {
-    filename <- "../public/api/stations"
+    filename <- "../public/api/prep_stations"
     pwde_stations |> 
       jsonlite::write_json(filename)
     filename
