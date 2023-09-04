@@ -1,25 +1,25 @@
 -------------------------------------------------------
 -- PREP DATA EXPLORER VIEWS                          --
 -- by: Jeff Walker <jeff@walkerenvres.com>           --
--- updated: 2023-08-14                               --
+-- updated: 2023-09-01                               --
 -------------------------------------------------------
 
 -- Step 1: create odm2.prep_basin
 -- use shp2pgsql to convert basin shapefile, which should contain only one polygon
--- $ shp2pgsql prep-basin.shp odm2.prep_basin > prep-basin.sql
+-- $ shp2pgsql prep-basin.shp public.prep_basin > prep-basin.sql
 -- then import using psql
 -- $ psql -h ... -p ... -u ... -d PREP -f prep-basin.sql
 
 -- Step 2: create prep_stations_basins view
 -- contains all stations within the prep basin
-create or replace view odm2.prep_stations_basin as (
+create materialized view odm2.prep_stations_basin as (
 	select s.samplingfeatureid,
 	       s.samplingfeaturecode,
 	       s.samplingfeaturename,
 	       s.samplingfeaturedescription,
 	       st_x(s.featuregeometry) as longitude,
 	       st_y(s.featuregeometry) as latitude
-	from samplingfeatures s, odm2.prep_basin pb
+	from samplingfeatures s, public.prep_basin pb
 	where st_x(s.featuregeometry) is not null
     and st_y(s.featuregeometry) is not null
     and st_within(s.featuregeometry, pb.geom)
@@ -27,7 +27,7 @@ create or replace view odm2.prep_stations_basin as (
 
 -- Step 3: create prep_results_all view
 -- this table includes results for ALL variables at stations within basin
-create or replace view odm2.prep_results_all as (
+create materialized view odm2.prep_results_all as (
 	with tsv as (
 		select resultid,
 			   count(*) as n_values,
@@ -62,7 +62,7 @@ create or replace view odm2.prep_results_all as (
 -- Step 4: create prep_variables view
 -- identifies most common units for each variableid in prep_results_all
 -- creates prep_variableid
-create or replace view odm2.prep_variables as (
+create materialized view odm2.prep_variables as (
 	with rv as (
 		select variabletypecv,
 			   variablenamecv,
@@ -78,9 +78,44 @@ create or replace view odm2.prep_variables as (
 	)
 	select row_number() over () as prep_variableid,
 	       variabletypecv,
-		   variablenamecv,
+		     variablenamecv,
 	       unitsid,
-	       unitsabbreviation
+	       unitsabbreviation,
+				 variablenamecv in (
+					'Blue-green algae (cyanobacteria), phycocyanin',
+					'Chlorophyll a',
+					'Chlorophyll a, corrected for pheophytin',
+					'Chlorophyll a, uncorrected for pheophytin',
+					'Coliform, fecal',
+					'Enterococcus',
+					'Escherichia Coli',
+					'Oxygen, dissolved',
+					'Oxygen, dissolved percent of saturation',
+					'pH',
+					'Salinity',
+					'Specific conductance',
+					'Chloride',
+					'Chloride Total',
+					'Nitrogen',
+					'Nitrogen, dissolved organic',
+					'Nitrogen, NH3',
+					'Nitrogen, NH4',
+					'Nitrogen, nitrate (NO3)',
+					'Nitrogen, nitrite (NO2) + nitrate (NO3)',
+					'Nitrogen, Particulate',
+					'Nitrogen, total',
+					'Nitrogen, total dissolved',
+					'Nitrogen, total kjeldahl',
+					'Phosphorus',
+					'Phosphorus As P Dissolved',
+					'Phosphorus As P Total',
+					'Phosphorus, organic',
+					'Phosphorus, phosphate (PO4)',
+					'Solids, Dissolved Total',
+					'Solids, Suspended Total',
+					'Temperature',
+					'Turbidity'
+		   ) as variablecore
 	from rv_rank rvr
 	where rvr.rank=1
 );
@@ -89,7 +124,7 @@ create or replace view odm2.prep_variables as (
 -- filters prep_results_all using prep_variables to only include results with
 --   the most common units for each variable
 -- groups results by prep_variableid (distinct variablenamecv, unitsid)
-create or replace view odm2.prep_results as (
+create materialized view odm2.prep_results as (
 	with rv as (
 		select r.*, v.prep_variableid
 		from odm2.prep_results_all r
@@ -142,7 +177,7 @@ create or replace view odm2.prep_results as (
 
 -- Step 6: create prep_results view
 -- filters stations within basin having at least one set of results
-create or replace view odm2.prep_stations as (
+create materialized view odm2.prep_stations as (
 	select *
 	from odm2.prep_stations_basin sb
 	where samplingfeatureid in (select distinct samplingfeatureid from odm2.prep_results)
