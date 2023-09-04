@@ -26,21 +26,20 @@ import ExplorerSidebar from '../components/ExplorerSidebar.vue'
 import MapLegend from '@/components/MapLegend.vue'
 
 import { useStationsStore } from '@/stores/stations'
-const { filteredStations, station: selectedStation } = storeToRefs(useStationsStore())
-const { fetchStations, selectStation, setNearbyStations } = useStationsStore()
-
 import { useResultsStore } from '@/stores/results'
+import { useVariablesStore } from '@/stores/variables'
+import { useMapStore } from '@/stores/map'
+
+const { filteredStations, station: selectedStation, spatialFilter } = storeToRefs(useStationsStore())
+const { fetchStations, selectStation, setNearbyStations, setSpatialFilter } = useStationsStore()
+
 const { valueCountByStation, valueCountArray } = storeToRefs(useResultsStore())
 const { fetchResults } = useResultsStore()
 
-import { useVariablesStore } from '@/stores/variables'
 const { fetchVariables } = useVariablesStore()
 
-import { useMapStore } from '@/stores/map'
 const { selectedOverlays } = storeToRefs(useMapStore())
 
-
-// const overlayRefs = ref(overlays)
 const mapEl = ref()
 const loading = ref(false)
 
@@ -124,6 +123,12 @@ function onClickStation (station: Station) {
   setNearbyStations([station, ...nearbyStations])
   selectStation(station.samplingfeatureid)
 }
+
+function onClickOverlay (e: L.LeafletMouseEvent) {
+  const layer = e.layer
+  if (!layer.options.interactive) return
+  setSpatialFilter(e.layer)
+}
 </script>
 
 <template>
@@ -154,6 +159,7 @@ function onClickStation (station: Station) {
             :options="overlay"
             :options-style="overlay.style as L.StyleFunction"
             layer-type="overlay"
+            @click="onClickOverlay"
           ></LGeoJson>
           <LCircleMarker
             v-for="station in filteredStations"

@@ -4,4 +4,5 @@ export default interface Variable {
   unitsid: number
   unitsabbreviation: string
   variable_label?: string
+  variablecore: boolean
 }

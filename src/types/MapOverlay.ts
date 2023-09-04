@@ -1,10 +1,10 @@
 import type L from 'leaflet'
 
 interface onEachFeatureFunction {
-  (feature, layer: L.Layer): void
+  (feature: any, layer: L.Layer): void
 }
 interface styleFunction {
-  (feature): {}
+  (feature: any): {}
 }
 
 export default interface MapOverlay {

@@ -285,7 +285,7 @@ const chartOptions = computed(() => {
 
 <template>
   <v-card>
-    <v-toolbar class="pl-4">
+    <v-toolbar class="pl-4" v-if="$vuetify.display.width > 1440">
       <span class="text-h6">Selected Station Data</span>
       <v-spacer></v-spacer>
       <div class="d-flex align-center" v-if="nearbyStations.length >= 1">
@@ -298,6 +298,25 @@ const chartOptions = computed(() => {
           Next
           <v-icon size="small" right>mdi-menu-right</v-icon>
         </v-btn>
+      </div>
+      <v-divider vertical class="mx-4"></v-divider>
+      <v-btn :icon="show ? '$expand' : '$collapse'" size="x-small" @click="show = !show"></v-btn>
+      <v-btn icon="$close" size="x-small" @click="selectStation()"></v-btn>
+    </v-toolbar>
+    <v-toolbar class="pl-4 d-flex" v-else>
+      <div class="flex-grow-1">
+        <div class="text-h6">Selected Station Data</div>
+        <div class="d-flex align-center" v-if="nearbyStations.length >= 1">
+          <v-btn size="x-small" :disabled="selectedStationIndex === 0" @click="prevStation">
+            <v-icon size="small" left>mdi-menu-left</v-icon>
+            Prev
+          </v-btn>
+          <span class="align-self-center text-caption mx-4">{{ selectedStationIndex + 1 }} of {{ nearbyStations.length }}</span>
+          <v-btn size="x-small" :disabled="selectedStationIndex === (nearbyStations.length - 1)" @click="nextStation">
+            Next
+            <v-icon size="small" right>mdi-menu-right</v-icon>
+          </v-btn>
+        </div>
       </div>
       <v-divider vertical class="mx-4"></v-divider>
       <v-btn :icon="show ? '$expand' : '$collapse'" size="x-small" @click="show = !show"></v-btn>
@@ -398,7 +417,7 @@ const chartOptions = computed(() => {
 
 <style>
 .prep-station-sheet {
-  max-height: calc(100vh - 210px);
+  max-height: calc(100vh - 270px);
   overflow-y: auto;
 }
 </style>

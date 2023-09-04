@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { storeToRefs } from 'pinia'
 import type L from 'leaflet'
 import type { Feature } from 'geojson'
+import { storeToRefs } from 'pinia'
 import { useResultsStore } from '@/stores/results'
-const { valueCountTickLabels } = storeToRefs(useResultsStore())
 import { useMapStore } from '@/stores/map'
+const { valueCountTickLabels } = storeToRefs(useResultsStore())
 const { overlays, selectedOverlays } = storeToRefs(useMapStore())
 
 defineProps<{
@@ -19,7 +19,7 @@ function getLayers (layer: L.GeoJSON): L.Layer[] {
 <template>
   <v-sheet class="py-2 px-4" elevation="2">
     <div class="d-flex mb-0 align-center">
-      <div class="text-subtitle-1"># Values per Station</div>
+      <div class="text-subtitle-1"># Measurements per Station</div>
       <v-spacer></v-spacer>
       <v-tooltip dir="left">
         <template v-slot:activator="{ props }">
@@ -51,6 +51,7 @@ function getLayers (layer: L.GeoJSON): L.Layer[] {
     </div>
     <v-divider class="my-4"></v-divider>
     <div class="mb-4">
+      <div class="text-subtitle-1">Map Layers</div>
       <v-autocomplete
         variant="underlined"
         density="compact"

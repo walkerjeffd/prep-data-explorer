@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
-import type Result from '../types/Result'
-import type Station from '../types/Station'
-import type Variable from '../types/Variable'
-import { getResults } from '../services/results'
+import type Result from '@/types/Result'
+import type Station from '@/types/Station'
+import type Variable from '@/types/Variable'
+import { getResults } from '@/services/results'
 import { min, median, max, sum, rollup, quantile } from 'd3-array'
 // const API_URL = import.meta.env.VITE_API_URL
 
@@ -16,26 +16,34 @@ export const useResultsStore = defineStore('results', {
     valueCountSelectedRange: [0, 100]
   }),
   getters: {
-    resultsFilteredByCoreStations (state): Result[] {
+    resultsFilteredByDates (state): Result[] {
+      if (!state.minDate && !state.maxDate) return this.results
+      const minDate = state.minDate ? new Date(state.minDate) : new Date(0)
+      const maxDate = state.maxDate ? new Date(state.maxDate) : new Date()
+      return this.results
+        .filter(d => d.start <= maxDate && d.end >= minDate)
+    },
+
+    resultsFilteredByCore (state): Result[] {
       if (!state.coreStationsOnly) return state.results
       return state.results.filter(d => d.samplingfeaturecore)
     },
-    resultsFilteredByDates (state): Result[] {
-      if (!state.minDate && !state.maxDate) return this.resultsFilteredByCoreStations
+    resultsFilteredByCoreDates (state): Result[] {
+      if (!state.minDate && !state.maxDate) return this.resultsFilteredByCore
       const minDate = state.minDate ? new Date(state.minDate) : new Date(0)
       const maxDate = state.maxDate ? new Date(state.maxDate) : new Date()
-      return this.resultsFilteredByCoreStations.filter(d => d.start <= maxDate && d.end >= minDate)
+      return this.resultsFilteredByCore.filter(d => d.start <= maxDate && d.end >= minDate)
     },
-    resultsFilteredByDatesAndVariables (state): Result[] {
-      if (state.variableIds.length === 0) return this.resultsFilteredByDates
+    resultsFilteredByCoreDatesVariables (state): Result[] {
+      if (state.variableIds.length === 0) return this.resultsFilteredByCoreDates
 
-      return this.resultsFilteredByDates.filter((d) => {
+      return this.resultsFilteredByCoreDates.filter((d) => {
         return state.variableIds.includes(d.prep_variableid)
       })
     },
     valueCountByStation (): Map<number, number> {
       return rollup(
-        this.resultsFilteredByDatesAndVariables,
+        this.resultsFilteredByCoreDatesVariables,
         v => sum(v, d => d.n_values),
         d => d.samplingfeatureid
       )
@@ -54,6 +62,11 @@ export const useResultsStore = defineStore('results', {
     },
     valueCountTickLabels (): [number, number, number] {
       return [this.valueCountMin, this.valueCountMedian, this.valueCountMax]
+    },
+    valueCountQuantile () : (v: number) => number {
+      return (v: number) => {
+        return Math.floor(quantile(this.valueCountArray, v / 100)!)
+      }
     },
     valueCountSelectedQuantiles (state) : [number, number] {
       const lower = state.valueCountSelectedRange[0] === 0 ?

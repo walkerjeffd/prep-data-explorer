@@ -26,7 +26,7 @@ function writeHeader () {
   const now = new Date()
   const body = `# Piscataqua Watershed Data Explorer
 # Piscataqua Region Estuaries Partnership (PREP)
-# https://prepestuaries.org/
+# http://data.prepestuaries.org/data-explorer/
 #
 # Downloaded at: ${now.toLocaleDateString('en-US', { timeZone: 'America/New_York' })} ${now.toLocaleTimeString('en-US', { timeZone: 'America/New_York' })}
 #`

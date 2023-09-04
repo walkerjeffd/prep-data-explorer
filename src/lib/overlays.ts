@@ -8,48 +8,80 @@ export default [
     visible: true,
     url: 'gis/basin.geojson',
     interactive: false,
-    onEachFeature: function (feature: { }, layer: L.Layer) {
+    onEachFeature: function (feature: { }, layer: any) {
       layer.bindTooltip('PREP Basin', { sticky: true })
     },
     style: () => ({
       fillOpacity: 0
-    }),
+    })
   },
-  {
-    id: 'huc10',
-    title: 'HUC10 Basins',
-    interactive: true,
-    url: 'gis/huc10.geojson',
-    onEachFeature: function (feature: { properties: { Name: string, HUC10: string } }, layer: L.Layer) {
-      layer.bindTooltip(`${feature.properties.Name} (HUC10 ${feature.properties.HUC10})`, { sticky: true })
-    },
-    style: () => ({
-      fillOpacity: 0,
-      color: schemeTableau10[5],
-      weight: 2
-    }),
-  },
+  // {
+  //   id: 'huc10',
+  //   title: 'HUC10 Basins',
+  //   interactive: true,
+  //   url: 'gis/huc10.geojson',
+  //   onEachFeature: function (feature: { properties: { Name: string, HUC10: string } }, layer: any) {
+  //     layer.bindTooltip(`${this.label(feature)}`, { sticky: true })
+  //     layer.on('mouseover', function () {
+  //       layer.setStyle({
+  //         weight: 4
+  //       })
+  //     })
+  //     layer.on('mouseout', function () {
+  //       layer.setStyle({
+  //         weight: 2
+  //       })
+  //     })
+  //   },
+  //   style: () => ({
+  //     fillOpacity: 0,
+  //     color: schemeTableau10[5],
+  //     weight: 2
+  //   }),
+  //   label: (d: any) => `HUC10: ${d.properties.Name} (${d.properties.HUC10})`
+  // },
   {
     id: 'huc12',
     title: 'HUC12 Basins',
     interactive: true,
     url: 'gis/huc12.geojson',
-    onEachFeature: function (feature: { properties: { Name: string, HUC12: string } }, layer: L.Layer) {
+    onEachFeature: function (feature: { properties: { Name: string, HUC12: string } }, layer: any) {
       layer.bindTooltip(`${feature.properties.Name} (HUC12 ${feature.properties.HUC12})`, { sticky: true })
+      layer.on('mouseover', function () {
+        layer.setStyle({
+          weight: 4
+        })
+      })
+      layer.on('mouseout', function () {
+        layer.setStyle({
+          weight: 2
+        })
+      })
     },
     style: () => ({
       fillOpacity: 0,
       color: schemeTableau10[2],
       weight: 2
     }),
+    label: (d: any) => `HUC12: ${d.properties.Name} (${d.properties.HUC12})`
   },
   {
     id: 'regions',
     title: 'Waterbody Regions',
     interactive: true,
     url: 'gis/regions.geojson',
-    onEachFeature: function (feature: { properties: { name: string } }, layer: L.Layer) {
-      layer.bindTooltip(feature.properties.name, { sticky: true })
+    onEachFeature: function (feature: { properties: { name: string } }, layer: any) {
+      layer.bindTooltip(this.label(feature), { sticky: true })
+      layer.on('mouseover', function () {
+        layer.setStyle({
+          weight: 4
+        })
+      })
+      layer.on('mouseout', function () {
+        layer.setStyle({
+          weight: 2
+        })
+      })
     },
     style: (feature: { id: number }) => ({
       weight: 2,
@@ -59,20 +91,32 @@ export default [
       byFeature: true,
       featureLabel: 'name'
     },
+    label: (d: { properties: { name: string }}) => `Waterbody: ${d.properties.name}`,
   },
   {
     id: 'towns',
     title: 'Towns and Municipalities',
     interactive: true,
     url: 'gis/towns.geojson',
-    onEachFeature: function (feature: { properties: { name: string } }, layer: L.Layer) {
-      layer.bindTooltip(`${feature.properties.name}, ${feature.properties.state}`, { sticky: true })
+    onEachFeature: function (feature: { properties: { name: string } }, layer: any) {
+      layer.bindTooltip(this.label(feature), { sticky: true })
+      layer.on('mouseover', function () {
+        layer.setStyle({
+          weight: 4
+        })
+      })
+      layer.on('mouseout', function () {
+        layer.setStyle({
+          weight: 2
+        })
+      })
     },
     style: () => ({
       weight: 2,
       fillOpacity: 0,
       color: schemeTableau10[4]
-    })
+    }),
+    label: (d: any) => `Town/Municipality: ${d.properties.name}, ${d.properties.state}`
   },
   {
     id: 'eelgrass-2010',
