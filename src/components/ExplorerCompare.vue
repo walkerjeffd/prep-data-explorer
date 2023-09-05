@@ -130,7 +130,7 @@ const chartOptions = computed(() => {
   return {
     chart: {
       zoomType: 'x',
-      width: 600,
+      width: 560,
       height: '80%',
       events: {
         load: function (event: any) {
@@ -218,9 +218,11 @@ const chartOptions = computed(() => {
     </div>
   </v-alert>
   <div v-else>
-    <highcharts :constructor-type="'stockChart'" :options="chartOptions" ref="chart"></highcharts>
+    <div class="mx-4">
+      <highcharts :constructor-type="'stockChart'" :options="chartOptions" ref="chart"></highcharts>
+    </div>
 
-    <div class=" d-flex align-center mb-4">
+    <div class="d-flex align-center mb-4 pr-4">
       <div class="ml-4">
         <v-menu open-on-hover :close-on-content-click="false">
           <template v-slot:activator="{ props }">
@@ -288,12 +290,12 @@ const chartOptions = computed(() => {
       </tbody>
     </v-table>
     <v-divider class="mb-8"></v-divider>
-    <div class="d-flex mt-4">
-      <v-btn variant="tonal" color="accent" @click="reset">
+    <div class="d-flex mt-4 px-4">
+      <v-btn variant="tonal" color="accent" @click="reset" :density="$vuetify.display.width > 1440 ? 'default' : 'comfortable'">
         <v-icon icon="mdi-close" start></v-icon> Clear
       </v-btn>
       <v-spacer></v-spacer>
-      <v-btn variant="tonal" color="accent" @click="download">
+      <v-btn variant="tonal" color="accent" @click="download" :density="$vuetify.display.width > 1440 ? 'default' : 'comfortable'">
         <v-icon icon="$download" start></v-icon> Download
       </v-btn>
     </div>

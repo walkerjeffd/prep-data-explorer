@@ -18,7 +18,8 @@ import { useCompareStore } from '@/stores/compare'
 import { getResultValues } from '@/services/resultValues'
 import { downloadFile } from '@/services/download'
 
-const { lgAndUp } = useDisplay()
+const { width } = useDisplay()
+
 const chart = ref(null)
 const lockPeriod = ref(true)
 const logScale = ref(false)
@@ -27,15 +28,15 @@ const loading = ref(false)
 const error: Ref<string | null> = ref(null)
 const resultValues: Ref<ResultValues[]> = ref([])
 
-const { station, nearbyStations } = storeToRefs(useStationsStore())
+const { selectedStation, nearbyStations } = storeToRefs(useStationsStore())
 const { selectStation } = useStationsStore()
 const { getResultsByStation } = useResultsStore()
-const { variableIds: resultsVariableIds, minDate, maxDate } = storeToRefs(useResultsStore())
-const { variables } = storeToRefs(useVariablesStore())
+const { minDate, maxDate } = storeToRefs(useResultsStore())
+const { variables, selectedVariables } = storeToRefs(useVariablesStore())
 const { getVariableById } = useVariablesStore()
 const { addResult } = useCompareStore()
 
-const stationResults: ComputedRef<Result[]> = computed(() => getResultsByStation(station.value))
+const stationResults: ComputedRef<Result[]> = computed(() => getResultsByStation(selectedStation.value))
 const selectedVariableId: Ref<number | null> = ref(null)
 const selectedVariable: ComputedRef<Variable | null> = computed(() => {
   if (selectedVariableId.value === null) return null
@@ -46,8 +47,8 @@ const stationVariables: ComputedRef<Variable[]> = computed(() => {
   return variables.value.filter(variable => stationVariableIds.includes(variable.prep_variableid))
 })
 const chartKey: ComputedRef<string> = computed(() => {
-  if (!station.value) return ''
-  return `${station.value.samplingfeatureid}-${selectedVariableId.value}`
+  if (!selectedStation.value) return ''
+  return `${selectedStation.value.samplingfeatureid}-${selectedVariableId.value}`
 })
 const seriesValues: ComputedRef<Array<Array<number>>> = computed(() => {
   const values = resultValues.value
@@ -60,8 +61,8 @@ const seriesValues: ComputedRef<Array<Array<number>>> = computed(() => {
     .sort((a: number[], b: number[]) => a[0] - b[0])
 })
 const selectedStationIndex: ComputedRef<number> = computed(() => {
-  if (!station.value) return -1
-  return nearbyStations.value.findIndex(d => d.samplingfeatureid === station.value?.samplingfeatureid)
+  if (!selectedStation.value) return -1
+  return nearbyStations.value.findIndex(d => d.samplingfeatureid === selectedStation.value?.samplingfeatureid)
 })
 function nextStation () {
   if (nearbyStations.value.length === 0) return
@@ -84,15 +85,15 @@ watch(stationVariables, () => {
   // keep selected variable for new station
   if (selectedVariableId.value !== null && stationVariableIds.includes(selectedVariableId.value)) return
 
-  if (resultsVariableIds.value.length > 0) {
+  if (selectedVariables.value.length > 0) {
     // use first of selected variables for results filter
-    selectedVariableId.value = resultsVariableIds.value[0]
+    selectedVariableId.value = selectedVariables.value[0].prep_variableid
   } else if (stationVariableIds.length > 0) {
     // use first of station variables
     selectedVariableId.value = stationVariableIds[0]
   }
 })
-watch([station, selectedVariable], async ([newStation, newSelectedVariable]) => {
+watch([selectedStation, selectedVariable], async ([newStation, newSelectedVariable]) => {
   if (!newStation) return
   if (!newSelectedVariable) return
 
@@ -102,7 +103,7 @@ watch([station, selectedVariable], async ([newStation, newSelectedVariable]) => 
   try {
     // @ts-ignore
     const newResultValues = await getResultValues([newStation], newSelectedVariable)
-    if (station.value?.samplingfeatureid === newStation.samplingfeatureid) {
+    if (selectedStation.value?.samplingfeatureid === newStation.samplingfeatureid) {
       resultValues.value = newResultValues
     }
   } catch (err) {
@@ -142,7 +143,7 @@ function variableAxisLabel(variable: Variable | null) {
 }
 
 function download(): void {
-  if (!station.value) return
+  if (!selectedStation.value) return
   if (!resultValues.value || resultValues.value.length === 0) return
   downloadFile(resultValues.value)
 }
@@ -173,23 +174,16 @@ function updateChartPeriod (chart: any) {
 }
 
 const chartOptions = computed(() => {
-  console.log('compute: chartOptions', seriesValues.value.length)
+  // console.log('compute: chartOptions', seriesValues.value.length)
   return {
     chart: {
       zoomType: 'x',
       height: '70%',
       events: {
-        // addSeries: () => console.log('addSeries'),
-        // drilldown: () => console.log('drilldown'),
-        // drillup: () => console.log('drillup'),
-        // drillupall: () => console.log('drillupall'),
         load: (event: any) => {
           const chart = event.target
           updateChartPeriod(chart)
         },
-        // redraw: () => console.log('redraw'),
-        // render: () => console.log('render'),
-        // selection: () => console.log('selection')
       }
     },
     title: {
@@ -221,7 +215,10 @@ const chartOptions = computed(() => {
     xAxis: {
       // type: 'datetime',
       title: {
-        text: 'Date'
+        text: 'Date',
+        style: {
+          font: width.value > 1440 ? '18px "Roboto Condensed", sans-serif' : '12px "Roboto Condensed", sans-serif'
+        }
       },
       ordinal: false,
       minRange: 24 * 3600 * 1000,
@@ -239,9 +236,13 @@ const chartOptions = computed(() => {
     yAxis: {
       type: logScale.value ? 'logarithmic' : 'linear',
       title: {
-        text: variableAxisLabel(selectedVariable.value)
+        text: variableAxisLabel(selectedVariable.value),
+        style: {
+          color: 'black',
+          font: width.value > 1440 ? '18px "Roboto Condensed", sans-serif' : '12px "Roboto Condensed", sans-serif'
+        }
       },
-      opposite: false
+      opposite: false,
     },
     legend: {
       enabled: false
@@ -249,7 +250,7 @@ const chartOptions = computed(() => {
     exporting: {
       chartOptions: {
         title: {
-          text: `${station.value?.samplingfeaturecode} - ${variableAxisLabel(selectedVariable.value)}`
+          text: `${selectedStation.value?.samplingfeaturecode} - ${variableAxisLabel(selectedVariable.value)}`
         }
       }
     },
@@ -262,8 +263,6 @@ const chartOptions = computed(() => {
       {
         name: selectedVariable.value?.variablenamecv,
         data: seriesValues.value,
-        // gapSize: values.length < 500 ? 0 : 7,
-        // lineWidth: values.length < 25 ? 0 : 1,
         lineWidth: 1,
         marker: {
           enabled: seriesValues.value.length < 500,
@@ -333,28 +332,28 @@ const chartOptions = computed(() => {
       <v-alert v-if="error !== null" type="error" class="ma-4" variant="tonal" border="start">
         <div class="text-h5">{{ error }}</div>
       </v-alert>
-      <v-alert v-if="station === null" type="info" class="mx-4 my-4" variant="tonal" border="start" title="No Station Selected">
+      <v-alert v-if="selectedStation === null" type="info" class="mx-4 my-4" variant="tonal" border="start" title="No Station Selected">
         <div class="font-weight-bold">Select a station on the map to view its data.</div>
       </v-alert>
       <v-sheet v-else class="prep-station-sheet">
-        <v-container v-if="lgAndUp">
+        <v-container v-if="$vuetify.display.width > 1440">
           <v-row align="end">
             <v-col cols="12" lg="8" xl="9">
-              <div class="text-h6 font-weight-black">{{ station.samplingfeaturecode }}</div>
-              <div>{{ station.samplingfeaturename }}</div>
+              <div class="text-h6 font-weight-black">{{ selectedStation.samplingfeaturecode }}</div>
+              <div>{{ selectedStation.samplingfeaturename }}</div>
             </v-col>
             <v-spacer></v-spacer>
             <v-col cols="12" lg="4" xl="3" class="text-right">
-              <div>{{ station.latitude.toFixed(4) }}, {{ station.longitude.toFixed(4) }}</div>
+              <div>{{ selectedStation.latitude.toFixed(4) }}, {{ selectedStation.longitude.toFixed(4) }}</div>
             </v-col>
           </v-row>
-          <div class="text-caption">{{ station.samplingfeaturedescription }}</div>
+          <div class="text-caption">{{ selectedStation.samplingfeaturedescription }}</div>
         </v-container>
         <v-container v-else>
-          <div class="text-h6 font-weight-black">{{ station.samplingfeaturecode }}</div>
-          <div>{{ station.samplingfeaturename }}</div>
-          <div>{{ station.latitude.toFixed(4) }}, {{ station.longitude.toFixed(4) }}</div>
-          <div class="text-caption">{{ station.samplingfeaturedescription }}</div>
+          <div class="text-body-1 font-weight-black">{{ selectedStation.samplingfeaturecode }}</div>
+          <div class="text-caption">{{ selectedStation.samplingfeaturename }}</div>
+          <div class="text-caption">{{ selectedStation.latitude.toFixed(4) }}, {{ selectedStation.longitude.toFixed(4) }}</div>
+          <div class="text-caption">{{ selectedStation.samplingfeaturedescription }}</div>
         </v-container>
         <v-divider class="mb-4"></v-divider>
         <div class="px-4 py-2">
@@ -366,6 +365,7 @@ const chartOptions = computed(() => {
             item-title="variable_label"
             item-value="prep_variableid"
             hide-details
+            :density="$vuetify.display.width > 1440 ? 'default' : 'compact'"
           ></v-autocomplete>
         </div>
 

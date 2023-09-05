@@ -5,15 +5,16 @@ import { getVariables } from '../services/variables'
 export const useVariablesStore = defineStore('variables', {
   state: () => ({
     allVariables: [] as Variable[],
+    selectedVariables: [] as Variable[],
     coreVariablesOnly: true,
   }),
   getters: {
-    variables (state) {
+    variables (state): Variable[] {
       if (!state.coreVariablesOnly) return state.allVariables
       return state.allVariables.filter(d => d.variablecore)
     },
     getVariableById (state) {
-      return (id: number) => state.variables.find(d => d.prep_variableid === id)
+      return (id: number) => state.allVariables.find((d: Variable) => d.prep_variableid === id)
     },
     getVariableCodeById () {
       return (id: number) => {
@@ -25,6 +26,9 @@ export const useVariablesStore = defineStore('variables', {
   actions: {
     async fetchVariables () {
       this.allVariables = await getVariables()
+    },
+    async selectVariables (variables: Variable[]) {
+      this.selectedVariables = variables
     }
   },
 })

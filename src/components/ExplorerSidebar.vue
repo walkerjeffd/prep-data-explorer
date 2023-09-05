@@ -20,15 +20,15 @@ watch(compareStore.results, () => {
       color="accent"
       grow
       class="px-8"
-      height="64"
+      :height="$vuetify.display.width > 1440 ? 64 : 40"
     >
-      <v-tab value="filter" prepend-icon="mdi-filter-outline">Filter Stations</v-tab>
+      <v-tab value="filter" prepend-icon="mdi-filter-outline">Filters</v-tab>
       <v-tab value="compare" prepend-icon="mdi-chart-line">Compare</v-tab>
     </v-tabs>
 
     <v-divider></v-divider>
 
-    <v-card-text>
+    <v-card-text class="px-0">
       <v-window v-model="tab">
         <v-window-item value="filter">
           <ExplorerFilter></ExplorerFilter>

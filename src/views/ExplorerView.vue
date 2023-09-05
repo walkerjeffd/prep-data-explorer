@@ -15,7 +15,7 @@ import {
   LCircleMarker,
   LTooltip
 } from '@vue-leaflet/vue-leaflet'
-import { map, range } from 'd3-array'
+import { range } from 'd3-array'
 import { scaleQuantile } from 'd3-scale'
 
 import { distance } from '@/lib/utils'
@@ -30,10 +30,10 @@ import { useResultsStore } from '@/stores/results'
 import { useVariablesStore } from '@/stores/variables'
 import { useMapStore } from '@/stores/map'
 
-const { filteredStations, station: selectedStation, spatialFilter } = storeToRefs(useStationsStore())
+const { selectedStation } = storeToRefs(useStationsStore())
 const { fetchStations, selectStation, setNearbyStations, setSpatialFilter } = useStationsStore()
 
-const { valueCountByStation, valueCountArray } = storeToRefs(useResultsStore())
+const { visibleStations, valueCountByStation, valueCountArray } = storeToRefs(useResultsStore())
 const { fetchResults } = useResultsStore()
 
 const { fetchVariables } = useVariablesStore()
@@ -112,7 +112,7 @@ function onClickStation (station: Station) {
       lat: station.latitude,
       lng: station.longitude
     })
-  const nearbyStations = filteredStations.value.filter(d => {
+  const nearbyStations = visibleStations.value.filter(d => {
     const dPosition = mapEl.value.leafletObject
       .latLngToContainerPoint({
         lat: d.latitude,
@@ -162,7 +162,7 @@ function onClickOverlay (e: L.LeafletMouseEvent) {
             @click="onClickOverlay"
           ></LGeoJson>
           <LCircleMarker
-            v-for="station in filteredStations"
+            v-for="station in visibleStations"
             :key="station.samplingfeatureid"
             :latLng="[station.latitude, station.longitude]"
             :radius="station === selectedStation ? 10 : 8"

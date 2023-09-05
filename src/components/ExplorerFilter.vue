@@ -12,9 +12,8 @@ import { useVariablesStore } from '@/stores/variables'
 import type Variable from '@/types/Variable'
 
 const {
-  resultsFilteredByCoreDates,
-  coreStationsOnly,
-  variableIds,
+  resultsFilteredByDatesStations,
+  visibleStations,
   minDate,
   maxDate,
   valueCountTickLabels,
@@ -22,45 +21,52 @@ const {
 } = storeToRefs(useResultsStore())
 const { valueCountQuantile } = useResultsStore()
 
-const { stations, station: selectedStation, filteredStations, spatialFilter } = storeToRefs(useStationsStore())
+const {
+  allStations,
+  coreStationsOnly,
+  selectedStation,
+  spatialFilter
+} = storeToRefs(useStationsStore())
 const { selectStation, setSpatialFilter } = useStationsStore()
-const { variables, coreVariablesOnly } = storeToRefs(useVariablesStore())
+
+const { variables, selectedVariables, coreVariablesOnly } = storeToRefs(useVariablesStore())
 
 const availableVariables: ComputedRef<Variable[]> = computed(() => {
-  const availableVariableIds = new Set()
-  for (let i = 0; i < resultsFilteredByCoreDates.value.length; i++) {
-    availableVariableIds.add(resultsFilteredByCoreDates.value[i].prep_variableid)
-  }
-  return variables.value.filter(d => availableVariableIds.has(d.prep_variableid))
+  return variables.value
+    .filter(d => {
+      return resultsFilteredByDatesStations.value
+        .some(result => result.prep_variableid === d.prep_variableid)
+    })
 })
 
 const firstSelectedVariable: ComputedRef<Variable | null> = computed(() => {
-  if (variableIds.value.length > 0) {
-    return variables.value.find(d => d.prep_variableid === variableIds.value[0]) as Variable
+  if (selectedVariables.value.length > 0) {
+    return selectedVariables.value[0]
   } else {
     return null
   }
 })
 
-watch(resultsFilteredByCoreDates, () => {
-  if (selectedStation.value) {
-    const availableStations = resultsFilteredByCoreDates.value.map(d => d.samplingfeatureid)
-    if (!availableStations.includes(selectedStation.value.samplingfeatureid)) {
-      selectStation()
-    }
+watch(visibleStations, () => {
+  if (selectedStation.value && !visibleStations.value.includes(selectedStation.value)) {
+    selectStation()
   }
 })
 
 watch(availableVariables, () => {
-  const availableVariableIds = availableVariables.value.map(d => d.prep_variableid)
-  variableIds.value = variableIds.value.filter(d => availableVariableIds.includes(d))
+  if (selectedVariables.value.length > 0) {
+    selectedVariables.value = selectedVariables.value.filter(d => availableVariables.value.includes(d))
+  }
 })
 
 function reset () {
   minDate.value = null
   maxDate.value = null
-  variableIds.value = []
+  coreStationsOnly.value = true
+  setSpatialFilter(null)
+  selectedVariables.value = []
   valueCountSelectedRange.value = [0, 100]
+  coreVariablesOnly.value = true
 }
 
 const showBulkDownload: Ref<boolean> = ref(false)
@@ -76,7 +82,7 @@ function truncateString (str: string, num: number) {
 
 <template>
   <!-- TIME PERIOD -->
-  <div>
+  <div class="px-4">
     <div class="d-flex align-center">
       <div class="text-body-1">Time Period</div>
       <v-spacer></v-spacer>
@@ -84,7 +90,7 @@ function truncateString (str: string, num: number) {
         <template v-slot:activator="{ props }">
           <v-btn icon="$info" variant="flat" size="x-small" v-bind="props"></v-btn>
         </template>
-        <span v-html="'Filter stations by first and last date of available data over all selected parameters.<br>Note: does not account for timeseries gaps.'"></span>
+        <span v-html="'Filter by first and last date of available data.<br>Note: does not account for timeseries gaps.'"></span>
       </v-tooltip>
     </div>
     <v-row class="pl-2">
@@ -111,7 +117,7 @@ function truncateString (str: string, num: number) {
   <v-divider class="mb-4"></v-divider>
 
   <!-- STATIONS -->
-  <div>
+  <div class="px-4">
     <div class="d-flex align-center">
       <div class="text-body-1">Stations</div>
       <v-spacer></v-spacer>
@@ -153,8 +159,8 @@ function truncateString (str: string, num: number) {
   </div>
   <v-divider class="my-4"></v-divider>
 
-  <!-- PARAMETERS -->
-  <div>
+  <!-- VARIABLES -->
+  <div class="px-4">
     <div class="d-flex align-center">
       <div class="text-body-1">Parameters</div>
     </div>
@@ -175,12 +181,12 @@ function truncateString (str: string, num: number) {
     </div>
     <div class="d-flex">
       <v-autocomplete
-        v-model="variableIds"
+        v-model="selectedVariables"
         :items="availableVariables"
         variant="underlined"
         placeholder="Select parameter(s)"
         item-title="variable_label"
-        item-value="prep_variableid"
+        return-object
         multiple
         clearable
         chips
@@ -199,7 +205,7 @@ function truncateString (str: string, num: number) {
   <v-divider class="mb-4"></v-divider>
 
   <!-- VALUES PER STATION -->
-  <div>
+  <div class="px-4">
     <div class="d-flex align-center">
       <div class="text-body-1">Measurement Counts</div>
       <v-spacer></v-spacer>
@@ -207,7 +213,7 @@ function truncateString (str: string, num: number) {
         <template v-slot:activator="{ props }">
           <v-btn icon="$info" variant="flat" size="x-small" v-bind="props"></v-btn>
         </template>
-        <span v-html="'Filter by # measurements (over all parameters) at each station.<br>Sliders filter based on relative percentile of # measurements.<br>Middle value is median # measurements per station over all stations.'"></span>
+        <span v-html="'Filter by # measurements at each station.<br>Slider range based on relative percentile of # measurements<br>(middle value = median # measurements per station over all stations).<br><br>NOTE: Counts include measurements from all selected parameters,<br>but are <strong>NOT</strong> filtered by time period.'"></span>
       </v-tooltip>
     </div>
     <v-range-slider
@@ -232,13 +238,18 @@ function truncateString (str: string, num: number) {
   </div>
   <v-divider class="my-4"></v-divider>
 
-  <div>
-    Showing <strong>{{ filteredStations.length.toLocaleString() }}</strong> of <strong>{{ stations.length.toLocaleString() }}</strong> available stations
+  <div class="px-4">
+    Showing <strong>{{ visibleStations.length.toLocaleString() }}</strong> of <strong>{{ allStations.length.toLocaleString() }}</strong> available stations
   </div>
+
+  <!-- <div class="my-4">
+    <pre>dates: {{ resultsFilteredByDates.length }}<br>dates+stations: {{ resultsFilteredByDatesStations.length }}<br>dates+stations+variables: {{ resultsFilteredByDatesStationsVariables.length }}<br>visible stations: {{ visibleStations.length }}</pre>
+  </div> -->
+
   <v-divider class="my-4"></v-divider>
 
-  <div class="d-flex">
-    <v-btn variant="tonal" color="accent" @click="reset">
+  <div class="d-flex px-4">
+    <v-btn variant="tonal" color="accent" @click="reset" :density="$vuetify.display.width > 1440 ? 'default' : 'comfortable'">
       <v-icon icon="mdi-refresh" start></v-icon> Reset
     </v-btn>
     <v-spacer></v-spacer>
@@ -248,7 +259,7 @@ function truncateString (str: string, num: number) {
       width="800px"
     >
       <template v-slot:activator="{ props }">
-        <v-btn variant="tonal" color="accent" v-bind="props">
+        <v-btn variant="tonal" color="accent" v-bind="props" :density="$vuetify.display.width > 1440 ? 'default' : 'comfortable'">
           <v-icon icon="$download" start></v-icon> Bulk Download
         </v-btn>
       </template>

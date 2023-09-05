@@ -3,6 +3,7 @@ export default interface Station {
   samplingfeaturecode: string
   samplingfeaturename: string
   samplingfeaturedescription: string
+  samplingfeaturecore: boolean
   longitude: number
   latitude: number
 }

@@ -5,11 +5,11 @@ import { storeToRefs } from 'pinia'
 import type Station from '@/types/Station'
 import type Variable from '@/types/Variable'
 
-import { useStationsStore } from '@/stores/stations'
+import { useResultsStore } from '@/stores/results'
 import { getResultValues } from '@/services/resultValues'
 import { downloadFile } from '@/services/download'
 
-const { filteredStations } = storeToRefs(useStationsStore())
+const { visibleStations } = storeToRefs(useResultsStore())
 
 const emit = defineEmits(['close'])
 const props = defineProps<{
@@ -21,7 +21,7 @@ const props = defineProps<{
 const error: Ref<string | null> = ref(null)
 const loading: Ref<boolean> = ref(false)
 
-const selectedStations: Ref<Station[]> = ref(Array.from(filteredStations.value))
+const selectedStations: Ref<Station[]> = ref(Array.from(visibleStations.value))
 const selectedVariable: Ref<Variable | null> = ref(props.selectedVariable)
 const minDate: Ref<string | null> = ref(props.minDate)
 const maxDate: Ref<string | null> = ref(props.maxDate)
@@ -75,31 +75,13 @@ async function download () {
     </v-card-title>
     <v-divider></v-divider>
     <v-card-text style="max-height: 80%;" class="px-8 py-4">
-      <!-- <div class="text-body-1">Stations</div>
-      <v-row>
-        <v-col cols="12">
-          <v-autocomplete
-            v-model="selectedStations"
-            :items="filteredStations"
-            variant="underlined"
-            placeholder="Select parameter"
-            item-title="samplingfeaturecode"
-            multiple
-            chips
-            closable-chips
-            clearable
-            return-object
-          ></v-autocomplete>
-        </v-col>
-      </v-row> -->
-
       <p class="text-body-1">
         Choose a parameter and enter a time period to download all data for the current set of filtered stations. You may download up to 1 year of data at a time.
       </p>
 
       <v-divider class="my-4"></v-divider>
 
-      <div class="text-body-1 mb-4"># Filtered Stations: {{ filteredStations.length }} (as shown on map)</div>
+      <div class="text-body-1 mb-4"># Filtered Stations: {{ visibleStations.length }} (as shown on map)</div>
 
       <div class="text-body-1">Parameter</div>
       <v-row>

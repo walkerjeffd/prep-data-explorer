@@ -24,7 +24,6 @@ const links: Link[] = [
     <v-app-bar>
       <v-img src="@/assets/prep_horiz.png" max-height="80%" max-width="200" />
       <v-app-bar-title text="Piscataqua Watershed Data Explorer" class="font-weight-medium text-h4">
-        <span class="text-button font-weight-bold text-disabled">BETA</span>
       </v-app-bar-title>
       <v-tabs
         color="primary"
