@@ -1,73 +1,67 @@
-PREP Data Explorer
-------------------
+Piscataqua Watershed Data Explorer
+----------------------------------
 
-This repo contains the source code for the PREP data explorer and related data preparation and analysis scripts.
+*Prepared for*: [Piscataqua Region Estuaries Partnership (PREP)](https://prepestuaries.org/)
 
-## Recommended IDE Setup
+*By*: Jeffrey D Walker, PhD ([Walker Environmental Research LLC](https://walkerenvres.com)) in collaboration with Laura Diemer, Luke Frankel ([FB Environmental](https://www.fbenvironmental.com/))
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+Links:
+- **Live Website**: http://data.prepestuaries.org/data-explorer/  
+- **Development Website**: http://walkerenvres-prep.s3-website-us-east-1.amazonaws.com/
 
-## Type Support for `.vue` Imports in TS
+## Overview
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
-
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
-
-1. Disable the built-in TypeScript Extension
-    1) Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-    2) Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+This repo contains the source code for the Piscataqua Watershed Data Explorer. The PWDE is a client-side web application developed using Vue.js, Vuetify, and Vite. Data are loaded from a PostgREST API to the PREP Database. The primary goals of this application are to provide a user-friendly interface for exploring and downloading water quality data throughout the PREP region.
 
 ## Project Setup
+
+### Install Dependencies
+
+After cloning this repo, install the dependencies:
 
 ```sh
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+### Configuration
+
+The application is configured using environment variables defined using `.env` files for each environment (e.g., `.env.development` for the development environment). The following environment variables are required:
+
+```
+VITE_API_URL="URL to the database API"
+BASE_URL="Base URL for the application"
+```
+
+## Development Server
+
+Run the `dev` command to start up a development server using Vite, which supports hot module reloading:
 
 ```sh
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
+Then navigate to the URL provided by Vite in your browser.
+
+## Production Build
+
+To build the application for production, run the `build` command:
 
 ```sh
 npm run build
 ```
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
+## Deployment
+
+After building the application, copy the contents of the `dist/` directory to the production web server.
 
 ```sh
-npm run test:unit
+# using rsync
+rsync -avz dist/ user@server:/path/to/destination
+# using scp
+scp -r dist/ user@server:/path/to/destination
+# using aws
+aws s3 sync dist/ s3://bucket/path/to/destination
 ```
-
-### Run End-to-End Tests with [Cypress](https://www.cypress.io/)
-
-```sh
-npm run test:e2e:dev
-```
-
-This runs the end-to-end tests against the Vite development server.
-It is much faster than the production build.
-
-But it's still recommended to test the production build with `test:e2e` before deploying (e.g. in CI environments):
-
-```sh
-npm run build
-npm run test:e2e
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
-
 ## License
 
 This application is licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
