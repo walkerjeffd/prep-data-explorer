@@ -17,7 +17,9 @@ This repo contains the source code for the Piscataqua Watershed Data Explorer. T
 
 ### Install Dependencies
 
-After cloning this repo, install the dependencies:
+First, install [Node.js](https://nodejs.org/en) (v18 or higher is recommended). Project was developed using the node version listed in `.tool-versions`, which can be used with [asdf version manager](https://github.com/asdf-vm/asdf).
+
+After node is installed, install the dependencies using npm:
 
 ```sh
 npm install
@@ -25,7 +27,9 @@ npm install
 
 ### Configuration
 
-The application is configured using environment variables defined using `.env` files for each environment (e.g., `.env.development` for the development environment). The following environment variables are required:
+The application is configured using environment variables defined using `.env` files for each environment (e.g., `.env.development` for the development environment). These files are tracked in the git repo, and thus do not need to be created.
+
+The following environment variables are required:
 
 ```
 VITE_API_URL="URL to the database API"
