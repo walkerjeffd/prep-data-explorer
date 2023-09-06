@@ -14,6 +14,7 @@ export const useStationsStore = defineStore('stations', {
     allStations: [] as Station[],
     coreStationsOnly: true,
     nearbyStations: [] as Station[],
+    selectedStations: [] as Station[],
     selectedStation: null as Station | null,
     spatialFilter: null as any | null,
   }),

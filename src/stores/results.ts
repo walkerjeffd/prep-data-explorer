@@ -7,7 +7,7 @@ import { min, median, max, sum, rollup, quantile } from 'd3-array'
 import { useStationsStore } from '@/stores/stations'
 import { useVariablesStore } from '@/stores/variables'
 
-const { stations } = storeToRefs(useStationsStore())
+const { stations, selectedStations } = storeToRefs(useStationsStore())
 const { variables, selectedVariables } = storeToRefs(useVariablesStore())
 
 export const useResultsStore = defineStore('results', {
@@ -29,13 +29,18 @@ export const useResultsStore = defineStore('results', {
       return this.resultsFilteredByDates
         .filter(d => stations.value.some(station => station.samplingfeatureid === d.samplingfeatureid))
     },
+    resultsFilteredByDatesStationsSelected (): Result[] {
+      if (selectedStations.value.length === 0) return this.resultsFilteredByDatesStations
+      return this.resultsFilteredByDatesStations
+        .filter(d => selectedStations.value.some(station => station.samplingfeatureid === d.samplingfeatureid))
+    },
     resultsFilteredByDatesStationsVariables (): Result[] {
       if (selectedVariables.value.length > 0) {
-        return this.resultsFilteredByDatesStations.filter((d) => {
+        return this.resultsFilteredByDatesStationsSelected.filter((d) => {
           return selectedVariables.value.some(variable => variable.prep_variableid === d.prep_variableid)
         })
       }
-      return this.resultsFilteredByDatesStations.filter((d) => {
+      return this.resultsFilteredByDatesStationsSelected.filter((d) => {
         return variables.value.some(variable => variable.prep_variableid === d.prep_variableid)
       })
     },

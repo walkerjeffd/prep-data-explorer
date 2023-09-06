@@ -10,9 +10,11 @@ import { useResultsStore } from '@/stores/results'
 import { useVariablesStore } from '@/stores/variables'
 
 import type Variable from '@/types/Variable'
+import type Station from '@/types/Station'
 
 const {
   resultsFilteredByDatesStations,
+  resultsFilteredByDatesStationsSelected,
   visibleStations,
   minDate,
   maxDate,
@@ -23,7 +25,9 @@ const { valueCountQuantile } = useResultsStore()
 
 const {
   allStations,
+  stations,
   coreStationsOnly,
+  selectedStations,
   selectedStation,
   spatialFilter
 } = storeToRefs(useStationsStore())
@@ -31,10 +35,18 @@ const { selectStation, setSpatialFilter } = useStationsStore()
 
 const { variables, selectedVariables, coreVariablesOnly } = storeToRefs(useVariablesStore())
 
+const availableStations: ComputedRef<Station[]> = computed(() => {
+  return stations.value
+    .filter(d => {
+      return resultsFilteredByDatesStations.value
+        .some(result => result.samplingfeatureid === d.samplingfeatureid)
+    })
+})
+
 const availableVariables: ComputedRef<Variable[]> = computed(() => {
   return variables.value
     .filter(d => {
-      return resultsFilteredByDatesStations.value
+      return resultsFilteredByDatesStationsSelected.value
         .some(result => result.prep_variableid === d.prep_variableid)
     })
 })
@@ -77,6 +89,14 @@ function truncateString (str: string, num: number) {
   } else {
     return str;
   }
+}
+
+function filterStations (value: string, query: string, item: { value: Station}) {
+  if (value == null || query == null) return -1
+
+  const text = item.value.samplingfeaturecode + ' ' + item.value.samplingfeaturename + ' ' + item.value.samplingfeaturedescription
+
+  return text.toString().toLocaleLowerCase().indexOf(query.toString().toLocaleLowerCase())
 }
 </script>
 
@@ -137,7 +157,7 @@ function truncateString (str: string, num: number) {
         </template>
       </v-tooltip>
     </div>
-    <div class="d-flex align-center">
+    <div class="d-flex align-center mb-2">
       <div class="d-flex align-center" style="max-width:100%">
         <span class="text-body-2 pl-2 text-grey-darken-1">Spatial:</span>
         <v-chip class="ma-2" color="accent" label outlined size="small" v-if="spatialFilter">
@@ -154,6 +174,39 @@ function truncateString (str: string, num: number) {
           <v-btn icon="$info" variant="flat" size="x-small" v-bind="props"></v-btn>
         </template>
         <span v-html="'Add a layer from the Map Layers dropdown (HUC12, Waterbody, Towns),<br>then click on a polygon to filter stations within that area.'"></span>
+      </v-tooltip>
+    </div>
+    <div class="d-flex">
+      <v-autocomplete
+        v-model="selectedStations"
+        :items="availableStations"
+        variant="underlined"
+        placeholder="Select station(s)"
+        item-title="samplingfeaturecode"
+        :custom-filter="filterStations"
+        filter-mode=""
+        return-object
+        multiple
+        clearable
+        chips
+        closable-chips
+        hide-details
+        class="pl-2 mt-n4 mb-4"
+      >
+        <template #item="{ props }">
+          <v-list-item v-bind="props" style="max-width:494px">
+            <template #prepend="{isSelected}">
+              <v-checkbox :model-value="isSelected"></v-checkbox>
+            </template>
+            <v-list-item-subtitle>{{ props.value.samplingfeaturename }}</v-list-item-subtitle>
+            <v-list-item-subtitle class="text-caption">{{ props.value.samplingfeaturedescription }}</v-list-item-subtitle>
+          </v-list-item>
+        </template>
+      </v-autocomplete>
+      <v-tooltip text="Select one or more stations from the dropdown to view only those stations" dir="left">
+        <template v-slot:activator="{ props }">
+          <v-btn icon="$info" variant="flat" size="x-small" v-bind="props"></v-btn>
+        </template>
       </v-tooltip>
     </div>
   </div>

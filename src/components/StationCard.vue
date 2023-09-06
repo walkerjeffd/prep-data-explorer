@@ -83,7 +83,9 @@ watch(stationVariables, () => {
   const stationVariableIds = stationVariables.value.map(d => d.prep_variableid)
 
   // keep selected variable for new station
-  if (selectedVariableId.value !== null && stationVariableIds.includes(selectedVariableId.value)) return
+  if (selectedVariableId.value !== null && stationVariableIds.includes(selectedVariableId.value)) {
+    return
+  }
 
   if (selectedVariables.value.length > 0) {
     // use first of selected variables for results filter
@@ -332,7 +334,7 @@ const chartOptions = computed(() => {
       <v-alert v-if="error !== null" type="error" class="ma-4" variant="tonal" border="start">
         <div class="text-h5">{{ error }}</div>
       </v-alert>
-      <v-alert v-if="selectedStation === null" type="info" class="mx-4 my-4" variant="tonal" border="start" title="No Station Selected">
+      <v-alert v-if="selectedStation === null" type="info" class="mx-4 mt-4 mb-6" variant="tonal" border="start" title="No Station Selected">
         <div class="font-weight-bold">Select a station on the map to view its data.</div>
       </v-alert>
       <v-sheet v-else class="prep-station-sheet">

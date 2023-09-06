@@ -35,5 +35,7 @@ export async function getStations (): Promise<Station[]> {
   data.forEach((d: Station) => {
     d.samplingfeaturecore = CORE_STATION_CODES.includes(d.samplingfeaturecode)
   })
+  // sort data by samplingfeaturecode
+  data.sort((a: Station, b: Station) => a.samplingfeaturecode < b.samplingfeaturecode ? -1 : 1)
   return data
 }
