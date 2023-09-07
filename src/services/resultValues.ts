@@ -25,11 +25,15 @@ export async function getResultValues (stations: Station[],
   return data
     .filter((d: any) => d?.timeseriesresults?.timeseriesresultvalues.length > 0)
     .map((d: any) => {
+      d.timeseriesresults.timeseriesresultvalues.forEach((d: any) => {
+        d.valuedatetime_string = d.valuedatetime
+        d.valuedatetime = new Date(d.valuedatetime)
+      })
       const values = d.timeseriesresults
-          .timeseriesresultvalues
-          .sort((a: Value, b: Value) => {
-            return new Date(a.valuedatetime).valueOf() - new Date(b.valuedatetime).valueOf()
-          })
+        .timeseriesresultvalues
+        .sort((a: Value, b: Value) => {
+          return a.valuedatetime.valueOf() - b.valuedatetime.valueOf()
+        })
       return {
         resultid: d.resultid,
         featureactionid: d.featureactionid,

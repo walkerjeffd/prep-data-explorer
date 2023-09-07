@@ -29,6 +29,8 @@ function writeHeader () {
 # http://data.prepestuaries.org/data-explorer/
 #
 # Downloaded at: ${now.toLocaleDateString('en-US', { timeZone: 'America/New_York' })} ${now.toLocaleTimeString('en-US', { timeZone: 'America/New_York' })}
+#
+# Reference: The PREP database is based on the Observations Data Model v2 (ODM2) schema. See https://www.odm2.org/ for more information about the tables and columns in this file.
 #`
 return body
 }
@@ -51,33 +53,37 @@ export function downloadFile (resultValues: ResultValues[]) {
   stations.sort((a: Station, b: Station) => a.samplingfeatureid - b.samplingfeatureid)
   const values = resultValues
     .map((d: ResultValues) => {
-      return d.values.map((v: Value) => ({
-        resultid: d.resultid,
-        samplingfeatureid: d.samplingfeatureid,
-        samplingfeaturecode: d.samplingfeaturecode,
-        variablenamecv: d.variablenamecv,
-        unitsabbreviation: d.unitsabbreviation,
-        valueid: v.valueid,
-        valuedatetime: v.valuedatetime,
-        valuedatetimeutcoffset: v.valuedatetimeutcoffset,
-        datavalue: v.datavalue,
-        censorcodecv: v.censorcodecv,
-      })).sort((a, b) => (new Date(a.valuedatetime)).valueOf() - (new Date(b.valuedatetime)).valueOf())
+      return d.values.map(function mapValue (v: Value) {
+        return {
+          resultid: d.resultid,
+          samplingfeatureid: d.samplingfeatureid,
+          samplingfeaturecode: d.samplingfeaturecode,
+          variablenamecv: d.variablenamecv,
+          unitsabbreviation: d.unitsabbreviation,
+          valueid: v.valueid,
+          valuedatetime: v.valuedatetime_string.replace('T', ' '),
+          valuedatetimeutcoffset: v.valuedatetimeutcoffset,
+          datavalue: v.datavalue,
+          censorcodecv: v.censorcodecv,
+        }
+      })
+      // @ts-ignore
+      .sort((a, b) => a.valuedatetime.valueOf() - b.valuedatetime.valueOf())
     })
     .sort((a, b) => a[0].resultid - b[0].resultid)
     .flat()
 
   const body = `${writeHeader()}
 ${hr(200)}
-# Stations
+# Sampling Features Table (Stations)
 #
 ${writeTable(stations)}
 ${hr(200)}
-# Sampling Metadata
+# Results Table (Sampling Metadata)
 #
 ${writeTable(results)}
 ${hr(200)}
-# Values
+# Timeseries Values Table (Measurements)
 #
 ${writeTable(values)}
   `

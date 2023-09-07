@@ -5,7 +5,6 @@ import type Variable from '@/types/Variable'
 export default interface Result {
   prep_resultid: number
   samplingfeatureid: number
-  samplingfeaturecore: boolean
   prep_variableid: number
   start: Date
   end: Date

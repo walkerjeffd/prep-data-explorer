@@ -21,6 +21,7 @@ import { downloadFile } from '@/services/download'
 const { width } = useDisplay()
 
 const chart = ref(null)
+const downloading = ref(false)
 const lockPeriod = ref(true)
 const logScale = ref(false)
 const show = ref(true)
@@ -147,7 +148,11 @@ function variableAxisLabel(variable: Variable | null) {
 function download(): void {
   if (!selectedStation.value) return
   if (!resultValues.value || resultValues.value.length === 0) return
-  downloadFile(resultValues.value)
+  downloading.value = true
+  setTimeout(() => {
+    downloadFile(resultValues.value)
+    downloading.value = false
+  }, 100)
 }
 
 function addToCompare(): void {
@@ -407,7 +412,7 @@ const chartOptions = computed(() => {
               <v-icon icon="mdi-plus" start></v-icon> Add to Compare
             </v-btn>
             <v-spacer></v-spacer>
-            <v-btn variant="tonal" color="accent" :disabled="resultValues.length === 0" @click="download">
+            <v-btn variant="tonal" color="accent" :disabled="resultValues.length === 0" @click="download" :loading="downloading">
               <v-icon icon="$download" start></v-icon> Download
             </v-btn>
           </div>

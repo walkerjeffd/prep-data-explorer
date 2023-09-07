@@ -66,11 +66,9 @@ function getLayers (layer: L.GeoJSON): L.Layer[] {
       >
         <template #prepend-item>
           <v-list-item density="compact">
-            <v-list-item-content>
-              <v-list-item-subtitle class="d-flex align-center justify-end">
-                <v-icon size="small" class="align-self-center">mdi-filter</v-icon> = Spatial Filter Layer
-              </v-list-item-subtitle>
-            </v-list-item-content>
+            <v-list-item-subtitle class="d-flex align-center justify-end">
+              <v-icon size="small" class="align-self-center">mdi-filter</v-icon> = Spatial Filter Layer
+            </v-list-item-subtitle>
           </v-list-item>
         </template>
         <template #item="{ item, props }">

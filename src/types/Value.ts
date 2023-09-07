@@ -2,7 +2,8 @@ export default interface Value {
   valueid: number
   resultid: number
   datavalue: number
-  valuedatetime: string
+  valuedatetime: Date
+  valuedatetime_string: string
   valuedatetimeutcoffset: number
   censorcodecv: string
 }

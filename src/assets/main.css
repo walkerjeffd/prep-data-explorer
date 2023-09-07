@@ -36,3 +36,8 @@ path.leaflet-interactive {
   overflow-y: auto;
   max-height: calc(100vh - 100px - 64px);
 }
+
+/* fix position of date range input */
+.highcharts-range-selector {
+  top: 35px !important;
+}

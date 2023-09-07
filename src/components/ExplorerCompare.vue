@@ -25,6 +25,7 @@ const chart = ref<HTMLInputElement | null>(null)
 const chartIsVisible = useElementVisibility(chart)
 const logScale = ref(false)
 const lockPeriod = ref(true)
+const downloading = ref(false)
 
 watch(chartIsVisible, () => {
   // re-render chart to fix range options (needs to know el width)
@@ -39,7 +40,11 @@ function download(): void {
     .map(d => d.resultValues || [])
     // @ts-ignore
     .flat()
-  downloadFile(resultValues)
+  downloading.value = true
+  setTimeout(() => {
+    downloadFile(resultValues)
+    downloading.value = false
+  }, 100)
 }
 
 watch([minDate, maxDate], () => {
@@ -105,7 +110,7 @@ const chartOptions = computed(() => {
           return {
             name: `${getStationCodeById(d.samplingfeatureid)} - ${getVariableCodeById(d.prep_variableid)}`,
             data: values
-              .map((value: Value) => [(new Date(value.valuedatetime)).valueOf(), Number(value.datavalue)])
+              .map((value: Value) => [value.valuedatetime.valueOf(), Number(value.datavalue)])
               .sort((a: number[], b: number[]) => a[0] - b[0]),
             // lineWidth: values && values.length >= 25 ? 1 : 0,
             lineWidth: 1,
@@ -194,7 +199,8 @@ const chartOptions = computed(() => {
         type: 'all',
         text: 'All',
         title: 'View all'
-      }]
+      }],
+      floating: false
     },
     // @ts-ignore
     yAxis: groupedSeries.map(d => d.yAxis),
@@ -295,7 +301,7 @@ const chartOptions = computed(() => {
         <v-icon icon="mdi-close" start></v-icon> Clear
       </v-btn>
       <v-spacer></v-spacer>
-      <v-btn variant="tonal" color="accent" @click="download" :density="$vuetify.display.width > 1440 ? 'default' : 'comfortable'">
+      <v-btn variant="tonal" color="accent" @click="download" :density="$vuetify.display.width > 1440 ? 'default' : 'comfortable'" :loading="downloading">
         <v-icon icon="$download" start></v-icon> Download
       </v-btn>
     </div>
