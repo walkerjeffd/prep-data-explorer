@@ -165,7 +165,7 @@ function filterStations (value: string, query: string, item: { value: Station}) 
           <v-icon small @click="setSpatialFilter(null)" class="ml-2">mdi-close</v-icon>
         </v-chip>
         <v-chip v-else class="ma-2" color="gray" label outlined size="small">
-          Add a layer and click a polygon to filter stations by area
+          Add a spatial filter to Map Layers, think click a polygon to filter stations by area
         </v-chip>
       </div>
       <v-spacer></v-spacer>
@@ -173,7 +173,7 @@ function filterStations (value: string, query: string, item: { value: Station}) 
         <template v-slot:activator="{ props }">
           <v-btn icon="$info" variant="flat" size="x-small" v-bind="props"></v-btn>
         </template>
-        <span v-html="'Add a layer from the Map Layers dropdown (HUC12, Waterbody, Towns),<br>then click on a polygon to filter stations within that area.'"></span>
+        <span v-html="'Add a spatial filters layer from the Map Layers dropdown (HUC12, Waterbody, Towns),<br>then click on a polygon to filter stations within that area.'"></span>
       </v-tooltip>
     </div>
     <div class="d-flex">
@@ -196,7 +196,7 @@ function filterStations (value: string, query: string, item: { value: Station}) 
         <template #item="{ props }">
           <v-list-item v-bind="props" style="max-width:494px">
             <template #prepend="{isSelected}">
-              <v-checkbox :model-value="isSelected"></v-checkbox>
+              <v-checkbox-btn :model-value="isSelected"></v-checkbox-btn>
             </template>
             <v-list-item-subtitle>{{ props.value.samplingfeaturename }}</v-list-item-subtitle>
             <v-list-item-subtitle class="text-caption">{{ props.value.samplingfeaturedescription }}</v-list-item-subtitle>

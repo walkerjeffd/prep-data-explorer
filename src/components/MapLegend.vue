@@ -64,7 +64,28 @@ function getLayers (layer: L.GeoJSON): L.Layer[] {
         clearable
         hide-details
       >
-        <template v-slot:selection="{ index }">
+        <template #prepend-item>
+          <v-list-item density="compact">
+            <v-list-item-content>
+              <v-list-item-subtitle class="d-flex align-center justify-end">
+                <v-icon size="small" class="align-self-center">mdi-filter</v-icon> = Spatial Filter Layer
+              </v-list-item-subtitle>
+            </v-list-item-content>
+          </v-list-item>
+        </template>
+        <template #item="{ item, props }">
+          <v-list-item v-bind="props">
+            <template #prepend="{isSelected}">
+              <v-checkbox-btn :model-value="isSelected"></v-checkbox-btn>
+            </template>
+            <template #append>
+              <div v-if="item.raw.interactive">
+                <v-icon color="grey-darken-1" size="small" class="align-self-center">mdi-filter</v-icon>
+              </div>
+            </template>
+          </v-list-item>
+        </template>
+        <template #selection="{ index }">
           <span class="grey--text text-body-1" v-if="index === 0">
             {{ selectedOverlays.length  }} {{ selectedOverlays.length > 1 ? 'layers' : 'layer' }} selected
           </span>

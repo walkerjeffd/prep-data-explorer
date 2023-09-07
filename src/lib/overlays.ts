@@ -15,31 +15,6 @@ export default [
       fillOpacity: 0
     })
   },
-  // {
-  //   id: 'huc10',
-  //   title: 'HUC10 Basins',
-  //   interactive: true,
-  //   url: 'gis/huc10.geojson',
-  //   onEachFeature: function (feature: { properties: { Name: string, HUC10: string } }, layer: any) {
-  //     layer.bindTooltip(`${this.label(feature)}`, { sticky: true })
-  //     layer.on('mouseover', function () {
-  //       layer.setStyle({
-  //         weight: 4
-  //       })
-  //     })
-  //     layer.on('mouseout', function () {
-  //       layer.setStyle({
-  //         weight: 2
-  //       })
-  //     })
-  //   },
-  //   style: () => ({
-  //     fillOpacity: 0,
-  //     color: schemeTableau10[5],
-  //     weight: 2
-  //   }),
-  //   label: (d: any) => `HUC10: ${d.properties.Name} (${d.properties.HUC10})`
-  // },
   {
     id: 'huc12',
     title: 'HUC12 Basins',
