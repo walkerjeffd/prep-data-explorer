@@ -8,10 +8,13 @@ Piscataqua Watershed Data Explorer
 Links:
 - **Live Website**: http://data.prepestuaries.org/data-explorer/  
 - **Development Website**: http://walkerenvres-prep.s3-website-us-east-1.amazonaws.com/
+- **Developer Documentation**: https://github.com/walkerjeffd/prep-data-explorer/wiki
 
 ## Overview
 
 This repo contains the source code for the Piscataqua Watershed Data Explorer. The PWDE is a client-side web application developed using Vue.js, Vuetify, and Vite. Data are loaded from a PostgREST API to the PREP Database. The primary goals of this application are to provide a user-friendly interface for exploring and downloading water quality data throughout the PREP region.
+
+See the [Project Wiki](https://github.com/walkerjeffd/prep-data-explorer/wiki)  for more detail how the web application retrieves data from the PREP database and API.
 
 ## Project Setup
 
@@ -69,3 +72,28 @@ aws s3 sync dist/ s3://bucket/path/to/destination
 ## License
 
 This application is licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). See `LICENSE` for more information.
+
+
+/results?
+featureaction.samplingfeatureid=in.(${stationIds})&
+variable.variablenamecv=eq.${encodeURIComponent(variable.variablenamecv)}&
+variable.variabletypecv=in.(Hydrology,Water quality)&
+unitsid=eq.${variable.unitsid}&
+timeseriesresults.timeseriesresultvalues.qualitycodecv=neq.Bad&
+timeseriesresults.timeseriesresultvalues.datavalue=neq.NaN$
+{queryDates}&
+select=*,
+       variable:variables!inner(*),
+       units:units!inner(*),
+       featureaction:featureactions!inner(
+         *,
+         samplingfeature:samplingfeatures(*),
+         action:actions(
+           *,
+           method:methods(*)
+         )
+       ),
+       timeseriesresults(
+        *,
+        timeseriesresultvalues(valueid,resultid,datavalue,valuedatetime,valuedatetimeutcoffset,censorcodecv)
+      )
