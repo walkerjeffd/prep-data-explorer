@@ -180,7 +180,7 @@ create materialized view odm2.prep_results as (
   left join samplingfeatures s on rvs.samplingfeatureid=s.samplingfeatureid
 );
 
--- Step 6: create prep_results view
+-- Step 6: create prep_stations view
 -- filters stations within basin having at least one set of results
 drop materialized view if exists odm2.prep_stations cascade;
 create materialized view odm2.prep_stations as (
