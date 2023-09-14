@@ -68,4 +68,4 @@ aws s3 sync dist/ s3://bucket/path/to/destination
 ```
 ## License
 
-This application is licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+This application is licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). See `LICENSE` for more information.
