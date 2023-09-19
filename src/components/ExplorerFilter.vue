@@ -165,7 +165,7 @@ function filterStations (value: string, query: string, item: { value: Station}) 
           <v-icon small @click="setSpatialFilter(null)" class="ml-2">mdi-close</v-icon>
         </v-chip>
         <v-chip v-else class="ma-2" color="gray" label outlined size="small">
-          Add a spatial filter to Map Layers, think click a polygon to filter stations by area
+          Add a spatial filter to Map Layers, then click a polygon to filter stations by area
         </v-chip>
       </div>
       <v-spacer></v-spacer>
