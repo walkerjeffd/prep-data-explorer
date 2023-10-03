@@ -41,3 +41,14 @@ path.leaflet-interactive {
 .highcharts-range-selector {
   top: 35px !important;
 }
+
+/* expansion panels for user-guide */
+.v-expansion-panel-title {
+  font-size: 1.5rem !important;
+  line-height: 1.9rem !important;
+}
+
+.v-expansion-panel-text__wrapper {
+  font-size: 1.2rem !important;
+  line-height: 1.8rem !important;
+}

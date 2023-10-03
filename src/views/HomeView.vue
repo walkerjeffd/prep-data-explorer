@@ -18,7 +18,9 @@
             <v-row class="mt-8">
               <v-col cols="12" xl="6" class="pr-8 mb-8">
                 <div class="text-center">
-                  <v-img src="/img/screenshot.jpg" class="elevation-2 mb-8 my-2" style="border-radius:10px"></v-img>
+                  <router-link :to="{name: 'explorer'}" >
+                    <v-img src="/img/screenshot.jpg" class="elevation-2 mb-8 my-2" style="border-radius:10px"></v-img>
+                  </router-link>
                   <v-btn :to="{name: 'explorer'}" color="accent" size="x-large">
                     Open Explorer <v-icon icon="mdi-arrow-right" class="ml-2"></v-icon>
                   </v-btn>
