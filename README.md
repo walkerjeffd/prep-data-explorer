@@ -72,28 +72,3 @@ aws s3 sync dist/ s3://bucket/path/to/destination
 ## License
 
 This application is licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). See `LICENSE` for more information.
-
-
-/results?
-featureaction.samplingfeatureid=in.(${stationIds})&
-variable.variablenamecv=eq.${encodeURIComponent(variable.variablenamecv)}&
-variable.variabletypecv=in.(Hydrology,Water quality)&
-unitsid=eq.${variable.unitsid}&
-timeseriesresults.timeseriesresultvalues.qualitycodecv=neq.Bad&
-timeseriesresults.timeseriesresultvalues.datavalue=neq.NaN$
-{queryDates}&
-select=*,
-       variable:variables!inner(*),
-       units:units!inner(*),
-       featureaction:featureactions!inner(
-         *,
-         samplingfeature:samplingfeatures(*),
-         action:actions(
-           *,
-           method:methods(*)
-         )
-       ),
-       timeseriesresults(
-        *,
-        timeseriesresultvalues(valueid,resultid,datavalue,valuedatetime,valuedatetimeutcoffset,censorcodecv)
-      )
