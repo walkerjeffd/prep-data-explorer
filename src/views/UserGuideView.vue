@@ -22,7 +22,7 @@
               </v-col>
               <v-col cols="5">
                 <div class="mb-8 text-h6">
-                  The User Guide provides detailed instructions on how to filter, visualize, and download data. 
+                  The User Guide provides detailed instructions on how to filter, visualize, and download data.
                 </div>
                 <v-btn color="accent" size="large" download href="/pdf/Piscataqua_Watershed_Data_Explorer_User_Guide.pdf">
                   <v-icon icon="mdi-download" start></v-icon> Download User Guide (PDF)
@@ -30,10 +30,9 @@
               </v-col>
             </v-row>
 
-            
             <h1 class="text-h3 mt-12">Frequently Asked Questions</h1>
             <v-divider class="mb-8"></v-divider>
-            
+
             <v-row>
               <v-col cols="12">
                 <v-expansion-panels>
@@ -41,190 +40,306 @@
                     title="How do I view data?"
                   >
                     <template #text>
-                      To visualize data, click on any station shown on the map and the <strong>Selected Station Data</strong> pop-up will open with a timeseries plot showing data at your selected station. By default, the plot will show all data for the first parameter in alphabetical order at that station. If you have already selected a time period and/or parameters of interest in the <code>FILTERS</code> tab, the plot will initially show data within that time period for the first parameter you selected.
+                      <v-row>
+                        <v-col cols="6">
+                          <v-img src="/img/user-guide/view-data.jpeg" class="elevation-2" style="border-radius:10px;"></v-img>
+                        </v-col>
+                        <v-col cols="6">
+                          Click on any station on the map to view the data collected at that location. Use the dropdown menu to choose between the available parameters. If you have selected any parameters in the <code>FILTERS</code> sidebar, then the chart will show data for the first selected parameter. Otherwise, it will default to whichever available parameter comes first alphabetically among the available parameters. If you have selected a start and/or end date for the <strong>Time Period</strong> on the <code>FILTERS</code> sidebar, the chart will automatically zoom to that period. You can also zoom the timeseries chart in and out using the smaller time period chart at the bottom of the <strong>Selected Station Data</strong> window.
+                        </v-col>
+                      </v-row>
                     </template>
                   </v-expansion-panel>
 
                   <v-expansion-panel
-                    title="How do I filter data for a specific time period?"
+                    title="How do I compare data between multiple stations or parameters?"
                   >
                     <template #text>
-                      To filter data by date, type in values or use the calendar drop-down menus to enter start and end dates for the time interval you are interested in for the two fields in the Time Period section of the <code>FILTERS</code> tab. The map will automatically update to show only the stations that have data for your selected time interval.
+                      <v-row>
+                        <v-col cols="6">
+                          <v-img src="/img/user-guide/compare-1.jpeg" class="elevation-2" style="border-radius:10px;"></v-img>
+                        </v-col>
+                        <v-col cols="6">
+                          First, add each timeseries to the <code>COMPARE</code> sidebar by clicking the <strong>Add to Compare</strong> button below the chart on the <strong>Selected Station Data</strong> window. Then select a different parameter or station, and add the next timeseries.
+                        </v-col>
+                      </v-row>
+                      <v-row>
+                        <v-col cols="6">
+                          <v-img src="/img/user-guide/compare-2.jpeg" class="elevation-2" style="border-radius:10px;"></v-img>
+                        </v-col>
+                        <v-col cols="6">
+                          After adding multiple timeseries, you can zoom in/out using the smaller time period chart, and hide/show invididual timeseries by clicking on the chart legend. You can also remove individual timeseries from the <code>COMPARE</code> tool by clicking the <v-icon size="x-small">mdi-close-circle</v-icon> icon beside it. Or click <strong>Clear</strong> to remove all of the timeseries.
+                        </v-col>
+                      </v-row>
                     </template>
                   </v-expansion-panel>
 
-                  <v-expansion-panel
-                    title="Aren't there more data than what is first displayed when you open the Explorer?"
-                  >
-                    <template #text>
-                      Yes, there are more data than what is available when you first open the Explorer. In fact, there's so much data that to prevent data overload we decided to display only the <strong>core stations</strong> initially. To reveal the data from all stations in the watershed, toggle the <strong>Core stations only</strong> button off in the Stations section of the <code>FILTERS</code> tab.
-                    </template>
-                  </v-expansion-panel>
-
-                  <v-expansion-panel
-                    title="If I know the names of the stations I am interested in, is there a way I can access data from those stations directly?"
-                  >
-                    <template #text>
-                      To filter data by station, type in the names or use the drop-down menu to select the stations you are interested in for the <strong>Select station(s)</strong> field in the <strong>Stations</strong> section of the <code>FILTERS</code> tab. The map will automatically update to show only the stations that you have selected.
-                    </template>
-                  </v-expansion-panel>
-
-                  <v-expansion-panel
-                    title="Can I filter data based on geographic area (e.g., watershed, waterbody, municipal boundary, etc.)?"
-                  >
-                    <template #text>
-                      Yes, you can filter data by geographic area by adding spatial data layers to the map and clicking on specific features within those data layers. To add spatial data layers, open the drop-down menu in the Map Layers section of the map legend and click on the desired layer names. Layers that can be used for filtering are identified by the filter icon next to their name.
-                    </template>
-                  </v-expansion-panel>
-
-                  <v-expansion-panel
-                    title="How do I filter data for specific parameters (e.g., temperature, dissolved oxygen, chlorophyll-a)?"
-                  >
-                    <template #text>
-                      To filter data by parameter, type in the name or use the drop-down menu to select the parameters you are interested in for the <strong>Select parameter(s)</strong> field in the Parameters section of the <code>FILTERS</code> tab. The map will automatically update to show only the stations with data for the parameter you selected.
-                    </template>
-                  </v-expansion-panel>
-
-                  <v-expansion-panel
-                    title="Aren't there more parameters than what is shown in the 'Select parameter(s)' drop-down menu?"
-                  >
-                    <template #text>
-                    Yes, there are more parameters than what is shown initially when you first open the <strong>Select parameter(s)</strong> drop-down menu. In fact, there are more than 175 different parameters to select from in the database. Many of these variables, however, are specific chemicals or analyses that are only relevant for narrowly focused research efforts. To simplify the parameter list for users, we created a list of <strong>Core Parameters</strong> that represent the variables that are most used by researchers. To reveal the complete list of parameters in the <strong>Select parameter(s)</strong> drop-down menu, toggle the “Core parameters only” button off in the Parameters section of the <code>FILTERS</code> tab.
-                    </template>
-                  </v-expansion-panel>
-                  
-                  <v-expansion-panel
-                    title="Can I filter data by the number of observations?"
-                  >
-                    <template #text>
-                      Yes, you can filter data by the number of observations using the slider in the Measurement Counts section at the bottom of the <code>FILTERS</code> tab. Note that the slider filters data by percentile and is therefore non-linear (i.e., the value displayed in the middle of the bar represents the median number of observations for the data shown on the map). Similar to the map, this slider dynamically updates depending on the other filters applied to the data.
-                    </template>
-                  </v-expansion-panel>
-                  
                   <v-expansion-panel
                     title="How do I download data?"
                   >
                     <template #text>
-                      Data from the Explorer can be downloaded three different ways:
-                      <ol>
-                        <li>To download the data from a single station and parameter shown on the timeseries plot in the <strong>Selected Station Data</strong> pop-up, click the DOWNLOAD button below the plot in the bottom right corner of the pop-up.</li>
-                        <li>To download the data from multiple stations and parameters shown on the timeseries plot in the <code>COMPARE</code> tab, click the DOWNLOAD button below the plot in the bottom right corner of the tab.</li>
-                        <li>To bulk download data from the stations shown on the map, click the <code>BULK DOWNLOAD</code> button in the bottom right corner of the <code>FILTERS</code> tab and follow the instructions in the window that appears. Note that only one year of data for one parameter can be downloaded using the <code>BULK DOWNLOAD</code> function. Once you have selected a parameter and time period of one year or less, you can obtain your file by clicking the DOWNLOAD button in the bottom left corner of the window.</li>
-                      </ol>
+                      <v-row>
+                        <v-col cols="6">
+                          <v-img src="/img/user-guide/download-1.jpeg" class="elevation-2" style="border-radius:10px;"></v-img>
+                        </v-col>
+                        <v-col cols="6">
+                          <div class="text-h5">Option 1: Single Station and Parameter</div>
+                          <p>To download data for a single station and parameter, click the <strong>Download</strong> button below the timeseries chart in the <strong>Selected Station Data</strong> window.</p>
+                        </v-col>
+                      </v-row>
+                      <v-row>
+                        <v-col cols="6">
+                          <v-img src="/img/user-guide/download-2.jpeg" class="elevation-2" style="border-radius:10px;"></v-img>
+                        </v-col>
+                        <v-col cols="6">
+                          <div class="text-h5">Option 2: Multiple Stations and/or Parameters</div>
+                          <p>To download data for multiple stations and parameters, first add them to the <code>COMPARE</code> tab (see previous FAQ question), then click the <strong>Download</strong> button below the comparison timeseries chart. This should only be used for a handful of stations or parameters at a time.</p>
+                        </v-col>
+                      </v-row>
+                      <v-row>
+                        <v-col cols="6">
+                          <v-img src="/img/user-guide/download-3a.jpeg" class="elevation-2" style="border-radius:10px;"></v-img>
+                        </v-col>
+                        <v-col cols="6">
+                          <div class="text-h5">Option 3: Bulk Download (Many Stations)</div>
+                          <p>To download large quantities of data across many stations, use the <strong>Bulk Download</strong> tool. To limit the file size, only one parameter and up to one year of data can be downloaded at a time using this tool. However, it can be used to download data across a large number of available stations.</p>
+                          <p>To download data for only a subset of those stations, first filter them using a <strong>Spatial Filter Layer</strong>, or by selecting them from the dropdown in the <strong>Station</strong> section of the <code>FILTERS</code> sidebar (see FAQ questions below).</p>
+                          <p>After filtering for the target stations (if necessary), click the <strong>Bulk Download</strong> button at the bottom of the <code>FILTERS</code> sidebar.</p>
+                        </v-col>
+                      </v-row>
+                      <v-row>
+                        <v-col cols="6">
+                          <v-img src="/img/user-guide/download-3b.jpeg" class="elevation-2" style="border-radius:10px;"></v-img>
+                        </v-col>
+                        <v-col cols="6">
+                          <div>Then, select the parameter of interest, enter the start and end dates, and click <strong>Download</strong>. To download more than one parameter or year of data, repeat this process multiple times.</div>
+                          <p>If this process is too burdensome for the data you want, please contact Trevor Mattera at <a href="mailto:Trevor.Mattera@unh.edu">Trevor.Mattera@unh.edu</a> to request a direct database export.</p>
+                        </v-col>
+                      </v-row>
                     </template>
                   </v-expansion-panel>
-                  
+
                   <v-expansion-panel
-                    title="How do I remove data filters?"
+                    title="How do I find data for a specific time period?"
                   >
                     <template #text>
-                      To remove data filters, click the <code>X</code> that appears next to the name of a filter that is currently being applied in the <code>FILTERS</code> tab. For some filters like Time Period, the <code>X</code> is only visible when you hover your mouse over the field. For fields where multiple filters can be applied at once (e.g., the <strong>Select station(s)</strong> and <strong>Select parameter(s)</strong> fields), filters can be removed individually by clicking the <code>X</code> next to each name or all at once by clicking the <code>X</code> that appears on the right side when you hover your mouse over the field.
+                      <v-row>
+                        <v-col cols="6">
+                          <v-img src="/img/user-guide/time-period.jpeg" class="elevation-2" style="border-radius:10px;"></v-img>
+                        </v-col>
+                        <v-col cols="6">
+                          Type in dates or use the calendar drop-down menus under <strong>Time Period</strong> on the <strong>FILTERS</strong> sidebar to specify the start and/or end dates for the period of interest. The map will automatically update to show only stations that have data collected during that period, and the list of available parameters will similarly be updated to only include those with data during that period. For example, to see which stations and parameters have data collected in the year 2020, you would set the <strong>Start Date</strong> to <strong>01/01/2020</strong> and <strong>End Date</strong> to <strong>12/31/2020</strong>. You may also specify only one of the two dates (start or end) to define an open-ended period. For example, if the <strong>Start Date</strong> is set to <strong>01/01/2020</strong> and the end date is left blank, then the map will show only stations having at least some data collected since January 1, 2020.
+                        </v-col>
+                      </v-row>
                     </template>
                   </v-expansion-panel>
-                  
+
                   <v-expansion-panel
-                    title="How do I determine the number of stations that fit my search criteria?"
+                    title="How do I find data for a specific station?"
                   >
                     <template #text>
-                      The number of stations that fit the search criteria currently being applied in the <code>FILTERS</code> tab is shown at the bottom left of that tab below the Measurement Counts section.
+                      <v-row>
+                        <v-col cols="6">
+                          <v-img src="/img/user-guide/filter-station.jpeg" class="elevation-2" style="border-radius:10px;"></v-img>
+                        </v-col>
+                        <v-col cols="6">
+                          If you already know the name or code of a station, you can search for it using the dropdown in the <strong>Stations</strong> section of the <code>FILTERS</code> sidebar. You can select more than one station from this dropdown, which will filter the dataset and list of available parameters for only those with data collected at those stations.
+                        </v-col>
+                      </v-row>
                     </template>
                   </v-expansion-panel>
-                  
+
                   <v-expansion-panel
-                    title="Can I visualize data on a log scale?"
+                    title="How do I focus on stations within a specific area, like a waterbody, basin, or town?"
                   >
                     <template #text>
-                      Yes, you can adjust the y-axis to a log scale for timeseries plots in the <strong>Selected Station Data</strong> pop-up or the <code>COMPARE</code> tab to aid data visualization for parameters that are not normally distributed. To do this, click the <strong>Chart Options</strong> button in the bottom left corner of the plot and toggle the <strong>Log Scale</strong> button on.
+                      <v-row>
+                        <v-col cols="6">
+                          <v-img src="/img/user-guide/spatial-filter-layer-1.jpeg" class="elevation-2" style="border-radius:10px;"></v-img>
+                        </v-col>
+                        <v-col cols="6">
+                          First, add a <strong>Spatial Filter Layer</strong> to the map using the <strong>Map Layers</strong> dropdown in the legend. Only layers marked with a <v-icon size="small" color="grey-darken-1">mdi-filter</v-icon> symbol can be used as spatial filters.
+                        </v-col>
+                      </v-row>
+                      <v-row>
+                        <v-col cols="6">
+                          <v-img src="/img/user-guide/spatial-filter-layer-2.jpeg" class="elevation-2" style="border-radius:10px;"></v-img>
+                        </v-col>
+                        <v-col cols="6">
+                          Then click on a polygon on the map to select only stations within that area. The selected spatial area will be shown in the <strong>Stations</strong> section of the <strong>FILTERS</strong> sidebar. To return to all stations, click the polygon again, or click the close icon (<v-icon size="small">mdi-clode</v-icon>) beside the area name.
+                        </v-col>
+                      </v-row>
                     </template>
                   </v-expansion-panel>
-                  
+
+                  <v-expansion-panel
+                    title="How do I find data for specific parameters (e.g., temperature, dissolved oxygen, chlorophyll-a)?"
+                  >
+                    <template #text>
+                      <v-row>
+                        <v-col cols="6">
+                          <v-img src="/img/user-guide/filter-parameter-1.jpeg" class="elevation-2" style="border-radius:10px;"></v-img>
+                        </v-col>
+                        <v-col cols="6">
+                          First, search for a parameter by name using the dropdown in the <strong>Parameters</strong> section of the <code>FILTERS</code> tab.
+                        </v-col>
+                      </v-row>
+                      <v-row>
+                        <v-col cols="6">
+                          <v-img src="/img/user-guide/filter-parameter-2.jpeg" class="elevation-2" style="border-radius:10px;"></v-img>
+                        </v-col>
+                        <v-col cols="6">
+                          Then, select one or more parameters from the dropdown to see which stations have data for those parameters.
+                        </v-col>
+                      </v-row>
+                    </template>
+                  </v-expansion-panel>
+
+                  <v-expansion-panel
+                    title="How do I focus on stations that have the most available data?"
+                  >
+                    <template #text>
+                      <v-row>
+                        <v-col cols="6">
+                          <v-img src="/img/user-guide/measurement-counts.jpeg" class="elevation-2" style="border-radius:10px;"></v-img>
+                        </v-col>
+                        <v-col cols="6">
+                          <p>The <strong>Measurement Counts</strong> slider in the <code>FILTERS</code> sidebar lets you focus on stations having a minimum (or maximum) number of measurements. This is useful, for example, to exclude stations that have relatively little data.</p>
+                          <p>Because the number of measurements at each station is highly skewed (a few stations have A LOT of measurements, and many stations have only a couple measurements), the slider operates on a non-linear scale. The left-most number indicates the <strong>minimum</strong> number of measurements at a single station, and the right-most number is the <strong>maximum</strong>. The number in the middle is the <strong>median</strong> number of measurements over all the available stations.</p>
+                          <p>For example, if the lower end of the slider is moved to the middle value (median), then only the top 50% of the available stations with the most data are shown.</p>
+                          <p>Note that the range of this slider range automatically adjusts to reflect the selected stations and parameters in the filters above it.</p>
+                        </v-col>
+                      </v-row>
+                    </template>
+                  </v-expansion-panel>
+
+                  <v-expansion-panel
+                    title="What are the 'Core' stations and parameters?"
+                  >
+                    <template #text>
+                      <v-row>
+                        <v-col cols="6">
+                          <v-img src="/img/user-guide/filter-core.jpeg" class="elevation-2" style="border-radius:10px;"></v-img>
+                        </v-col>
+                        <v-col cols="6">
+                          Because the database contains so much data, the Explorer starts by showing only a primary (or "Core") set of stations and parameters. To view <strong>ALL</strong> available stations or parameters, click the respective toggle switch to turn them off.
+                        </v-col>
+                      </v-row>
+                    </template>
+                  </v-expansion-panel>
+
+                  <v-expansion-panel
+                    title="How do I make the timeseries charts bigger?"
+                  >
+                    <template #text>
+                      <v-row>
+                        <v-col cols="6">
+                          <v-img src="/img/user-guide/chart-full-screen.jpeg" class="elevation-2" style="border-radius:10px;"></v-img>
+                        </v-col>
+                        <v-col cols="6">
+                          Open the chart menu in the top right-corner, then click <strong>View Full Screen</strong>.
+                        </v-col>
+                      </v-row>
+                    </template>
+                  </v-expansion-panel>
+
+                  <v-expansion-panel
+                    title="How do I download the charts as image files?"
+                  >
+                    <template #text>
+                      <v-row>
+                        <v-col cols="6">
+                          <v-img src="/img/user-guide/chart-download.jpeg" class="elevation-2" style="border-radius:10px;"></v-img>
+                        </v-col>
+                        <v-col cols="6">
+                          Open the chart menu in the top right-corner, then click one of the <strong>Download</strong> options to save the chart as a PNG, JPG, or PDF file.
+                        </v-col>
+                      </v-row>
+                    </template>
+                  </v-expansion-panel>
+
+                  <v-expansion-panel
+                    title="How do I view the data on a log scale?"
+                  >
+                    <template #text>
+                      <v-row>
+                        <v-col cols="6">
+                          <v-img src="/img/user-guide/chart-log.jpeg" class="elevation-2" style="border-radius:10px;"></v-img>
+                        </v-col>
+                        <v-col cols="6">
+                          Open the <strong>Chart Options</strong> menu below the chart, then toggle the <strong>Log Scale</strong> option.
+                        </v-col>
+                      </v-row>
+                    </template>
+                  </v-expansion-panel>
+
                   <v-expansion-panel
                     title="What does the 'Lock to Time Period' button do?"
                   >
                     <template #text>
-                      The <strong>Lock to Time Period</strong> button allows users to choose whether they want the timeseries plots shown in the Explorer to automatically zoom into the time period that is selected in the <code>FILTERS</code> tab or remain fixed at whatever zoom they are already set to if the time period filter is adjusted. The <strong>Lock to Time Period</strong> button can be found when you click the <strong>Chart Options</strong> button below the plots in the <strong>Selected Station Data</strong> pop-up and the <code>COMPARE</code> tab. By default, the <strong>Lock to Time Period</strong> button is toggled on, meaning that the plots will automatically zoom to the time period that is selected in the <code>FILTERS</code> tab.
+                      <v-row>
+                        <v-col cols="6">
+                          <v-img src="/img/user-guide/chart-lock-time.jpeg" class="elevation-2" style="border-radius:10px;"></v-img>
+                        </v-col>
+                        <v-col cols="6">
+                          The <strong>Lock to Time Period</strong> option in the <strong>Chart Options</strong> menu synchronizes the time period shown on the chart with the start and end dates in the <strong>Time Period</strong> section of the <code>FILTERS</code> sidebar. By default, the <strong>Lock to Time Period</strong> option is enabled meaning the chart will automatically zoom to the filtered time period. To disable this behavior, turn off this option and the chart will start with the full period of available data regardless of the time period filter.
+                        </v-col>
+                      </v-row>
                     </template>
                   </v-expansion-panel>
 
                   <v-expansion-panel
-                    title="Why is the time period filter not working? Why are there some stations shown that don't have data when I enter a specific time period?"
+                    title="I entered a time period filter, why do I see stations that have no data during that period?"
                   >
                     <template #text>
-                      To improve the speed of the Explorer, the time period filter intentionally ignores data gaps. In other words, the stations that remain on the map that do not have data within the specified time period in the <code>FILTERS</code> tab are shown because they do have data both before and after that time period. To better understand the temporal data availability for these stations, adjust the sliders in the context chart directly below the timeseries plot in the <strong>Selected Station Data</strong> pop-up to find where the data lie before and after your selected time period.
+                      <v-row>
+                        <v-col cols="6">
+                          <v-img src="/img/user-guide/data-gap.jpeg" class="elevation-2" style="border-radius:10px;"></v-img>
+                        </v-col>
+                        <v-col cols="6">
+                          The <strong>Time Period</strong> filter is not aware of data gaps, and only considers the first and last measurement date of each parameter and station. For example, if the first and last available measurement dates are January 1, 2020 and December 31, 2022 for a given station and parameter, then the Explorer would assume that it contains at least some data in 2021. Therefore, if the user set a <strong>Time Period</strong> from Jan 1, 2021 - Dec 31, 2021, then that station would still appear on the map even if it did not in fact have any measurements in that year due to a gap in sampling.
+                        </v-col>
+                      </v-row>
                     </template>
                   </v-expansion-panel>
-                  
-                  <v-expansion-panel
-                    title="Can I compare data across different stations and parameters within the Explorer?"
-                  >
-                    <template #text>
-                      Yes, within the Explorer you can compare data across multiple stations and parameters using the <code>COMPARE</code> tab. You can compare an unlimited number of parameter-station combinations within the timeseries plot in the <code>COMPARE</code> tab.
-                    </template>
-                  </v-expansion-panel>
-                  
-                  <v-expansion-panel
-                    title="How do I add data to the COMPARE tab?"
-                  >
-                    <template #text>
-                      To add data to the <code>COMPARE</code> tab, display the data that you would like to add on the timeseries plot in the <strong>Selected Station Data</strong> pop-up and then click the <strong>Add to Compare</strong> button below the plot in the bottom left corner of the pop-up. The data timeseries will now appear in the <code>COMPARE</code> tab, both on the timeseries plot and in the summary table below the plot.
-                    </template>
-                  </v-expansion-panel>
-                  
-                  <v-expansion-panel
-                    title="How do I remove data from the COMPARE tab?"
-                  >
-                    <template #text>
-                      To remove a single data timeseries from the <code>COMPARE</code> tab, simply click the <code>X</code> next to the data timeseries in the summary table below the plot. To remove all data timeseries from the <code>COMPARE</code> tab, click the <strong>Clear</strong> button in the bottom left corner of the <code>COMPARE</code> tab.
-                    </template>
-                  </v-expansion-panel>
-                  
-                  <v-expansion-panel
-                    title="How do I change the zoom of the timeseries plots in the 'Selected Station' Data pop-up and the COMPARE tab?"
-                  >
-                    <template #text>
-                      The zoom of timeseries plots can be adjusted in five different ways:
-                      <ol>
-                        <li>Clicking and dragging your mouse on the plot to select the area you would like to zoom in on.</li>
-                        <li>Adjusting the sliders on the context chart directly below the plot to specify the time period you would like to zoom in on.</li>
-                        <li>Select the desired zoom interval (e.g., 1 month, 6 months, 1 year) from the drop-down menu in the top left corner of the plot area.</li>
-                        <li>Manually input the time period of interest in the fields directly above the plot.</li>
-                        <li>Adjust the start and end dates for the two fields in the Time Period section of the <code>FILTERS</code> tab while the “Lock to Time Period” button for the plot is turned on.</li>
-                      </ol>
-                    </template>
-                  </v-expansion-panel>
-                  
-                  <v-expansion-panel
-                    title="How do I export plots from the Explorer?"
-                  >
-                    <template #text>
-                    To export a plot that is currently displayed in the Explorer either in the <strong>Selected Station Data</strong> pop-up or the <code>COMPARE</code> tab, simply click the menu icon in the top right corner of the plot and select the desired option. Plots can either be downloaded as a PNG, JPEG, or PDF, or they can be printed directly from the Explorer by selecting the “Print chart” option. For printing, it is recommended that you expand the plot to the whole screen first by selecting the “View in full screen” option.
-                    </template>
-                  </v-expansion-panel>
-                  
+
                   <v-expansion-panel
                     title="How do I select a station that is hidden under another station?"
                   >
                     <template #text>
-                    To select a station that is hidden beneath another station, first click on top of the group of stations at that location. The Explorer will by default display the data from the top station on the timeseries plot in the <strong>Selected Station Data</strong> pop-up. Next, to toggle the selection between stations in the group, click the PREV and NEXT buttons at the top of the <strong>Selected Station Data</strong> pop-up. You will notice that this both changes the station that is selected on the map and the station that is displayed in the <strong>Selected Station Data</strong> pop-up.
+                      <v-row>
+                        <v-col cols="6">
+                          <v-img src="/img/user-guide/station-overlap.jpeg" class="elevation-2" style="border-radius:10px;"></v-img>
+                        </v-col>
+                        <v-col cols="6">
+                          <div>
+                            In some cases, the map symbols for two or more stations may overlap due to their close proximity, especially when viewing all stations (i.e., when <strong>Core Stations Only</strong> is disabled).
+                          </div>
+                          <p>
+                            To select a station that is hidden beneath another station, first click on top of the group of stations at that location. Then use the <strong>Prev</strong> and <strong>Next</strong> buttons in the <strong>Selected Station Toolbar</strong> to cycle through them.
+                          </p>
+                          <p>
+                            Note that data for only only one of these stations can be viewed a time in the <strong>Selected Station Data</strong> window. To view data across multiple, overlapping stations at once, add the timeseries from each station to the <code>COMPARE</code> sidebar (see FAQ question above).
+                          </p>
+                        </v-col>
+                      </v-row>
                     </template>
                   </v-expansion-panel>
 
                   <v-expansion-panel
-                    title="How do I change the basemap in the Explorer?"
+                    title="How do I change the basemap?"
                   >
                     <template #text>
-                    To change the basemap displayed in the background of the Explorer, hover over the layer icon in the top left corner of the map and select a new basemap. There are seven different basemaps to choose from, as well as the option for no basemap.
+                      <v-row>
+                        <v-col cols="6">
+                          <v-img src="/img/user-guide/basemaps.jpeg" class="elevation-2" style="border-radius:10px;"></v-img>
+                        </v-col>
+                        <v-col cols="6">
+                          Hover your mouse over the <strong>Basemaps</strong> icon in the top-left corner of the map, and choose a new basemap.
+                        </v-col>
+                      </v-row>
                     </template>
                   </v-expansion-panel>
-                  
-                  <v-expansion-panel
-                    title="Where can I find metadata for the stations?"
-                  >
-                    <template #text>
-                      Once a station is selected, metadata for the station can be found above the timeseries plot in the <strong>Selected Station Data</strong> pop-up. Metadata displayed there include station alias, station name, coordinates, and waterbody ID. This metadata is also included in data files downloaded from the Explorer.
-                    </template>
-                  </v-expansion-panel>
-
                 </v-expansion-panels>
               </v-col>
             </v-row>
@@ -256,7 +371,6 @@ code {
 }
 
 p {
-  margin-left: 16px;
   margin-top: 8px;
 }
 
