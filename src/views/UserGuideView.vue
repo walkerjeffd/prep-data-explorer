@@ -45,7 +45,15 @@
                           <v-img src="/img/user-guide/view-data.jpeg" class="elevation-2" style="border-radius:10px;"></v-img>
                         </v-col>
                         <v-col cols="6">
-                          Click on any station on the map to view the data collected at that location. Use the dropdown menu to choose between the available parameters. If you have selected any parameters in the <code>FILTERS</code> sidebar, then the chart will show data for the first selected parameter. Otherwise, it will default to whichever available parameter comes first alphabetically among the available parameters. If you have selected a start and/or end date for the <strong>Time Period</strong> on the <code>FILTERS</code> sidebar, the chart will automatically zoom to that period. You can also zoom the timeseries chart in and out using the smaller time period chart at the bottom of the <strong>Selected Station Data</strong> window.
+                          <div>
+                            Click on a station on the map, then use the dropdown menu to choose between the available parameters.
+                          </div>
+                          <p>
+                            If you have selected any parameters in the <code>FILTERS</code> sidebar, then the chart will show data for the first selected parameter. Otherwise, it will default to whichever available parameter comes first alphabetically among the available parameters at that station.
+                          </p>
+                          <p>
+                            If you have selected a start and/or end date for the <strong>Time Period</strong> on the <code>FILTERS</code> sidebar, the chart will automatically zoom to that period. You can also zoom the timeseries chart in and out using the smaller time period chart at the bottom of the <strong>Selected Station Data</strong> window.
+                          </p>
                         </v-col>
                       </v-row>
                     </template>
@@ -68,7 +76,7 @@
                           <v-img src="/img/user-guide/compare-2.jpeg" class="elevation-2" style="border-radius:10px;"></v-img>
                         </v-col>
                         <v-col cols="6">
-                          After adding multiple timeseries, you can zoom in/out using the smaller time period chart, and hide/show invididual timeseries by clicking on the chart legend. You can also remove individual timeseries from the <code>COMPARE</code> tool by clicking the <v-icon size="x-small">mdi-close-circle</v-icon> icon beside it. Or click <strong>Clear</strong> to remove all of the timeseries.
+                          After adding multiple timeseries, you can zoom in and out using the smaller time period chart, or hide/show invididual timeseries by clicking on them in the chart legend. You can also remove individual timeseries from the <code>COMPARE</code> tool by clicking the <v-icon size="x-small">mdi-close-circle</v-icon> icon beside it. Or click <strong>Clear</strong> to remove all of the timeseries.
                         </v-col>
                       </v-row>
                     </template>
@@ -84,7 +92,7 @@
                         </v-col>
                         <v-col cols="6">
                           <div class="text-h5">Option 1: Single Station and Parameter</div>
-                          <p>To download data for a single station and parameter, click the <strong>Download</strong> button below the timeseries chart in the <strong>Selected Station Data</strong> window.</p>
+                          <p>To download data for a single station and parameter, click the <strong>Download</strong> button below the timeseries chart in the <strong>Selected Station Data</strong> window. The data will be downloaded as a Comma-Separate Values (CSV) file containing the timeseries values and associated station and sampling metadata.</p>
                         </v-col>
                       </v-row>
                       <v-row>
@@ -93,7 +101,7 @@
                         </v-col>
                         <v-col cols="6">
                           <div class="text-h5">Option 2: Multiple Stations and/or Parameters</div>
-                          <p>To download data for multiple stations and parameters, first add them to the <code>COMPARE</code> tab (see previous FAQ question), then click the <strong>Download</strong> button below the comparison timeseries chart. This should only be used for a handful of stations or parameters at a time.</p>
+                          <p>To download data for multiple stations and parameters, first add them to the <code>COMPARE</code> sidebar (see previous FAQ question), then click the <strong>Download</strong> button below the comparison timeseries chart. This should only be used for a handful of stations or parameters at a time.</p>
                         </v-col>
                       </v-row>
                       <v-row>
@@ -113,7 +121,7 @@
                         </v-col>
                         <v-col cols="6">
                           <div>Then, select the parameter of interest, enter the start and end dates, and click <strong>Download</strong>. To download more than one parameter or year of data, repeat this process multiple times.</div>
-                          <p>If this process is too burdensome for the data you want, please contact Trevor Mattera at <a href="mailto:Trevor.Mattera@unh.edu">Trevor.Mattera@unh.edu</a> to request a direct database export.</p>
+                          <p>If this process is too burdensome for your data needs, please contact Trevor Mattera at <a href="mailto:Trevor.Mattera@unh.edu">Trevor.Mattera@unh.edu</a> to request a larger database export.</p>
                         </v-col>
                       </v-row>
                     </template>
@@ -128,7 +136,15 @@
                           <v-img src="/img/user-guide/time-period.jpeg" class="elevation-2" style="border-radius:10px;"></v-img>
                         </v-col>
                         <v-col cols="6">
-                          Type in dates or use the calendar drop-down menus under <strong>Time Period</strong> on the <strong>FILTERS</strong> sidebar to specify the start and/or end dates for the period of interest. The map will automatically update to show only stations that have data collected during that period, and the list of available parameters will similarly be updated to only include those with data during that period. For example, to see which stations and parameters have data collected in the year 2020, you would set the <strong>Start Date</strong> to <strong>01/01/2020</strong> and <strong>End Date</strong> to <strong>12/31/2020</strong>. You may also specify only one of the two dates (start or end) to define an open-ended period. For example, if the <strong>Start Date</strong> is set to <strong>01/01/2020</strong> and the end date is left blank, then the map will show only stations having at least some data collected since January 1, 2020.
+                          <div>
+                            Type in dates or use the calendar drop-down menus under <strong>Time Period</strong> on the <strong>FILTERS</strong> sidebar to specify the start and/or end dates for the period of interest. The map will automatically update to show only stations that have data collected during that period, and the list of available parameters will similarly be updated to only include those with data during that period. 
+                          </div>
+                          <p>
+                            For example, to see which stations and parameters have data collected in the year 2020, you would set the <strong>Start Date</strong> to <strong>01/01/2020</strong> and <strong>End Date</strong> to <strong>12/31/2020</strong>.
+                          </p>
+                          <p>
+                            You may also specify only one of the two dates (start or end) to define an open-ended period. For example, if the <strong>Start Date</strong> is set to <strong>01/01/2020</strong> and the end date is left blank, then the map will show only stations having at least some data collected any day since January 1, 2020.
+                          </p>
                         </v-col>
                       </v-row>
                     </template>
@@ -143,7 +159,7 @@
                           <v-img src="/img/user-guide/filter-station.jpeg" class="elevation-2" style="border-radius:10px;"></v-img>
                         </v-col>
                         <v-col cols="6">
-                          If you already know the name or code of a station, you can search for it using the dropdown in the <strong>Stations</strong> section of the <code>FILTERS</code> sidebar. You can select more than one station from this dropdown, which will filter the dataset and list of available parameters for only those with data collected at those stations.
+                          If you already know the name or code of a station, you can search for it and then select it using the dropdown in the <strong>Stations</strong> section of the <code>FILTERS</code> sidebar. You can select more than one station from this dropdown, which will filter the dataset and list of available parameters for only those with data collected at the selected stations.
                         </v-col>
                       </v-row>
                     </template>
@@ -166,7 +182,7 @@
                           <v-img src="/img/user-guide/spatial-filter-layer-2.jpeg" class="elevation-2" style="border-radius:10px;"></v-img>
                         </v-col>
                         <v-col cols="6">
-                          Then click on a polygon on the map to select only stations within that area. The selected spatial area will be shown in the <strong>Stations</strong> section of the <strong>FILTERS</strong> sidebar. To return to all stations, click the polygon again, or click the close icon (<v-icon size="small">mdi-clode</v-icon>) beside the area name.
+                          Then click on a polygon on the map to select only stations within that area. The selected spatial area will be shown in the <strong>Stations</strong> section of the <strong>FILTERS</strong> sidebar. To return to all stations, click the polygon again, or click the close icon (<v-icon size="x-small">mdi-close</v-icon>) beside the area name.
                         </v-col>
                       </v-row>
                     </template>
@@ -181,7 +197,7 @@
                           <v-img src="/img/user-guide/filter-parameter-1.jpeg" class="elevation-2" style="border-radius:10px;"></v-img>
                         </v-col>
                         <v-col cols="6">
-                          First, search for a parameter by name using the dropdown in the <strong>Parameters</strong> section of the <code>FILTERS</code> tab.
+                          First, search for a parameter by name using the dropdown in the <strong>Parameters</strong> section of the <code>FILTERS</code> sidebar.
                         </v-col>
                       </v-row>
                       <v-row>
