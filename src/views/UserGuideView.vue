@@ -16,7 +16,7 @@
 
             <v-row class="align-center justify-center">
               <v-col cols="3" class="text-center">
-                <a download href="/pdf/Piscataqua_Watershed_Data_Explorer_User_Guide.pdf" class="pb-0 mx-auto">
+                <a download href="pdf/Piscataqua_Watershed_Data_Explorer_User_Guide.pdf" class="pb-0 mx-auto">
                   <v-img src="/img/user-guide-cover.png" class="elevation-2 my-2 mx-auto" style="border-radius:10px;" width="300"></v-img>
                 </a>
               </v-col>
@@ -24,7 +24,7 @@
                 <div class="mb-8 text-h6">
                   The User Guide provides detailed instructions on how to filter, visualize, and download data.
                 </div>
-                <v-btn color="accent" size="large" download href="/pdf/Piscataqua_Watershed_Data_Explorer_User_Guide.pdf">
+                <v-btn color="accent" size="large" download href="pdf/Piscataqua_Watershed_Data_Explorer_User_Guide.pdf">
                   <v-icon icon="mdi-download" start></v-icon> Download User Guide (PDF)
                 </v-btn>
               </v-col>
