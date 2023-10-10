@@ -335,7 +335,7 @@
                             To select a station that is hidden beneath another station, first click on top of the group of stations at that location. Then use the <strong>Prev</strong> and <strong>Next</strong> buttons in the <strong>Selected Station Toolbar</strong> to cycle through them.
                           </p>
                           <p>
-                            Note that data for only only one of these stations can be viewed a time in the <strong>Selected Station Data</strong> window. To view data across multiple, overlapping stations at once, add the timeseries from each station to the <code>COMPARE</code> sidebar (see FAQ question above).
+                            Note that data for only one of these stations can be viewed at a time in the <strong>Selected Station Data</strong> window. To view data across multiple, overlapping stations at once, add the timeseries from each station to the <code>COMPARE</code> sidebar (see FAQ question above).
                           </p>
                         </v-col>
                       </v-row>
