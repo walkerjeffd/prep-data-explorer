@@ -21,7 +21,9 @@ const { getStationCodeById } = useStationsStore()
 const { getVariableCodeById, getVariableById } = useVariablesStore()
 const { minDate, maxDate } = storeToRefs(useResultsStore())
 
+// const chartContainer = ref<HTMLInputElement | null>(null);
 const chart = ref<HTMLInputElement | null>(null)
+// const chartWidth = ref(200)
 const chartIsVisible = useElementVisibility(chart)
 const logScale = ref(false)
 const lockPeriod = ref(true)
@@ -54,6 +56,23 @@ watch([minDate, maxDate], () => {
   updateChartPeriod(chartObj)
 })
 
+// onMounted(() => {
+//   window.addEventListener('resize', updateWidth)
+//   updateWidth()
+// })
+
+// onUnmounted(() => {
+//   window.removeEventListener('resize', updateWidth)
+// })
+
+// function updateWidth () {
+//   console.log('updateWidth')
+//   if (chartContainer.value) {
+//     chartWidth.value = chartContainer.value.offsetWidth
+//     console.log(chartWidth.value)
+//   }
+// }
+
 function updateChartPeriod (chart: any) {
   console.log('updateChartPeriod')
   if (!chart || !lockPeriod.value) return
@@ -66,7 +85,7 @@ function updateChartPeriod (chart: any) {
     maxDateValue = parseDate(maxDate.value).valueOf()
   }
 
-  console.log(minDateValue, maxDateValue)
+  // console.log(minDateValue, maxDateValue)
   chart.xAxis[0].setExtremes(minDateValue, maxDateValue)
   chart.render()
 }
@@ -94,7 +113,7 @@ const chartOptions = computed(() => {
           title: {
             text: variable?.variable_label,
             style: {
-              font: '14px "Roboto Condensed", sans-serif'
+              fontSize: '12px'
             }
           },
           labels: {
@@ -112,7 +131,6 @@ const chartOptions = computed(() => {
             data: values
               .map((value: Value) => [value.valuedatetime.valueOf(), Number(value.datavalue)])
               .sort((a: number[], b: number[]) => a[0] - b[0]),
-            // lineWidth: values && values.length >= 25 ? 1 : 0,
             lineWidth: 1,
             marker: {
               enabled: values ? values.length < 200 : false,
@@ -135,8 +153,6 @@ const chartOptions = computed(() => {
   return {
     chart: {
       zoomType: 'x',
-      width: 560,
-      height: '80%',
       events: {
         load: function (event: any) {
           // @ts-ignore
@@ -151,7 +167,10 @@ const chartOptions = computed(() => {
     xAxis: {
       type: 'datetime',
       title: {
-        text: 'Date'
+        text: 'Date',
+        style: {
+          fontSize: '12px',
+        }
       },
       ordinal: false,
       minRange: 24 * 3600 * 1000,
@@ -223,8 +242,9 @@ const chartOptions = computed(() => {
       Click the <code>Add to Compare</code> button below a timeseries in the selected station box.
     </div>
   </v-alert>
-  <div v-else>
-    <div class="mx-4">
+  <div v-else style="width:100%">
+    <!-- <div>{{ chartWidth }}</div> -->
+    <div class="mx-4" ref="chartContainer">
       <highcharts :constructor-type="'stockChart'" :options="chartOptions" ref="chart"></highcharts>
     </div>
 
@@ -257,7 +277,7 @@ const chartOptions = computed(() => {
       </div>
     </div>
     <v-divider class="mb-4"></v-divider>
-    <v-table density="compact">
+    <v-table density="compact" style="max-width:100%">
       <thead>
         <tr>
           <th class="text-center">
@@ -282,13 +302,13 @@ const chartOptions = computed(() => {
           :key="`${result.samplingfeatureid}:${result.prep_variableid}`"
         >
           <!-- <td><v-checkbox hide-details v-model="result.visible"></v-checkbox></td> -->
-          <td class="text-left truncate" style="max-width:200px;">{{ getStationCodeById(result?.samplingfeatureid) }}</td>
-          <td class="text-left truncate" style="max-width:200px;">{{ getVariableCodeById(result?.prep_variableid) }}</td>
+          <td class="text-left">{{ getStationCodeById(result?.samplingfeatureid) }}</td>
+          <td class="text-left">{{ getVariableCodeById(result?.prep_variableid) }}</td>
           <td class="text-right">
             {{ result.start?.toLocaleDateString() }} to {{ result.end?.toLocaleDateString() }}
           </td>
           <td class="text-right">{{ result.n_values.toLocaleString() }}</td>
-          <td class="text-center px-0" style="max-width:60px">
+          <td class="text-center px-0">
             <v-btn size="x-small" icon="mdi-close-circle" variant="flat" @click="removeResult(result)">
             </v-btn>
           </td>
@@ -309,9 +329,4 @@ const chartOptions = computed(() => {
 </template>
 
 <style scoped>
-.truncate {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 </style>

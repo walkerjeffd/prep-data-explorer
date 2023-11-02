@@ -21,7 +21,32 @@ const links: Link[] = [
 
 <template>
   <v-app>
-    <v-app-bar>
+    <v-app-bar v-if="$vuetify.display.mobile">
+      <v-img src="@/assets/prep_horiz.png" max-height="80%" max-width="200" />
+      <v-spacer></v-spacer>
+      <v-menu>
+        <template v-slot:activator="{ props }">
+          <v-btn
+            icon
+            v-bind="props"
+          >
+            <v-icon>mdi-menu</v-icon>
+          </v-btn>
+        </template>
+        <v-list>
+          <v-list-item
+            v-for="link in links"
+            :key="link"
+            :prepend-icon="link.icon"
+            :to="{ name: link.name }"
+            link
+          >
+            <v-list-item-title>{{ link.label }}</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+    </v-app-bar>
+    <v-app-bar v-else>
       <v-img src="@/assets/prep_horiz.png" max-height="80%" max-width="200" />
       <v-app-bar-title text="Piscataqua Watershed Data Explorer" class="font-weight-medium text-h4">
       </v-app-bar-title>

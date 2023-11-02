@@ -121,6 +121,7 @@ function filterStations (value: string, query: string, item: { value: Station}) 
           type="date"
           variant="underlined"
           clearable
+          hide-details
         ></v-text-field>
       </v-col>
       <v-col cols="6">
@@ -130,11 +131,13 @@ function filterStations (value: string, query: string, item: { value: Station}) 
           type="date"
           variant="underlined"
           clearable
+          hide-details
         ></v-text-field>
       </v-col>
     </v-row>
   </div>
-  <v-divider class="mb-4"></v-divider>
+
+  <v-divider class="my-2 my-xl-4"></v-divider>
 
   <!-- STATIONS -->
   <div class="px-4">
@@ -158,13 +161,13 @@ function filterStations (value: string, query: string, item: { value: Station}) 
       </v-tooltip>
     </div>
     <div class="d-flex align-center mb-2">
-      <div class="d-flex align-center" style="max-width:100%">
-        <span class="text-body-2 pl-2 text-grey-darken-1">Spatial:</span>
-        <v-chip class="ma-2" color="accent" label outlined size="small" v-if="spatialFilter">
+      <div class="d-flex align-center">
+        <div class="text-body-2 pl-2 text-grey-darken-1">Spatial:</div>
+        <v-chip v-if="spatialFilter" class="ma-2 wrap-chip" color="accent" label outlined size="small">
           <span class="text-body-1">{{ truncateString(spatialFilter.options.label(spatialFilter.feature), 55) }}</span>
           <v-icon small @click="setSpatialFilter(null)" class="ml-2">mdi-close</v-icon>
         </v-chip>
-        <v-chip v-else class="ma-2" color="gray" label outlined size="small">
+        <v-chip v-else class="ma-2 wrap-chip" color="gray" label outlined size="small">
           Add a spatial filter to Map Layers, then click a polygon to filter stations by area
         </v-chip>
       </div>
@@ -191,7 +194,7 @@ function filterStations (value: string, query: string, item: { value: Station}) 
         chips
         closable-chips
         hide-details
-        class="pl-2 mt-n4 mb-4"
+        class="pl-2 mt-n4 mb-2"
       >
         <template #item="{ props }">
           <v-list-item v-bind="props" style="max-width:494px">
@@ -210,7 +213,8 @@ function filterStations (value: string, query: string, item: { value: Station}) 
       </v-tooltip>
     </div>
   </div>
-  <v-divider class="my-4"></v-divider>
+
+  <v-divider class="my-2 my-xl-4"></v-divider>
 
   <!-- VARIABLES -->
   <div class="px-4">
@@ -245,7 +249,7 @@ function filterStations (value: string, query: string, item: { value: Station}) 
         chips
         closable-chips
         hide-details
-        class="pl-2 mt-n4 mb-4"
+        class="pl-2 mt-n4 mb-2"
       ></v-autocomplete>
       <v-tooltip dir="left">
         <template v-slot:activator="{ props }">
@@ -255,7 +259,8 @@ function filterStations (value: string, query: string, item: { value: Station}) 
       </v-tooltip>
     </div>
   </div>
-  <v-divider class="mb-4"></v-divider>
+
+  <v-divider class="my-2 my-xl-4"></v-divider>
 
   <!-- VALUES PER STATION -->
   <div class="px-4">
@@ -289,17 +294,14 @@ function filterStations (value: string, query: string, item: { value: Station}) 
       </template>
     </v-range-slider>
   </div>
-  <v-divider class="my-4"></v-divider>
+
+  <v-divider class="my-2 my-xl-4"></v-divider>
 
   <div class="px-4">
     Showing <strong>{{ visibleStations.length.toLocaleString() }}</strong> of <strong>{{ allStations.length.toLocaleString() }}</strong> available stations
   </div>
 
-  <!-- <div class="my-4">
-    <pre>dates: {{ resultsFilteredByDates.length }}<br>dates+stations: {{ resultsFilteredByDatesStations.length }}<br>dates+stations+variables: {{ resultsFilteredByDatesStationsVariables.length }}<br>visible stations: {{ visibleStations.length }}</pre>
-  </div> -->
-
-  <v-divider class="my-4"></v-divider>
+  <v-divider class="my-2 my-xl-4"></v-divider>
 
   <div class="d-flex px-4">
     <v-btn variant="tonal" color="accent" @click="reset" :density="$vuetify.display.width > 1440 ? 'default' : 'comfortable'">
@@ -321,10 +323,10 @@ function filterStations (value: string, query: string, item: { value: Station}) 
   </div>
 </template>
 
-<style scoped>
-.truncate {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+<style>
+.wrap-chip {
+  max-width: 100% !important;
+  white-space: normal !important;
+  height: fit-content !important;
 }
 </style>

@@ -132,7 +132,7 @@ function onClickOverlay (e: L.LeafletMouseEvent) {
 </script>
 
 <template>
-  <div class="explorer">
+  <div class="explorer" v-if="$vuetify.display.width >= 1400">
     <div class="explorer-map">
       <div style="height:100%;width:100%">
         <LMap :zoom="11" :center="[43.1, -71.0]" @ready="mapReady" ref="mapEl">
@@ -193,6 +193,18 @@ function onClickOverlay (e: L.LeafletMouseEvent) {
       <ExplorerSidebar></ExplorerSidebar>
     </div>
   </div>
+  <div v-else class="d-flex align-center justify-space-around" style="height:100%;">
+    <v-alert
+      class="ma-4"
+      type="warning"
+      elevation="2"
+      icon="mdi-alert"
+      style="max-width:600px"
+    >
+      <div class="font-weight-bold">Window Too Small</div>
+      This application is not designed for mobile devices. Please come back on a device with a larger screen size.
+    </v-alert>
+  </div>
 </template>
 
 <style scoped>
@@ -210,7 +222,8 @@ function onClickOverlay (e: L.LeafletMouseEvent) {
 }
 .explorer-sidebar {
   display: flex;
-  flex-basis: 600px;
+  width: 30%;
+  /* flex-basis: 20%; */
   flex-grow: 0;
   flex-shrink: 1;
 }
@@ -219,7 +232,7 @@ function onClickOverlay (e: L.LeafletMouseEvent) {
   bottom: 0;
   left: 0;
   width: 30%;
-  min-width: 400px;
+  min-width: 600px;
   z-index:500;
 }
 .explorer-loading {

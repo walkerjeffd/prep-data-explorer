@@ -220,11 +220,11 @@ const chartOptions = computed(() => {
       }]
     },
     xAxis: {
-      // type: 'datetime',
+      type: 'datetime',
       title: {
         text: 'Date',
         style: {
-          font: width.value > 1440 ? '18px "Roboto Condensed", sans-serif' : '12px "Roboto Condensed", sans-serif'
+          fontSize: '12px'
         }
       },
       ordinal: false,
@@ -246,7 +246,7 @@ const chartOptions = computed(() => {
         text: variableAxisLabel(selectedVariable.value),
         style: {
           color: 'black',
-          font: width.value > 1440 ? '18px "Roboto Condensed", sans-serif' : '12px "Roboto Condensed", sans-serif'
+          fontSize: '12px'
         }
       },
       opposite: false,
